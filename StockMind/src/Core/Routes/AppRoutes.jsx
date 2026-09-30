@@ -14,7 +14,6 @@ const AppRoutes = () => {
             <Route path="/instructor/*" element={<InstructorRoutes />} />
             <Route path="/cuentadante/*" element={<CuentaDanteRoutes />} />
             <Route path="/admin/*" element={<AdminRoutes />} />
-
             {/* Inicio, login y registro (va al final para no tapar las otras) */}
             <Route path="/*" element={<AuthRoutes />} />
         </Routes>
