@@ -10,7 +10,6 @@ import { loginData } from '../Data/Informacion'
 
 const Login = () => {
     const { visible } = useLoginAnimation()
-
     return (
         <main className="flex min-h-screen items-center justify-center bg-[#F7F9F6] px-5 py-8">
             <div

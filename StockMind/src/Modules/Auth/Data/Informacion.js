@@ -18,6 +18,6 @@ export const loginData = {
     rutas: {
         inicio: '/',
         registro: '/registropaso1',
-        inicioAprendiz: '/inicioaprendiz'
+        inicioAprendiz: '/aprendiz/home'
     }
 }

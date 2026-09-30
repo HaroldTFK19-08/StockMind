@@ -1,24 +1,42 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import AprendizLayout from '../Components/AprendizLayout'
-import InicioAprendiz from '../Pages/InicioAprendiz'
-import ReportesAprendiz from '../Pages/ReportesAprendiz'
-import MisElementosAprendiz from '../Pages/MisElementosAprendiz'
-import ReportarDanos from '../Pages/ReportarDanos'
 
-// Se monta en el router principal como:  <Route path="/aprendiz/*" element={<AprendizRoutes />} />
-// Por eso aquí las rutas son RELATIVAS a /aprendiz.
+import PanelLayout from '../../../Shared/Layouts/PanelLayout'
+import Enlaces, { titulosExtraAprendiz, enlacePerfilAprendiz } from '../Data/rutasAprendiz'
+
+// Páginas propias del módulo Aprendiz
+import HomeAprendiz from '../Pages/Home'
+import PerfilAprendiz from '../Pages/Perfil'
+
+// Páginas que viven en su propio módulo
+import Reportes from '../../Reportes/Pages/Reportes'
+import ReportarDano from '../../Reportes/Pages/ReportarDano'
+import Elementos from '../../Elementos/Pages/Elementos'
+
 const AprendizRoutes = () => {
     return (
         <Routes>
-            <Route index element={<Navigate to="inicio" replace />} />
-            {/* Pantalla de bienvenida: a pantalla completa, sin barra lateral */}
-            <Route path="inicio" element={<InicioAprendiz />} />
-            {/* Pantallas con barra lateral (NavbarAprendiz) */}
-            <Route element={<AprendizLayout />}>
-                <Route path="reportes" element={<ReportesAprendiz />} />
-                <Route path="elementos" element={<MisElementosAprendiz />} />
-                <Route path="reportar-dano" element={<ReportarDanos />} />
+            {/* Layout compartido: menú + cabecera. Las páginas se pintan en su <Outlet /> */}
+            <Route
+                element={
+                    <PanelLayout
+                        enlaces={Enlaces}
+                        enlacePerfil={enlacePerfilAprendiz}
+                        titulosExtra={titulosExtraAprendiz}
+                    />
+                }
+            >
+                {/* /aprendiz → /aprendiz/home */}
+                <Route index element={<Navigate to="/aprendiz/home" replace />} />
+
+                <Route path="home" element={<HomeAprendiz />} />
+                <Route path="perfil" element={<PerfilAprendiz />} />
+                <Route path="reportes" element={<Reportes />} />
+                <Route path="reportes/reportarDano" element={<ReportarDano />} />
+                <Route path="elementos" element={<Elementos />} />
             </Route>
+
+            {/* Cualquier subruta no válida dentro de /aprendiz vuelve al inicio */}
+            <Route path="*" element={<Navigate to="/aprendiz/home" replace />} />
         </Routes>
     )
 }
