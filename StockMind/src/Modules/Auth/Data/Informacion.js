@@ -6,6 +6,7 @@ export const loginData = {
     passwordPlaceholder: 'Contraseña',
     olvidarPassword: '¿Olvidaste tu contraseña?',
     botonLogin: 'INICIAR SESIÓN',
+    ayudaDemo: 'Modo de prueba: entra con un correo que empiece por admin, instructor o cuentadante para ver esos paneles. Cualquier otro correo abre el panel de aprendiz.',
     logo: {
         stockmind: StockMind
     },

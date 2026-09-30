@@ -27,8 +27,8 @@ const LoginFormulario = () => {
             </div>
             <form
                 onSubmit={handleSubmit(async (datos) => {
-                    await iniciarSesion(datos)
-                    navigate(loginData.rutas.inicioAprendiz)
+                    const rutaPanel = await iniciarSesion(datos)
+                    navigate(rutaPanel)
                 })}
                 className="w-full"
             >
@@ -75,6 +75,9 @@ const LoginFormulario = () => {
                     )}
                 </button>
             </form>
+            <p className="mt-5 text-center text-xs leading-5 text-gray-500">
+                {loginData.ayudaDemo}
+            </p>
         </div>
     )
 }

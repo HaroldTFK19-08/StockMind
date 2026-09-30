@@ -1,9 +1,9 @@
 /**
- * Fila de botones para filtrar por una opción (ej. estado).
- * opciones: array de strings. valor: opción activa.
+ * Botones para filtrar por una opción (ej. estado).
+ * conteos es opcional: { Todos: 10, Pendiente: 2 }
  */
 const FiltroChips = ({ opciones = [], valor, onCambiar, conteos = {} }) => (
-    <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Filtrar por estado">
+    <div className="mb-6 flex flex-wrap gap-2">
         {opciones.map((opcion) => {
             const activo = opcion === valor
             return (
@@ -12,7 +12,7 @@ const FiltroChips = ({ opciones = [], valor, onCambiar, conteos = {} }) => (
                     type="button"
                     aria-pressed={activo}
                     onClick={() => onCambiar(opcion)}
-                    className={`rounded-full border-2 px-4 py-1.5 text-sm font-semibold transition-colors duration-200 ${
+                    className={`rounded-full border-2 px-4 py-1.5 text-sm font-semibold transition-colors ${
                         activo
                             ? 'border-[#39A900] bg-[#39A900] text-white'
                             : 'border-[#edf2f7] bg-white text-[#475569] hover:border-[#cbd5e1]'
@@ -20,9 +20,7 @@ const FiltroChips = ({ opciones = [], valor, onCambiar, conteos = {} }) => (
                 >
                     {opcion}
                     {conteos[opcion] !== undefined && (
-                        <span className={`ml-2 ${activo ? 'text-white/80' : 'text-[#94a3b8]'}`}>
-                            {conteos[opcion]}
-                        </span>
+                        <span className={`ml-2 ${activo ? 'text-white/80' : 'text-[#94a3b8]'}`}>{conteos[opcion]}</span>
                     )}
                 </button>
             )

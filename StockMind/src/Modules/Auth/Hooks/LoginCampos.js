@@ -16,8 +16,16 @@ const useLogin = () => {
         }
     })
 
+    // Mientras no haya backend, el panel se elige por el correo:
+    // admin@... -> Administrador, instructor@... -> Instructor,
+    // cuentadante@... -> Cuentadante, cualquier otro -> Aprendiz
     const iniciarSesion = async (datos) => {
-        console.log('Datos de login:', datos)
+        const correo = datos.email.toLowerCase()
+
+        if (correo.startsWith('admin')) return '/admin/home'
+        if (correo.startsWith('instructor')) return '/instructor/home'
+        if (correo.startsWith('cuentadante')) return '/cuentadante/home'
+        return '/aprendiz/home'
     }
 
     return {

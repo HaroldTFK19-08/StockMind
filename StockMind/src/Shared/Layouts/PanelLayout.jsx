@@ -6,34 +6,33 @@ import Cabecera from "./Header";
 import ContenidoPrincipal from "./Main";
 
 /**
- * Layout de los paneles internos (Aprendiz, Instructor, Admin...).
- * Se monta UNA sola vez y las páginas se pintan dentro del <Outlet />,
- * así el menú no se recarga al navegar.
+ * Layout de los paneles (Aprendiz, Instructor, Cuentadante, Admin).
+ * El menú y la cabecera se montan una vez; cada página se pinta en <Outlet />.
  *
- * - enlaces: enlaces del menú lateral.
- * - enlacePerfil: ruta del botón de perfil de la cabecera.
- * - titulosExtra: títulos para rutas que no están en el menú
- *   (ej. { "/aprendiz/perfil": "Mi perfil" }).
+ * panel = {
+ *   enlaces: [...]            enlaces del menú
+ *   rutaPerfil: "/rol/perfil"
+ *   rutaNotificaciones: "/rol/notificaciones"
+ *   titulosExtra: { "/rol/perfil": "Mi perfil" }   títulos de rutas que no están en el menú
+ * }
  */
-export default function PanelLayout({ enlaces = [], enlacePerfil, titulosExtra = {} }) {
+export default function PanelLayout({ panel }) {
     const [menuAbierto, setMenuAbierto] = useState(false);
     const { pathname } = useLocation();
-    const ruta = pathname.replace(/\/+$/, "");
-    const titulo =
-        enlaces.find((enlace) => enlace.ruta === ruta)?.titulo ??
-        titulosExtra[ruta] ??
-        "";
+
     return (
         <div>
             <NavegacionLayout
-                enlaces={enlaces}
+                enlaces={panel.enlaces}
                 abierto={menuAbierto}
                 onCerrar={() => setMenuAbierto(false)}
             />
+
             <ContenidoPrincipal>
                 <Cabecera
-                    contenido={titulo}
-                    enlacePerfil={enlacePerfil}
+                    contenido={buscarTitulo(pathname, panel)}
+                    enlacePerfil={panel.rutaPerfil}
+                    enlaceNotificaciones={panel.rutaNotificaciones}
                     onAbrirMenu={() => setMenuAbierto(true)}
                 />
                 <div className="mx-auto w-full max-w-[1200px] px-5 py-8 sm:px-8">
@@ -42,4 +41,20 @@ export default function PanelLayout({ enlaces = [], enlacePerfil, titulosExtra =
             </ContenidoPrincipal>
         </div>
     );
+}
+
+// Busca el título de la ruta actual. Si no hay uno exacto, usa la ruta "padre" más parecida.
+// Ej: "/admin/centros/2" usa el título de "/admin/centros".
+function buscarTitulo(pathname, panel) {
+    const titulos = { ...panel.titulosExtra };
+    panel.enlaces.forEach((enlace) => {
+        titulos[enlace.ruta] = titulos[enlace.ruta] ?? enlace.titulo;
+    });
+
+    let ruta = pathname.replace(/\/+$/, "");
+    while (ruta) {
+        if (titulos[ruta]) return titulos[ruta];
+        ruta = ruta.slice(0, ruta.lastIndexOf("/"));
+    }
+    return "";
 }
