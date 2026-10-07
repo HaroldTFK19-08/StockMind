@@ -1,16 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
-
 @import "tailwindcss";
-
 @theme {
     --font-jakarta: "Plus Jakarta Sans", sans-serif;
-
     --color-sena: #39A900;
     --color-sena-dark: #2F8F00;
     --color-sena-light: #8AFD5D;
-
     --color-background: #F7F9F6;
-
     --color-text-primary: #081B28;
     --color-text-secondary: #6B7280;
 }
@@ -19,7 +14,6 @@
     * {
         box-sizing: border-box;
     }
-
     body {
         margin: 0;
         padding: 0;
