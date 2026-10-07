@@ -29,10 +29,8 @@ const Login = () => {
                             size={19}
                             strokeWidth={2.5}
                         />
-
                         Volver
                     </Link>
-
                     <LoginFormulario />
                 </section>
 
