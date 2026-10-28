@@ -54,7 +54,7 @@ const GraficoTorta = ({ datos = [] }) => {
                         />
                     </RechartsPieChart>
                 </ResponsiveContainer>
-                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <span className="text-3xl font-bold tracking-tight text-[#081B28]">{total}</span>
                     <span className="mt-0.5 text-[11px] font-medium text-[#64748b]">en total</span>
                 </div>
