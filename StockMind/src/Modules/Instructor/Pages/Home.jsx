@@ -2,22 +2,23 @@ import { Link } from 'react-router-dom'
 import { AlertOctagon, Building2, ChevronRight, Clock } from 'lucide-react'
 
 import StatCard from '../../../Shared/Components/Cards/StatCard'
-import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import { contarPor } from '../../../Shared/Utils/texto'
 
+import GraficoTorta from '../Components/graficoTorta'
 import perfilInstructor from '../Data/perfilInstructor'
 import { ambientesInstructor, elementosInstructor, reportesInstructor } from '../Data/datosInstructor'
 import ListaReportes from '../../Reportes/Components/ListaReportes'
 
 export default function HomeInstructor() {
     const pendientes = reportesInstructor.filter((r) => r.estado === 'Pendiente')
-
-    // Para la gráfica: reportes abiertos por ambiente
-    const reportesPorAmbiente = ambientesInstructor.map((ambiente) => ({
-        nombre: ambiente.nombre,
-        total: reportesInstructor.filter((r) => r.ambienteId === ambiente.id && r.estado !== 'Resuelto').length,
-    }))
-    const maximo = Math.max(1, ...reportesPorAmbiente.map((a) => a.total))
+    const totalAmbientes = ambientesInstructor.length
+    const totalPendientes = pendientes.length
+    const elementosDanados = contarPor(elementosInstructor, 'estado', 'Dañado')
+    const datosGrafico = [
+        { nombre: 'Ambientes', cantidad: totalAmbientes, fill: '#39A900' },
+        { nombre: 'Reportes pendientes', cantidad: totalPendientes, fill: '#F4B400' },
+        { nombre: 'Elementos dañados', cantidad: elementosDanados, fill: '#F06449' },
+    ]
 
     return (
         <section className="space-y-8">
@@ -27,9 +28,9 @@ export default function HomeInstructor() {
             </div>
 
             <div className="grid gap-5 sm:grid-cols-3">
-                <StatCard etiqueta="Ambientes" valor={ambientesInstructor.length} icono={Building2} />
-                <StatCard etiqueta="Reportes pendientes" valor={pendientes.length} icono={Clock} color="ambar" />
-                <StatCard etiqueta="Elementos dañados" valor={contarPor(elementosInstructor, 'estado', 'Dañado')} icono={AlertOctagon} color="rojo" />
+                <StatCard etiqueta="Ambientes" valor={totalAmbientes} icono={Building2} />
+                <StatCard etiqueta="Reportes pendientes" valor={totalPendientes} icono={Clock} color="ambar" />
+                <StatCard etiqueta="Elementos dañados" valor={elementosDanados} icono={AlertOctagon} color="rojo" />
             </div>
 
             <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
@@ -43,22 +44,7 @@ export default function HomeInstructor() {
                     <ListaReportes reportes={pendientes} compacta />
                 </div>
 
-                {/* Gráfica de barras sencilla hecha con divs */}
-                <Tarjeta titulo="Reportes abiertos por ambiente" className="h-fit">
-                    <ul className="space-y-4">
-                        {reportesPorAmbiente.map((ambiente) => (
-                            <li key={ambiente.nombre}>
-                                <div className="mb-1 flex justify-between text-sm">
-                                    <span className="text-[#475569]">{ambiente.nombre}</span>
-                                    <span className="font-semibold text-[#081B28]">{ambiente.total}</span>
-                                </div>
-                                <div className="h-2.5 rounded-full bg-[#F4F7FA]">
-                                    <div className="h-2.5 rounded-full bg-[#39A900]" style={{ width: `${(ambiente.total / maximo) * 100}%` }} />
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </Tarjeta>
+                <GraficoTorta datos={datosGrafico} />
             </div>
         </section>
     )
