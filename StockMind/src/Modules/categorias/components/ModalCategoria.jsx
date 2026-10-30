@@ -19,7 +19,7 @@ const CategoriasModal = ({ abierto, onCerrar, nombre, setNombre, descripcion, se
                         onChange={(e) => setNombre(e.target.value)}
                         required
                         placeholder="Ej. Tecnología"
-                        className="w-full rounded-xl border border-[#edf2f7] p-3 text-sm text-[#1e293b] focus:border-[#39A900] focus:outline-none"
+                        className="w-full rounded-xl border border-[#edf2f7] p-3 text-sm text-[#1e293b] focus:border-sena focus:outline-none"
                     />
                 </div>
 
@@ -32,7 +32,7 @@ const CategoriasModal = ({ abierto, onCerrar, nombre, setNombre, descripcion, se
                         onChange={(e) => setDescripcion(e.target.value)}
                         rows="3"
                         placeholder="Ej. Elementos y equipos tecnológicos..."
-                        className="w-full rounded-xl border border-[#edf2f7] p-3 text-sm text-[#1e293b] focus:border-[#39A900] focus:outline-none"
+                        className="w-full rounded-xl border border-[#edf2f7] p-3 text-sm text-[#1e293b] focus:border-sena focus:outline-none"
                     />
                 </div>
 
@@ -40,13 +40,13 @@ const CategoriasModal = ({ abierto, onCerrar, nombre, setNombre, descripcion, se
                     <button 
                         type="button" 
                         onClick={onCerrar}
-                        className="rounded-xl bg-[#f7f9f6] px-4 py-2.5 text-sm font-medium text-[#64748b] hover:bg-[#edf2f7]"
+                        className="rounded-xl bg-background px-4 py-2.5 text-sm font-medium text-[#64748b] hover:bg-[#edf2f7]"
                     >
                         Cancelar
                     </button>
                     <button 
                         type="submit" 
-                        className="rounded-xl bg-[#39A900] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#329600]"
+                        className="rounded-xl bg-sena px-5 py-2.5 text-sm font-medium text-white hover:bg-[#329600]"
                     >
                         Guardar Registro
                     </button>

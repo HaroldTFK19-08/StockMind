@@ -35,7 +35,7 @@ const Categorias = () => {
                 </div>
                 <button 
                     onClick={modal.abrirModal}
-                    className="flex items-center gap-2 rounded-xl bg-[#39A900] px-4 py-2.5 text-white font-medium hover:bg-[#329600] transition-colors"
+                    className="flex items-center gap-2 rounded-xl bg-sena px-4 py-2.5 text-white font-medium hover:bg-[#329600] transition-colors"
                 >
                     <Plus size={20} />
                     Nueva Categoría
