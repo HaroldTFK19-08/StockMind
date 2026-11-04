@@ -1,11 +1,21 @@
 import Modal from '../../../Shared/Components/Modals/Modal'
 
-const CategoriasModal = ({ abierto, onCerrar, nombre, setNombre, descripcion, setDescripcion, onSubmit }) => {
+const CategoriasModal = ({
+    abierto,
+    onCerrar,
+    nombre,
+    setNombre,
+    descripcion,
+    setDescripcion,
+    onSubmit,
+    titulo = "Registrar nueva categoría",
+    guardando = false,
+}) => {
     return (
         <Modal 
             abierto={abierto} 
-            titulo="Registrar nueva categoría" 
-            descripcion="Completa los datos para agregar una nueva categoría al sistema."
+            titulo={titulo}
+            descripcion="Completa los datos de la categoría."
             onCerrar={onCerrar}
         >
             <form onSubmit={onSubmit} className="space-y-4">
@@ -40,15 +50,17 @@ const CategoriasModal = ({ abierto, onCerrar, nombre, setNombre, descripcion, se
                     <button 
                         type="button" 
                         onClick={onCerrar}
+                        disabled={guardando}
                         className="rounded-xl bg-background px-4 py-2.5 text-sm font-medium text-[#64748b] hover:bg-[#edf2f7]"
                     >
                         Cancelar
                     </button>
                     <button 
                         type="submit" 
+                        disabled={guardando}
                         className="rounded-xl bg-sena px-5 py-2.5 text-sm font-medium text-white hover:bg-[#329600]"
                     >
-                        Guardar Registro
+                        {guardando ? 'Guardando...' : 'Guardar Registro'}
                     </button>
                 </div>
             </form>

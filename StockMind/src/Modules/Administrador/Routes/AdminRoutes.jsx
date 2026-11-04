@@ -16,6 +16,7 @@ import GestionReportes from '../../Reportes/Pages/GestionReportes'
 import Notificaciones from '../../Notificaciones/Pages/Notificaciones'
 import Perfil from '../../Perfil/Pages/Perfil'
 import EditarPerfil from '../../Perfil/Pages/EditarPerfil'
+import Categorias from '../../categorias/pages/Categorias'
 
 // Todas las rutas empiezan por /admin
 const AdminRoutes = () => {
@@ -34,6 +35,7 @@ const AdminRoutes = () => {
                 <Route path="notificaciones" element={<Notificaciones datos={notificacionesAdmin} />} />
                 <Route path="perfil" element={<Perfil usuario={perfilAdmin} rutaEditar="/admin/perfil/editar" />} />
                 <Route path="perfil/editar" element={<EditarPerfil usuario={perfilAdmin} rutaPerfil="/admin/perfil" />} />
+                <Route path="categorias" element={<Categorias />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/admin/home" replace />} />
