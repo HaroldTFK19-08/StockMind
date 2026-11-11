@@ -3,6 +3,7 @@ import StatCard from "../../../Shared/Components/Cards/StatCard"
 import { useCategorias } from "../hook/categoria"
 import { Layers, Plus, Pencil, Trash2 } from "lucide-react"
 import Tabla from "../../../Shared/Components/Tables/Tabla"
+import EstadoVacio from "../../../Shared/Components/Feedback/EstadoVacio"
 import {useCategoriasModal} from "../hook/useModal"
 import CategoriasModal from "../components/ModalCategoria"
 import ConfirmarEliminarCategoria from "../components/ConfirmarEliminarCategoria"
@@ -115,42 +116,50 @@ const Categorias = () => {
                 </button>
             </div>
 
-            <Tabla columnas={['Nombre', 'Descripción', 'Acciones']}>
-                {loading ? (
+            {loading ? (
+                <Tabla columnas={['Nombre', 'Descripción', 'Acciones']}>
                     <tr><td colSpan={3} className="py-6 text-center">Cargando categorías...</td></tr>
-                ) : categorias.length === 0 ? (
-                    <tr><td colSpan={3} className="py-6 text-center">No hay categorías registradas.</td></tr>
-                ) : categorias.map((categoria) => (
-                    <tr key={categoria.id}>
-                        <td className="font-medium text-[#1e293b]">
-                            {categoria.nombre}
-                        </td>
-                        <td className="text-[#64748b]">
-                            {categoria.descripcion || 'Sin descripción'}
-                        </td>
-                        <td>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => abrirModalEdicion(categoria)}
-                                    aria-label={`Editar ${categoria.nombre}`}
-                                    className="rounded-lg p-2 text-[#475569] hover:bg-gray-100"
-                                >
-                                    <Pencil size={17} />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setCategoriaAEliminar(categoria)}
-                                    aria-label={`Eliminar ${categoria.nombre}`}
-                                    className="rounded-lg p-2 text-red-600 hover:bg-red-50"
-                                >
-                                    <Trash2 size={17} />
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                ))}
-            </Tabla>
+                </Tabla>
+            ) : categorias.length === 0 ? (
+                <EstadoVacio
+                    titulo="Todavía no hay categorías"
+                    descripcion="Crea la primera categoría para organizar los elementos del inventario."
+                    icono={Layers}
+                />
+            ) : (
+                <Tabla columnas={['Nombre', 'Descripción', 'Acciones']}>
+                    {categorias.map((categoria) => (
+                        <tr key={categoria.id}>
+                            <td className="font-medium text-[#1e293b]">
+                                {categoria.nombre}
+                            </td>
+                            <td className="text-[#64748b]">
+                                {categoria.descripcion || 'Sin descripción'}
+                            </td>
+                            <td>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => abrirModalEdicion(categoria)}
+                                        aria-label={`Editar ${categoria.nombre}`}
+                                        className="rounded-lg p-2 text-[#475569] hover:bg-gray-100"
+                                    >
+                                        <Pencil size={17} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setCategoriaAEliminar(categoria)}
+                                        aria-label={`Eliminar ${categoria.nombre}`}
+                                        className="rounded-lg p-2 text-red-600 hover:bg-red-50"
+                                    >
+                                        <Trash2 size={17} />
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                </Tabla>
+            )}
             <CategoriasModal
                 abierto={modal.modalAbierto}
                 onCerrar={modal.cerrarModal}

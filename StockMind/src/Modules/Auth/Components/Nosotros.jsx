@@ -34,7 +34,7 @@ export default function Nosotros(){
                             </p>
                         </div>
                         <div className="flex flex-1 flex-col gap-5">
-                            <div className="rounded-[20px] border border-[#e6e6e7] bg-[#e1e2e3] p-[35px] text-center shadow-[0_10px_25px_rgba(0,0,0,0.05)] transition-transform duration-300 hover:-translate-y-[5px]">
+                            <div style={{ "--auth-card-delay": "0ms" }} className="auth-landing-card rounded-[20px] border border-[#e6e6e7] bg-[#e1e2e3] p-[35px] text-center shadow-[0_10px_25px_rgba(0,0,0,0.05)]">
                                 <h3 className="mb-[5px] text-[2.5rem] font-bold text-[#39A900]">
                                     100%
                                 </h3>
@@ -42,7 +42,7 @@ export default function Nosotros(){
                                     Control Digital
                                 </p>
                             </div>
-                            <div className="rounded-[20px] border border-[#e6e6e7] bg-[#e1e2e3] p-[35px] text-center shadow-[0_10px_25px_rgba(0,0,0,0.05)] transition-transform duration-300 hover:-translate-y-[5px]">
+                            <div style={{ "--auth-card-delay": "100ms" }} className="auth-landing-card rounded-[20px] border border-[#e6e6e7] bg-[#e1e2e3] p-[35px] text-center shadow-[0_10px_25px_rgba(0,0,0,0.05)]">
                                 <h3 className="mb-[5px] text-[2.5rem] font-bold text-[#39A900]">
                                     Real-Time
                                 </h3>
@@ -68,7 +68,8 @@ export default function Nosotros(){
                                     return (
                                         <div
                                             key={index}
-                                            className={`group rounded-[25px] border border-[#f1f5f9] bg-[#f2f5f5] px-[25px] py-10 text-center shadow-[0_4px_6px_rgba(0,0,0,0.02)] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] hover:-translate-y-[15px] hover:border-[#39A900] hover:bg-white hover:shadow-[0_20px_40px_rgba(57,169,0,0.1)] lg:col-span-2 ${
+                                            style={{ "--auth-card-delay": `${index * 90}ms` }}
+                                            className={`auth-landing-card group rounded-[25px] border border-[#f1f5f9] bg-[#f2f5f5] px-[25px] py-10 text-center shadow-[0_4px_6px_rgba(0,0,0,0.02)] transition-all hover:border-[#39A900] hover:bg-white hover:shadow-[0_20px_40px_rgba(57,169,0,0.1)] lg:col-span-2 ${
                                                 index === 3
                                                     ? 'lg:col-start-2'
                                                     : index === 4
@@ -76,7 +77,7 @@ export default function Nosotros(){
                                                         : ''
                                             }`}
                                         >
-                                            <div className="mx-auto mb-5 flex h-[75px] w-[75px] items-center justify-center rounded-full bg-[#f0fdf4] text-[#39A900] transition-all duration-300 group-hover:rotate-[10deg] group-hover:scale-110 group-hover:bg-[#39A900] group-hover:text-white">
+                                            <div className="auth-card-icon mx-auto mb-5 flex h-[75px] w-[75px] items-center justify-center rounded-full bg-[#f0fdf4] text-[#39A900] group-hover:bg-[#39A900] group-hover:text-white">
                                                 <Icono size={30} strokeWidth={2} />
                                             </div>
                                             <h4 className="mb-[15px] text-xl font-semibold text-[#1f2937]">

@@ -36,7 +36,7 @@ export default function PanelLayout({ panel }) {
                     enlaceNotificaciones={panel.rutaNotificaciones}
                     onAbrirMenu={() => setMenuAbierto(true)}
                 />
-                <div className="mx-auto w-full max-w-[1200px] px-5 py-8 sm:px-8">
+                <div className="page-enter mx-auto w-full max-w-[1200px] px-5 py-8 sm:px-8">
                     <Outlet />
                 </div>
             </ContenidoPrincipal>

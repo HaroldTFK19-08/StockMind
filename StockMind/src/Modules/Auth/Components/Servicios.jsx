@@ -21,23 +21,24 @@ export default function Servicios(){
                         </p>
                     </div>
                     <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] items-center gap-[30px]">
-                        {servicios.map((servicio) => {
+                        {servicios.map((servicio, index) => {
                             const Icono = servicio.icono
                             return (
                                 <div
                                     key={servicio.titulo}
-                                    className={`relative rounded-[30px] bg-white px-[35px] py-[50px] text-center transition-all duration-300 ${
+                                    style={{ "--auth-card-delay": `${index * 120}ms` }}
+                                    className={`auth-landing-card relative rounded-[30px] bg-white px-[35px] py-[50px] text-center ${
                                         servicio.destacado
-                                            ? 'scale-105 border-2 border-[#39A900] shadow-[0_20px_40px_rgba(57,169,0,0.1)] hover:-translate-y-2.5'
-                                            : 'border border-[#e5e7eb] hover:-translate-y-2.5 hover:shadow-[0_15px_30px_rgba(0,0,0,0.05)]'
+                                            ? 'border-2 border-[#39A900] shadow-[0_20px_40px_rgba(57,169,0,0.1)] hover:shadow-[0_25px_50px_rgba(57,169,0,0.16)]'
+                                            : 'border border-[#e5e7eb] hover:shadow-[0_20px_40px_rgba(8,27,40,0.10)]'
                                     }`}
                                 >
                                     {servicio.destacado && (
-                                        <span className="absolute left-1/2 top-[-15px] -translate-x-1/2 rounded-[20px] bg-[#39A900] px-5 py-[5px] text-[0.8rem] font-bold text-white">
+                                        <span className="absolute left-1/2 top-[-15px] -translate-x-1/2 rounded-[20px] bg-[#39A900] px-5 py-[5px] text-[0.8rem] font-bold text-white shadow-[0_8px_20px_rgba(57,169,0,0.24)]">
                                             Más Popular
                                         </span>
                                     )}
-                                    <div className="mb-[25px] flex justify-center text-[#39A900]">
+                                    <div className="auth-card-icon mb-[25px] flex justify-center text-[#39A900]">
                                         <Icono size={56} strokeWidth={1.8} />
                                     </div>
 

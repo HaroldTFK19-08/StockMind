@@ -3,10 +3,10 @@ import { Bell, Menu, UserRound } from "lucide-react";
 
 export default function Cabecera({ contenido, enlacePerfil, enlaceNotificaciones, onAbrirMenu }) {
     const claseBoton =
-        "flex h-10 w-10 items-center justify-center rounded-xl text-[#081B28] transition-colors hover:bg-[#F4F7FA] hover:text-[#39A900]";
+        "app-button flex h-10 w-10 items-center justify-center rounded-xl text-[#081B28] hover:bg-[#F1F7F0] hover:text-[#2F8F00]";
 
     return (
-        <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-gray-200 bg-white px-5 sm:px-8">
+        <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-[#e9efea] bg-white/95 px-5 shadow-[0_4px_18px_rgba(8,27,40,0.03)] backdrop-blur-md sm:px-8">
             <div className="flex items-center gap-3">
                 {/* Botón de menú: solo en celular */}
                 <button type="button" onClick={onAbrirMenu} aria-label="Abrir menú" className={`${claseBoton} lg:hidden`}>
@@ -23,7 +23,7 @@ export default function Cabecera({ contenido, enlacePerfil, enlaceNotificaciones
                 <Link
                     to={enlacePerfil}
                     aria-label="Mi perfil"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E8F7E3] text-[#39A900] hover:bg-[#D8F0D0]"
+                    className="app-button flex h-10 w-10 items-center justify-center rounded-full bg-[#E8F7E3] text-[#2F8F00] hover:bg-[#D8F0D0]"
                 >
                     <UserRound size={19} />
                 </Link>
