@@ -13,6 +13,7 @@ const panelAdmin = {
     rutaPerfil: '/admin/perfil',
     rutaNotificaciones: '/admin/notificaciones',
     titulosExtra: {
+        '/admin/sedes': 'Detalle de la sede',
         '/admin/ambientes': 'Detalle del ambiente',
         '/admin/perfil': 'Mi perfil',
         '/admin/perfil/editar': 'Editar datos',

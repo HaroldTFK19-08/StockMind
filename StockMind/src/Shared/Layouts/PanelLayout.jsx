@@ -4,6 +4,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import NavegacionLayout from "./Aside";
 import Cabecera from "./Header";
 import ContenidoPrincipal from "./Main";
+import { buscarTituloRuta } from "../Utils/rutas";
 
 /**
  * Layout de los paneles (Aprendiz, Instructor, Cuentadante, Admin).
@@ -30,7 +31,7 @@ export default function PanelLayout({ panel }) {
 
             <ContenidoPrincipal>
                 <Cabecera
-                    contenido={buscarTitulo(pathname, panel)}
+                    contenido={buscarTituloRuta(pathname, panel.enlaces, panel.titulosExtra)}
                     enlacePerfil={panel.rutaPerfil}
                     enlaceNotificaciones={panel.rutaNotificaciones}
                     onAbrirMenu={() => setMenuAbierto(true)}
@@ -41,20 +42,4 @@ export default function PanelLayout({ panel }) {
             </ContenidoPrincipal>
         </div>
     );
-}
-
-// Busca el título de la ruta actual. Si no hay uno exacto, usa la ruta "padre" más parecida.
-// Ej: "/admin/centros/2" usa el título de "/admin/centros".
-function buscarTitulo(pathname, panel) {
-    const titulos = { ...panel.titulosExtra };
-    panel.enlaces.forEach((enlace) => {
-        titulos[enlace.ruta] = titulos[enlace.ruta] ?? enlace.titulo;
-    });
-
-    let ruta = pathname.replace(/\/+$/, "");
-    while (ruta) {
-        if (titulos[ruta]) return titulos[ruta];
-        ruta = ruta.slice(0, ruta.lastIndexOf("/"));
-    }
-    return "";
 }

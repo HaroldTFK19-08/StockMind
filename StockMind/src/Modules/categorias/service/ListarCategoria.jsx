@@ -1,9 +1,9 @@
 import api from '../../../Core/Services/api'
-export const ObterCategorias = async () => {
-    const response = await api.get('/categorias')
-    return response.data
+import { obtenerTodos } from '../../../Core/Services/apiUtils'
 
-}
+// Laravel devuelve las categorías paginadas ({ data: [...] }); obtenerTodos devuelve la lista completa
+export const ObterCategorias = () => obtenerTodos('/categorias')
+
 export const CrearCategoria = async (categoria) => {
     const response = await api.post('/categorias', categoria)
     return response.data

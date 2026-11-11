@@ -4,7 +4,7 @@ import PanelLayout from '../../../Shared/Layouts/PanelLayout'
 import panelInstructor from '../Data/panelInstructor'
 import perfilInstructor from '../Data/perfilInstructor'
 import notificacionesInstructor from '../Data/notificacionesInstructor'
-import { ambientesInstructor, reportesInstructor } from '../Data/datosInstructor'
+import { reportesInstructor } from '../Data/datosInstructor'
 
 import HomeInstructor from '../Pages/Home'
 import Ambientes from '../../Ambientes/Pages/Ambientes'
@@ -21,7 +21,7 @@ const InstructorRoutes = () => {
             <Route element={<PanelLayout panel={panelInstructor} />}>
                 <Route index element={<Navigate to="/instructor/home" replace />} />
                 <Route path="home" element={<HomeInstructor />} />
-                <Route path="ambientes" element={<Ambientes ambientes={ambientesInstructor} rutaBase="/instructor/ambientes" />} />
+                <Route path="ambientes" element={<Ambientes rutaBase="/instructor/ambientes" />} />
                 <Route path="ambientes/:id" element={<DetalleAmbiente puedeReportar />} />
                 <Route path="reportes" element={<GestionReportes reportes={reportesInstructor} puedeCambiarEstado />} />
                 <Route path="notificaciones" element={<Notificaciones datos={notificacionesInstructor} />} />

@@ -1,9 +1,9 @@
 // Color de cada estado que usa la app
 const colores = {
-    verde: ['Buen estado', 'Resuelto', 'Activo', 'Activa', 'Completado', 'Entrada'],
-    ambar: ['Pendiente', 'En reparación', 'Media', 'En mantenimiento'],
-    azul: ['En revisión', 'En tránsito', 'Baja', 'Salida'],
-    rojo: ['Dañado', 'Urgente', 'Alta', 'Inactivo'],
+    verde: ['Buen estado', 'Resuelto', 'Activo', 'Activa', 'Completado', 'Entrada', 'Disponible', 'Bueno', 'Urbana'],
+    ambar: ['Pendiente', 'En reparación', 'Media', 'En mantenimiento', 'Regular', 'Rural'],
+    azul: ['En revisión', 'En tránsito', 'Baja', 'Salida', 'Asignado', 'Prestado', 'En traslado'],
+    rojo: ['Dañado', 'Urgente', 'Alta', 'Inactivo', 'Malo', 'Dado de baja'],
 }
 
 const estilos = {

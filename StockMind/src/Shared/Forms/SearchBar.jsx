@@ -26,19 +26,19 @@ const SearchBar = ({
 
             {/* El botón "Filtros" solo aparece si la página le pasa onFiltrar */}
             {onFiltrar && (
-            <button
-                type="button"
-                onClick={onFiltrar}
-                className="flex items-center gap-2 rounded-[15px] border-2 border-[#edf2f7] bg-white px-[25px] font-jakarta font-semibold text-[#081B28] transition-all duration-300 hover:border-[#cbd5e1] hover:bg-[#f8f9fa]"
-            >
-                <SlidersHorizontal
-                    size={18}
-                    strokeWidth={2}
-                    className="text-[#39A900]"
-                />
+                <button
+                    type="button"
+                    onClick={onFiltrar}
+                    className="flex items-center gap-2 rounded-[15px] border-2 border-[#edf2f7] bg-white px-[25px] font-jakarta font-semibold text-[#081B28] transition-all duration-300 hover:border-[#cbd5e1] hover:bg-[#f8f9fa]"
+                >
+                    <SlidersHorizontal
+                        size={18}
+                        strokeWidth={2}
+                        className="text-[#39A900]"
+                    />
 
-                <span>Filtros</span>
-            </button>
+                    <span>Filtros</span>
+                </button>
             )}
         </div>
     )

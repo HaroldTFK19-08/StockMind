@@ -9,6 +9,7 @@ import HomeAdmin from '../Pages/Home'
 import Usuarios from '../Pages/Usuarios'
 import Centros from '../../Centros/Pages/Centros'
 import DetalleCentro from '../../Centros/Pages/DetalleCentro'
+import DetalleSede from '../../Sedes/Pages/DetalleSede'
 import DetalleAmbiente from '../../Ambientes/Pages/DetalleAmbiente'
 import Inventario from '../../Elementos/Pages/Inventario'
 import Movimientos from '../../Traslados/Pages/Movimientos'
@@ -27,6 +28,7 @@ const AdminRoutes = () => {
                 <Route path="home" element={<HomeAdmin />} />
                 <Route path="centros" element={<Centros />} />
                 <Route path="centros/:id" element={<DetalleCentro />} />
+                <Route path="sedes/:id" element={<DetalleSede />} />
                 <Route path="ambientes/:id" element={<DetalleAmbiente />} />
                 <Route path="inventario" element={<Inventario puedeAgregar />} />
                 <Route path="movimientos" element={<Movimientos />} />

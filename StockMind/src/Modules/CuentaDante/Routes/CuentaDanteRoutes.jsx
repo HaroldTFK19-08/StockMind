@@ -4,7 +4,7 @@ import PanelLayout from '../../../Shared/Layouts/PanelLayout'
 import panelCuentaDante from '../Data/panelCuentaDante'
 import perfilCuentaDante from '../Data/perfilCuentaDante'
 import notificacionesCuentaDante from '../Data/notificacionesCuentaDante'
-import { ambientesCuentaDante, elementosCuentaDante, reportesCuentaDante } from '../Data/datosCuentaDante'
+import { ambientesCuentaDante, reportesCuentaDante } from '../Data/datosCuentaDante'
 
 import HomeCuentaDante from '../Pages/Home'
 import Ambientes from '../../Ambientes/Pages/Ambientes'
@@ -24,9 +24,9 @@ const CuentaDanteRoutes = () => {
             <Route element={<PanelLayout panel={panelCuentaDante} />}>
                 <Route index element={<Navigate to="/cuentadante/home" replace />} />
                 <Route path="home" element={<HomeCuentaDante />} />
-                <Route path="ambientes" element={<Ambientes ambientes={ambientesCuentaDante} rutaBase="/cuentadante/ambientes" />} />
+                <Route path="ambientes" element={<Ambientes rutaBase="/cuentadante/ambientes" />} />
                 <Route path="ambientes/:id" element={<DetalleAmbiente />} />
-                <Route path="elementos" element={<Inventario elementos={elementosCuentaDante} />} />
+                <Route path="elementos" element={<Inventario />} />
                 <Route path="asignaciones" element={<Asignaciones />} />
                 <Route path="traslados" element={<Traslados ambientes={ambientesCuentaDante} />} />
                 <Route path="reportes" element={<ReportesCuentadante ambientes={ambientesCuentaDante} reportes={reportesCuentaDante} />} />
