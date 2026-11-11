@@ -11,6 +11,7 @@ import { ambientesCuentaDante, elementosCuentaDante, reportesCuentaDante } from 
 import { nombreAmbiente } from '../../Ambientes/Data/ambientesData'
 import asignacionesData from '../../Asignaciones/Data/asignacionesData'
 import trasladosData from '../../Traslados/Data/trasladosData'
+import TarjetaMindBot from '../../../Shared/Components/Cards/TarjetaMindBot'
 
 const accesos = [
     { titulo: 'Nueva asignación', texto: 'Entrega elementos a un aprendiz', ruta: '/cuentadante/asignaciones', icono: ClipboardCheck },
@@ -23,9 +24,12 @@ export default function HomeCuentaDante() {
 
     return (
         <section className="space-y-8">
-            <div>
-                <h2 className="text-2xl font-bold text-[#081B28] sm:text-3xl">Hola, {perfilCuentaDante.nombres.split(' ')[0]}</h2>
-                <p className="mt-1 text-sm text-[#64748b]">Tienes a cargo {ambientesCuentaDante.length} ambientes y {elementosCuentaDante.length} elementos.</p>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold text-[#081B28] sm:text-3xl">Hola, {perfilCuentaDante.nombres.split(' ')[0]}</h2>
+                    <p className="mt-1 text-sm text-[#64748b]">Tienes a cargo {ambientesCuentaDante.length} ambientes y {elementosCuentaDante.length} elementos.</p>
+                </div>
+                <TarjetaMindBot />
             </div>
 
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">

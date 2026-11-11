@@ -8,6 +8,7 @@ import GraficoTorta from '../Components/graficoTorta'
 import perfilInstructor from '../Data/perfilInstructor'
 import { ambientesInstructor, elementosInstructor, reportesInstructor } from '../Data/datosInstructor'
 import ListaReportes from '../../Reportes/Components/ListaReportes'
+import TarjetaMindBot from '../../../Shared/Components/Cards/TarjetaMindBot'
 
 export default function HomeInstructor() {
     const pendientes = reportesInstructor.filter((r) => r.estado === 'Pendiente')
@@ -22,9 +23,12 @@ export default function HomeInstructor() {
 
     return (
         <section className="space-y-8">
-            <div>
-                <h2 className="text-2xl font-bold text-[#081B28] sm:text-3xl">Hola, {perfilInstructor.nombres.split(' ')[0]}</h2>
-                <p className="mt-1 text-sm text-[#64748b]">Este es el estado de los ambientes de tu centro.</p>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold text-[#081B28] sm:text-3xl">Hola, {perfilInstructor.nombres.split(' ')[0]}</h2>
+                    <p className="mt-1 text-sm text-[#64748b]">Este es el estado de los ambientes de tu centro.</p>
+                </div>
+                <TarjetaMindBot />
             </div>
 
             <div className="grid gap-5 sm:grid-cols-3">

@@ -67,7 +67,7 @@ export const mensajeError = (error) => {
         if (error.response.status === 429) return 'Se hicieron demasiadas peticiones. Espera un momento e intenta de nuevo.'
         return error.response.data?.message || 'Ocurrió un error inesperado.'
     }
-    if (error.request) return 'No se pudo conectar con el servidor. Revisa que el backend esté encendido.'
+    if (error.request) return 'El servidor no esta disponible. Intenta de nuevo más tarde.'
     return error.message || 'Ocurrió un error inesperado.'
 }
 

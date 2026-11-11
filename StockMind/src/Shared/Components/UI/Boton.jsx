@@ -14,7 +14,7 @@ const variantes = {
  *   <Boton to="/aprendiz/reportes" variante="secundario">Volver</Boton>
  */
 const Boton = ({ to, variante = 'primario', icono: Icono, children, className = '', type = 'button', ...props }) => {
-    const clases = `app-button inline-flex items-center justify-center gap-2 rounded-[30px] px-5 py-2.5 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60 ${variantes[variante]} ${className}`
+    const clases = `inline-flex items-center justify-center gap-2 rounded-[30px] px-5 py-2.5 text-sm font-bold transition-[color,background-color,border-color,box-shadow,transform] duration-[180ms] hover:-translate-y-px active:translate-y-0 disabled:hover:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 ${variantes[variante]} ${className}`
 
     const contenido = (
         <>

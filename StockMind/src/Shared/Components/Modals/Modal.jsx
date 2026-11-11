@@ -23,7 +23,7 @@ const Modal = ({ abierto, titulo, descripcion, onCerrar, children, ancho = 'max-
                 aria-modal="true"
                 aria-label={titulo}
                 onClick={(evento) => evento.stopPropagation()}
-                className={`max-h-[92vh] w-full overflow-y-auto rounded-t-[24px] bg-white p-5 shadow-2xl sm:rounded-[24px] sm:p-7 ${ocultarBarra ? 'scrollbar-hidden' : ''} ${ancho}`}
+                className={`max-h-[92vh] w-full overflow-y-auto rounded-t-[24px] bg-white p-5 shadow-2xl sm:rounded-[24px] sm:p-7 ${ocultarBarra ? '[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden' : ''} ${ancho}`}
             >
                 <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#edf2f7] pb-4">
                     <div>

@@ -4,7 +4,7 @@
  * Las celdas <td> toman el estilo automáticamente.
  */
 const Tabla = ({ columnas = [], children }) => (
-    <div className="surface-card overflow-x-auto rounded-[20px] border bg-white">
+    <div className="overflow-x-auto rounded-[20px] border border-[#e9efea] bg-white shadow-[0_8px_24px_rgba(8,27,40,0.04)] transition-[box-shadow,border-color,transform] duration-[220ms] hover:border-[#dce8dd] hover:shadow-[0_14px_32px_rgba(8,27,40,0.07)]">
         <table className="w-full min-w-[640px] text-left text-sm [&_td]:px-5 [&_td]:py-3.5 [&_td]:align-middle [&_td]:text-[#475569] [&_tbody_tr]:border-t [&_tbody_tr]:border-[#edf1ed] [&_tbody_tr]:transition-colors [&_tbody_tr:hover]:bg-[#f7faf6]">
             <thead className="bg-[#f5f8f5]">
                 <tr>

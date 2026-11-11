@@ -14,6 +14,7 @@ import centrosData, { buscarCentro } from '../../Centros/Data/centrosData'
 import { buscarAmbiente } from '../../Ambientes/Data/ambientesData'
 import inventarioData from '../../Elementos/Data/inventarioData'
 import reportesData from '../../Reportes/Data/reportesData'
+import TarjetaMindBot from '../../../Shared/Components/Cards/TarjetaMindBot'
 
 export default function HomeAdmin() {
     const urgentes = reportesData.filter((r) => r.prioridad === 'Alta' && r.estado !== 'Resuelto')
@@ -23,9 +24,12 @@ export default function HomeAdmin() {
 
     return (
         <section className="space-y-8">
-            <div>
-                <h2 className="text-2xl font-bold text-[#081B28] sm:text-3xl">Hola, {perfilAdmin.nombres.split(' ')[0]}</h2>
-                <p className="mt-1 text-sm text-[#64748b]">Resumen del inventario en los centros de formación.</p>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold text-[#081B28] sm:text-3xl">Hola, {perfilAdmin.nombres.split(' ')[0]}</h2>
+                    <p className="mt-1 text-sm text-[#64748b]">Resumen del inventario en los centros de formación.</p>
+                </div>
+                <TarjetaMindBot />
             </div>
 
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">

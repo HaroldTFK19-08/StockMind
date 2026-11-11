@@ -10,11 +10,13 @@ export default function Inicio() {
     const inicioRef = useRef(null)
 
     useEffect(() => {
-        const cards = inicioRef.current?.querySelectorAll(".auth-landing-card")
+        const cards = inicioRef.current?.querySelectorAll("[data-reveal-card]")
         if (!cards?.length) return
 
         if (!("IntersectionObserver" in window)) {
-            cards.forEach((card) => card.classList.add("is-visible"))
+            cards.forEach((card) =>
+                card.classList.add("animate-auth-card-reveal", "[animation-delay:var(--auth-card-delay,0ms)]"),
+            )
             return
         }
 
@@ -22,7 +24,10 @@ export default function Inicio() {
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add("is-visible")
+                        entry.target.classList.add(
+                            "animate-auth-card-reveal",
+                            "[animation-delay:var(--auth-card-delay,0ms)]",
+                        )
                         observer.unobserve(entry.target)
                     }
                 })

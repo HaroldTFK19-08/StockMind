@@ -19,7 +19,7 @@ export default function NavegacionLayout({ enlaces = [], abierto = false, onCerr
             />
 
             <aside
-                className={`app-sidebar fixed left-0 top-0 z-40 flex h-screen w-[250px] flex-col border-r border-[#e9efea] bg-white transition-transform duration-300 lg:translate-x-0 ${
+                className={`fixed left-0 top-0 z-40 flex h-screen w-[250px] flex-col border-r border-[#e9efea] bg-white shadow-[8px_0_30px_rgba(8,27,40,0.03)] transition-transform duration-300 lg:translate-x-0 ${
                     abierto ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
@@ -48,7 +48,7 @@ export default function NavegacionLayout({ enlaces = [], abierto = false, onCerr
                                         end={enlace.exacto}
                                         onClick={onCerrar}
                                         className={({ isActive }) =>
-                                            `app-nav-link relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm ${
+                                            `relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-[color,background-color,transform] duration-[180ms] hover:translate-x-0.5 ${
                                                 isActive
                                                     ? "bg-[#eff8ec] font-semibold text-[#2f7d20] before:absolute before:left-0 before:h-7 before:w-1 before:rounded-r-full before:bg-[#39a900]"
                                                     : "text-gray-600 hover:bg-[#f5f8f5] hover:text-[#081b28]"
@@ -68,7 +68,7 @@ export default function NavegacionLayout({ enlaces = [], abierto = false, onCerr
                 <div className="border-t border-gray-100 p-3">
                     <Link
                         to="/login"
-                        className="app-nav-link flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-gray-600 hover:bg-red-50 hover:text-red-600"
+                        className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-gray-600 transition-[color,background-color,transform] duration-[180ms] hover:translate-x-0.5 hover:bg-red-50 hover:text-red-600"
                     >
                         <LogOut size={19} strokeWidth={1.9} />
                         <span>Cerrar sesión</span>

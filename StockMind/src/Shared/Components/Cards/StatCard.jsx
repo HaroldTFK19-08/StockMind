@@ -13,7 +13,7 @@ const StatCard = ({
   detalle,
 }) => {
   return (
-    <article className="surface-card stat-card flex items-center gap-[15px] rounded-[20px] border bg-white p-5">
+    <article className="flex items-center gap-[15px] rounded-[20px] border border-[#e9efea] bg-white p-5 shadow-[0_8px_24px_rgba(8,27,40,0.04)] transition-[box-shadow,border-color,transform] duration-[220ms] hover:border-[#dce8dd] hover:shadow-[0_14px_32px_rgba(8,27,40,0.07)] animate-card-enter nth-[2]:[animation-delay:60ms] nth-[3]:[animation-delay:120ms] nth-[4]:[animation-delay:180ms]">
       <div
         className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${estilos[color]}`}
       >

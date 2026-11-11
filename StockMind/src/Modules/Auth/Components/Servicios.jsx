@@ -1,5 +1,12 @@
 import { CheckCircle2 } from "lucide-react";
 import servicios from "../Data/Servicios";
+
+const clasesTarjetaAnimada =
+    "group origin-bottom opacity-0 [will-change:opacity,translate,scale,filter] transition-[transform,box-shadow,border-color] duration-[380ms] hover:[transform:perspective(900px)_translateY(-10px)_rotateX(1.5deg)] motion-reduce:opacity-100 motion-reduce:origin-center motion-reduce:[translate:none] motion-reduce:scale-100 motion-reduce:blur-0 motion-reduce:transition-none";
+
+const clasesIconoAnimado =
+    "transition-[transform,background-color,color] duration-[420ms] group-hover:rotate-[-7deg] group-hover:scale-110 motion-reduce:transition-none";
+
 export default function Servicios(){
     return(
         <>
@@ -26,8 +33,9 @@ export default function Servicios(){
                             return (
                                 <div
                                     key={servicio.titulo}
+                                    data-reveal-card
                                     style={{ "--auth-card-delay": `${index * 120}ms` }}
-                                    className={`auth-landing-card relative rounded-[30px] bg-white px-[35px] py-[50px] text-center ${
+                                    className={`${clasesTarjetaAnimada} relative rounded-[30px] bg-white px-[35px] py-[50px] text-center ${
                                         servicio.destacado
                                             ? 'border-2 border-[#39A900] shadow-[0_20px_40px_rgba(57,169,0,0.1)] hover:shadow-[0_25px_50px_rgba(57,169,0,0.16)]'
                                             : 'border border-[#e5e7eb] hover:shadow-[0_20px_40px_rgba(8,27,40,0.10)]'
@@ -38,7 +46,7 @@ export default function Servicios(){
                                             Más Popular
                                         </span>
                                     )}
-                                    <div className="auth-card-icon mb-[25px] flex justify-center text-[#39A900]">
+                                    <div className={`${clasesIconoAnimado} mb-[25px] flex justify-center text-[#39A900]`}>
                                         <Icono size={56} strokeWidth={1.8} />
                                     </div>
 
