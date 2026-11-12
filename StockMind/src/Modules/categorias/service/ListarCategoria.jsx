@@ -1,4 +1,4 @@
-import api from '../../../Core/Services/api'
+import { api } from '../../../Core/Config/api'
 import { obtenerTodos } from '../../../Core/Services/apiUtils'
 
 // Laravel devuelve las categorías paginadas ({ data: [...] }); obtenerTodos devuelve la lista completa

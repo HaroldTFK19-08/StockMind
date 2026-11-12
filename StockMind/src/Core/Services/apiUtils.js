@@ -1,4 +1,4 @@
-import api from './api'
+import {api} from "../Config/api"
 
 /**
  * Funciones de ayuda para consumir el backend de Laravel.

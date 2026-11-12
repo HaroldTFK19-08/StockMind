@@ -1,4 +1,4 @@
-import api from '../../../Core/Services/api'
+import { api } from '../../../Core/Config/api'
 import { obtenerTodos, obtenerUno } from '../../../Core/Services/apiUtils'
 
 // Sedes -> /v1/sedes

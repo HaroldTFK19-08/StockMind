@@ -1,4 +1,4 @@
-import api from '../../../Core/Services/api'
+import { api } from '../../../Core/Config/api'
 import { actualizarConArchivos, crearConArchivos, obtenerTodos, obtenerUno } from '../../../Core/Services/apiUtils'
 
 // Elementos del inventario -> /v1/elementos
