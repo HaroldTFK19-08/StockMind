@@ -71,6 +71,7 @@ const Contactos = () => {
                             <a
                                 href="https://www.facebook.com/SENACauca"
                                 target="_blank"
+                                // noopener/noreferrer evitan que la página externa acceda a window.opener (tabnabbing).
                                 rel="noopener noreferrer"
                                 className="group flex items-center gap-[15px] text-[1.1rem] font-medium text-[#475569] transition-all duration-300 hover:translate-x-[10px] hover:text-[#39A900]"
                             >
@@ -83,6 +84,7 @@ const Contactos = () => {
                             <a
                                 href="https://www.instagram.com/senacomunica/"
                                 target="_blank"
+                                // noopener/noreferrer evitan que la página externa acceda a window.opener (tabnabbing).
                                 rel="noopener noreferrer"
                                 className="group flex items-center gap-[15px] text-[1.1rem] font-medium text-[#475569] transition-all duration-300 hover:translate-x-[10px] hover:text-[#39A900]"
                             >
@@ -95,6 +97,7 @@ const Contactos = () => {
                             <a
                                 href="https://twitter.com/SENAComunica"
                                 target="_blank"
+                                // noopener/noreferrer evitan que la página externa acceda a window.opener (tabnabbing).
                                 rel="noopener noreferrer"
                                 className="group flex items-center gap-[15px] text-[1.1rem] font-medium text-[#475569] transition-all duration-300 hover:translate-x-[10px] hover:text-[#39A900]"
                             >

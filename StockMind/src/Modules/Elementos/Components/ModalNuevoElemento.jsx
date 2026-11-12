@@ -32,37 +32,52 @@ const ModalNuevoElemento = ({ abierto, onCerrar, onGuardar }) => {
     }
 
     return (
-        <Modal abierto={abierto} titulo="Agregar elemento" descripcion="Registra un elemento nuevo en el inventario." onCerrar={cerrar}>
-            <form onSubmit={guardar} className="grid gap-4 sm:grid-cols-2">
-                <Campo etiqueta="Nombre del elemento" htmlFor="nombre" className="sm:col-span-2">
-                    <input id="nombre" name="nombre" value={formulario.nombre} onChange={cambiarCampo} placeholder="Ej: Portátil Dell Latitude" className={claseInput} />
-                </Campo>
-                <Campo etiqueta="Categoría" htmlFor="categoria">
-                    <select id="categoria" name="categoria" value={formulario.categoria} onChange={cambiarCampo} className={claseInput}>
-                        <option value="">Selecciona</option>
-                        {categorias.map((c) => <option key={c}>{c}</option>)}
-                    </select>
-                </Campo>
-                <Campo etiqueta="Placa SENA" htmlFor="placa">
-                    <input id="placa" name="placa" value={formulario.placa} onChange={cambiarCampo} placeholder="SENA-CPU-0000" className={claseInput} />
-                </Campo>
-                <Campo etiqueta="Ambiente" htmlFor="ambienteId">
-                    <select id="ambienteId" name="ambienteId" value={formulario.ambienteId} onChange={cambiarCampo} className={claseInput}>
-                        <option value="">Selecciona</option>
-                        {ambientesData.map((a) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
-                    </select>
-                </Campo>
-                <Campo etiqueta="Estado" htmlFor="estado">
-                    <select id="estado" name="estado" value={formulario.estado} onChange={cambiarCampo} className={claseInput}>
-                        {estadosElemento.map((e) => <option key={e}>{e}</option>)}
-                    </select>
-                </Campo>
+        <Modal abierto={abierto} titulo="Agregar elemento" descripcion="Registra un elemento nuevo en el inventario." onCerrar={cerrar} ancho="max-w-[680px]">
+            {/* Formulario de nuevo elemento:
+                - Sección con grilla responsive para capturar datos rápidamente.
+                - Sin scroll interno y con acciones claras al final. */}
+            <form onSubmit={guardar} className="space-y-6">
+                <section className="rounded-2xl border border-[#edf2f7] bg-[#fbfdfb] p-4 sm:p-5">
+                    <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.04em] text-[#2F8F00]">Datos del elemento</h3>
 
-                {error && <p className="text-sm text-[#dc2626] sm:col-span-2">{error}</p>}
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Campo etiqueta="Nombre del elemento" htmlFor="nombre" className="sm:col-span-2">
+                            <input id="nombre" name="nombre" value={formulario.nombre} onChange={cambiarCampo} placeholder="Ej: Portátil Dell Latitude" className={claseInput} />
+                        </Campo>
 
-                <div className="flex justify-end gap-2 pt-2 sm:col-span-2">
-                    <Boton variante="texto" onClick={cerrar}>Cancelar</Boton>
-                    <Boton type="submit">Agregar elemento</Boton>
+                        <Campo etiqueta="Categoría" htmlFor="categoria">
+                            <select id="categoria" name="categoria" value={formulario.categoria} onChange={cambiarCampo} className={claseInput}>
+                                <option value="">Selecciona</option>
+                                {categorias.map((c) => <option key={c}>{c}</option>)}
+                            </select>
+                        </Campo>
+
+                        <Campo etiqueta="Placa SENA" htmlFor="placa">
+                            <input id="placa" name="placa" value={formulario.placa} onChange={cambiarCampo} placeholder="SENA-CPU-0000" className={claseInput} />
+                        </Campo>
+
+                        <Campo etiqueta="Ambiente" htmlFor="ambienteId">
+                            <select id="ambienteId" name="ambienteId" value={formulario.ambienteId} onChange={cambiarCampo} className={claseInput}>
+                                <option value="">Selecciona</option>
+                                {ambientesData.map((a) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
+                            </select>
+                        </Campo>
+
+                        <Campo etiqueta="Estado" htmlFor="estado">
+                            <select id="estado" name="estado" value={formulario.estado} onChange={cambiarCampo} className={claseInput}>
+                                {estadosElemento.map((e) => <option key={e}>{e}</option>)}
+                            </select>
+                        </Campo>
+                    </div>
+                </section>
+
+                {/* Mensaje de validación del formulario */}
+                {error && <p role="alert" className="animate-inline-error rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm text-[#dc2626]">{error}</p>}
+
+                {/* Acciones finales del formulario */}
+                <div className="flex flex-col-reverse gap-3 border-t border-[#edf2f7] pt-5 sm:flex-row sm:justify-end">
+                    <Boton variante="texto" className="w-full sm:w-auto" onClick={cerrar}>Cancelar</Boton>
+                    <Boton type="submit" className="w-full sm:w-auto">Agregar elemento</Boton>
                 </div>
             </form>
         </Modal>

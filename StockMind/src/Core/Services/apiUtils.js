@@ -60,15 +60,29 @@ export const actualizarConArchivos = async (ruta, datos) => {
     return respuesta.data
 }
 
-// Mensaje para mostrarle al usuario cuando una petición falla
+// Mensaje seguro para mostrar al usuario cuando una petición falla.
+// No se exponen detalles internos del cliente/red para evitar filtrar información.
 export const mensajeError = (error) => {
     if (error.response) {
-        if (error.response.status === 404) return 'No se encontró el registro solicitado.'
-        if (error.response.status === 429) return 'Se hicieron demasiadas peticiones. Espera un momento e intenta de nuevo.'
-        return error.response.data?.message || 'Ocurrió un error inesperado.'
+        const { status, data } = error.response
+
+        // Mensajes claros para estados comunes sin revelar detalles del servidor.
+        if (status === 401) return 'Tu sesión no es válida o ha expirado. Inicia sesión nuevamente.'
+        if (status === 403) return 'No tienes permisos para realizar esta acción.'
+        if (status === 404) return 'No se encontró el registro solicitado.'
+        if (status === 429) return 'Se hicieron demasiadas peticiones. Espera un momento e intenta de nuevo.'
+
+        // Solo mostramos el mensaje enviado por la API (validaciones/reglas de negocio).
+        // Para errores 5xx u otros casos, usamos un texto genérico.
+        if (status >= 400 && status < 500 && typeof data?.message === 'string' && data.message.trim()) {
+            return data.message
+        }
+
+        return 'Ocurrió un error inesperado.'
     }
-    if (error.request) return 'El servidor no esta disponible. Intenta de nuevo más tarde.'
-    return error.message || 'Ocurrió un error inesperado.'
+
+    if (error.request) return 'El servidor no está disponible. Intenta de nuevo más tarde.'
+    return 'Ocurrió un error inesperado.'
 }
 
 // Errores de validación por campo: { nombre: "El nombre es obligatorio." }

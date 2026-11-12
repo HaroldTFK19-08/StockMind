@@ -55,7 +55,7 @@ const ModalEliminar = ({ titulo, nombre, eliminar, onEliminado, onCerrar }) => {
             </div>
 
             {error && (
-                <p role="alert" className="mt-4 rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm leading-5 text-[#b42318]">
+                <p role="alert" className="animate-inline-error mt-4 rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm leading-5 text-[#b42318]">
                     {error}
                 </p>
             )}

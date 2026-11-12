@@ -30,13 +30,18 @@ export default function PanelLayout({ panel }) {
             />
 
             <ContenidoPrincipal>
+                {/* Cabecera fija del panel (título de ruta, perfil, notificaciones, menú móvil) */}
                 <Cabecera
                     contenido={buscarTituloRuta(pathname, panel.enlaces, panel.titulosExtra)}
                     enlacePerfil={panel.rutaPerfil}
                     enlaceNotificaciones={panel.rutaNotificaciones}
                     onAbrirMenu={() => setMenuAbierto(true)}
                 />
-                <div className="animate-page-enter mx-auto w-full max-w-[1200px] px-5 py-8 sm:px-8">
+
+                {/* Área de contenido de cada página del módulo/rol.
+                    - Ancho máximo para lectura cómoda.
+                    - Espaciado amplio y animación de entrada para una UI más pulida. */}
+                <div className="animate-page-enter mx-auto w-full max-w-[1240px] px-4 py-6 sm:px-8 sm:py-8 lg:px-10">
                     <Outlet />
                 </div>
             </ContenidoPrincipal>

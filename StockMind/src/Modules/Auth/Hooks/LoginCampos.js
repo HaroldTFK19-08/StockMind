@@ -16,16 +16,21 @@ const useLogin = () => {
         }
     })
 
-    // Mientras no haya backend, el panel se elige por el correo:
-    // admin@... -> Administrador, instructor@... -> Instructor,
-    // cuentadante@... -> Cuentadante, cualquier otro -> Aprendiz
-    const iniciarSesion = async (datos) => {
-        const correo = datos.email.toLowerCase()
+    // DEMO (sin backend): el panel se elige por el correo.
+    // Importante: esto NO es un control de acceso real. La autorización debe validarse en el backend.
+    // Se devuelve solo una ruta interna permitida para evitar redirecciones abiertas.
+    const rutasPermitidas = ['/admin/home', '/instructor/home', '/cuentadante/home', '/aprendiz/home']
 
-        if (correo.startsWith('admin')) return '/admin/home'
-        if (correo.startsWith('instructor')) return '/instructor/home'
-        if (correo.startsWith('cuentadante')) return '/cuentadante/home'
-        return '/aprendiz/home'
+    const iniciarSesion = async (datos) => {
+        const correo = String(datos?.email || '').trim().toLowerCase()
+
+        let ruta = '/aprendiz/home'
+        if (correo.startsWith('admin')) ruta = '/admin/home'
+        else if (correo.startsWith('instructor')) ruta = '/instructor/home'
+        else if (correo.startsWith('cuentadante')) ruta = '/cuentadante/home'
+
+        // Defensa extra: si por error cambia la lógica, solo navegamos a rutas conocidas.
+        return rutasPermitidas.includes(ruta) ? ruta : '/aprendiz/home'
     }
 
     return {

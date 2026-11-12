@@ -1,6 +1,6 @@
 import { CheckCircle2 } from "lucide-react";
 import servicios from "../Data/Servicios";
-import { actualizarPunteroTarjeta, restablecerPunteroTarjeta } from "./animacionesTarjeta";
+import { actualizarPunteroTarjeta, restablecerPunteroTarjeta } from "../Hooks/animacionesTarjeta";
 
 const clasesTarjetaAnimada =
     "group auth-card-3d auth-card-spotlight origin-bottom opacity-0 will-change-transform transition-[transform,box-shadow,border-color] duration-[320ms] ease-[cubic-bezier(0.2,0.75,0.25,1)] hover:-translate-y-2 hover:scale-[1.015] motion-reduce:opacity-100 motion-reduce:origin-center motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100 motion-reduce:transition-none";

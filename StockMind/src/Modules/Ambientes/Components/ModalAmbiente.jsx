@@ -32,31 +32,40 @@ const ModalAmbiente = ({ ambiente, sedeId, onGuardado, onCerrar }) => {
     const { valores, cambiar, errores } = formulario
 
     return (
-        <Modal abierto titulo={editando ? 'Editar ambiente' : 'Nuevo ambiente'} onCerrar={onCerrar} ancho="max-w-[480px]">
-            <form onSubmit={formulario.enviar} className="space-y-4">
-                <Campo etiqueta="Nombre del ambiente" htmlFor="nombre" error={errores.nombre}>
-                    <input id="nombre" name="nombre" value={valores.nombre} onChange={cambiar} placeholder="Ej: Software 1" maxLength={100} required className={claseInput} />
-                </Campo>
+        <Modal abierto titulo={editando ? 'Editar ambiente' : 'Nuevo ambiente'} onCerrar={onCerrar} ancho="max-w-[560px]">
+            {/* Formulario de ambiente:
+                - Agrupa campos en una sección clara para facilitar el registro.
+                - Usa grilla responsive y evita contenedores con scroll. */}
+            <form onSubmit={formulario.enviar} className="space-y-6">
+                <section className="rounded-2xl border border-[#edf2f7] bg-[#fbfdfb] p-4 sm:p-5">
+                    <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.04em] text-[#2F8F00]">Información del ambiente</h3>
 
-                <Campo etiqueta="Tipo de ambiente" htmlFor="tipo" error={errores.tipo}>
-                    {/* Se puede escribir cualquier tipo; la lista solo da sugerencias */}
-                    <input id="tipo" name="tipo" list="tipos-ambiente" value={valores.tipo} onChange={cambiar} placeholder="Ej: Sala de sistemas" maxLength={50} required className={claseInput} />
-                    <datalist id="tipos-ambiente">
-                        {tiposAmbiente.map((tipo) => <option key={tipo} value={tipo} />)}
-                    </datalist>
-                </Campo>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Campo etiqueta="Nombre del ambiente" htmlFor="nombre" error={errores.nombre} className="sm:col-span-2">
+                            <input id="nombre" name="nombre" value={valores.nombre} onChange={cambiar} placeholder="Ej: Software 1" maxLength={100} required className={claseInput} />
+                        </Campo>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <Campo etiqueta="Capacidad" htmlFor="capacidad" error={errores.capacidad}>
-                        <input id="capacidad" name="capacidad" type="number" min="0" max="65535" step="1" value={valores.capacidad} onChange={cambiar} required className={claseInput} />
-                    </Campo>
-                    <Campo etiqueta="Estado" htmlFor="estado" error={errores.estado}>
-                        <select id="estado" name="estado" value={valores.estado} onChange={cambiar} className={claseInput}>
-                            {estadosActivo.map((estado) => <option key={estado} value={estado}>{capitalizar(estado)}</option>)}
-                        </select>
-                    </Campo>
-                </div>
+                        <Campo etiqueta="Tipo de ambiente" htmlFor="tipo" error={errores.tipo} className="sm:col-span-2">
+                            {/* Se puede escribir cualquier tipo; la lista solo da sugerencias */}
+                            <input id="tipo" name="tipo" list="tipos-ambiente" value={valores.tipo} onChange={cambiar} placeholder="Ej: Sala de sistemas" maxLength={50} required className={claseInput} />
+                            <datalist id="tipos-ambiente">
+                                {tiposAmbiente.map((tipo) => <option key={tipo} value={tipo} />)}
+                            </datalist>
+                        </Campo>
 
+                        <Campo etiqueta="Capacidad" htmlFor="capacidad" error={errores.capacidad}>
+                            <input id="capacidad" name="capacidad" type="number" min="0" max="65535" step="1" value={valores.capacidad} onChange={cambiar} required className={claseInput} />
+                        </Campo>
+
+                        <Campo etiqueta="Estado" htmlFor="estado" error={errores.estado}>
+                            <select id="estado" name="estado" value={valores.estado} onChange={cambiar} className={claseInput}>
+                                {estadosActivo.map((estado) => <option key={estado} value={estado}>{capitalizar(estado)}</option>)}
+                            </select>
+                        </Campo>
+                    </div>
+                </section>
+
+                {/* Pie del formulario: error general (si existe) y botones de acción */}
                 <PieFormulario formulario={formulario} onCancelar={onCerrar} textoGuardar={editando ? 'Guardar cambios' : 'Crear ambiente'} />
             </form>
         </Modal>

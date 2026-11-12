@@ -28,23 +28,32 @@ const ModalAlmacen = ({ almacen, sedeId, onGuardado, onCerrar }) => {
     const { valores, cambiar, errores } = formulario
 
     return (
-        <Modal abierto titulo={editando ? 'Editar almacén' : 'Nuevo almacén'} onCerrar={onCerrar} ancho="max-w-[480px]">
-            <form onSubmit={formulario.enviar} className="space-y-4">
-                <Campo etiqueta="Nombre del almacén" htmlFor="nombre" error={errores.nombre}>
-                    <input id="nombre" name="nombre" value={valores.nombre} onChange={cambiar} placeholder="Ej: Almacén principal" maxLength={100} required className={claseInput} />
-                </Campo>
+        <Modal abierto titulo={editando ? 'Editar almacén' : 'Nuevo almacén'} onCerrar={onCerrar} ancho="max-w-[560px]">
+            {/* Formulario de almacén:
+                - Sección visual única para agrupar campos relacionados.
+                - Sin scroll interno; el contenido se distribuye en grilla responsive. */}
+            <form onSubmit={formulario.enviar} className="space-y-6">
+                <section className="rounded-2xl border border-[#edf2f7] bg-[#fbfdfb] p-4 sm:p-5">
+                    <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.04em] text-[#2F8F00]">Información del almacén</h3>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <Campo etiqueta="Capacidad (elementos)" htmlFor="capacidad_elementos" error={errores.capacidad_elementos}>
-                        <input id="capacidad_elementos" name="capacidad_elementos" type="number" min="0" step="1" value={valores.capacidad_elementos} onChange={cambiar} required className={claseInput} />
-                    </Campo>
-                    <Campo etiqueta="Estado" htmlFor="estado" error={errores.estado}>
-                        <select id="estado" name="estado" value={valores.estado} onChange={cambiar} className={claseInput}>
-                            {estadosActivo.map((estado) => <option key={estado} value={estado}>{capitalizar(estado)}</option>)}
-                        </select>
-                    </Campo>
-                </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Campo etiqueta="Nombre del almacén" htmlFor="nombre" error={errores.nombre} className="sm:col-span-2">
+                            <input id="nombre" name="nombre" value={valores.nombre} onChange={cambiar} placeholder="Ej: Almacén principal" maxLength={100} required className={claseInput} />
+                        </Campo>
 
+                        <Campo etiqueta="Capacidad (elementos)" htmlFor="capacidad_elementos" error={errores.capacidad_elementos}>
+                            <input id="capacidad_elementos" name="capacidad_elementos" type="number" min="0" step="1" value={valores.capacidad_elementos} onChange={cambiar} required className={claseInput} />
+                        </Campo>
+
+                        <Campo etiqueta="Estado" htmlFor="estado" error={errores.estado}>
+                            <select id="estado" name="estado" value={valores.estado} onChange={cambiar} className={claseInput}>
+                                {estadosActivo.map((estado) => <option key={estado} value={estado}>{capitalizar(estado)}</option>)}
+                            </select>
+                        </Campo>
+                    </div>
+                </section>
+
+                {/* Pie del formulario: muestra error general y acciones Guardar/Cancelar */}
                 <PieFormulario formulario={formulario} onCancelar={onCerrar} textoGuardar={editando ? 'Guardar cambios' : 'Crear almacén'} />
             </form>
         </Modal>

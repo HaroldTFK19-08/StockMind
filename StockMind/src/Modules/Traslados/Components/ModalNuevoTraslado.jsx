@@ -47,47 +47,65 @@ const ModalNuevoTraslado = ({ abierto, ambientes, onCerrar, onGuardar }) => {
     }
 
     return (
-        <Modal abierto={abierto} titulo="Nuevo traslado" descripcion="Mueve elementos de un ambiente a otro lugar." onCerrar={cerrar} ancho="max-w-[640px]">
-            <form onSubmit={guardar} className="space-y-5">
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <Campo etiqueta="Ambiente de origen" htmlFor="origenId">
-                        <select id="origenId" name="origenId" value={formulario.origenId} onChange={cambiarCampo} className={claseInput}>
-                            <option value="">Selecciona</option>
-                            {ambientes.map((a) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
-                        </select>
-                    </Campo>
-                    <Campo etiqueta="Destino" htmlFor="destino">
-                        <select id="destino" name="destino" value={formulario.destino} onChange={cambiarCampo} className={claseInput}>
-                            <option value="">Selecciona</option>
-                            {destinos.map((d) => <option key={d}>{d}</option>)}
-                        </select>
-                    </Campo>
-                    <Campo etiqueta="Motivo" htmlFor="motivo" className="sm:col-span-2">
-                        <input id="motivo" name="motivo" value={formulario.motivo} onChange={cambiarCampo} placeholder="Ej: Revisión técnica" className={claseInput} />
-                    </Campo>
-                </div>
+        <Modal abierto={abierto} titulo="Nuevo traslado" descripcion="Mueve elementos de un ambiente a otro lugar." onCerrar={cerrar} ancho="max-w-[760px]">
+            {/* Formulario de traslado sin scroll interno:
+                - Campos principales en grilla para mejor lectura.
+                - Lista de elementos en columnas (sin contenedor con overflow). */}
+            <form onSubmit={guardar} className="space-y-6">
+                <section className="rounded-2xl border border-[#edf2f7] bg-[#fbfdfb] p-4 sm:p-5">
+                    <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.04em] text-[#2F8F00]">Información del traslado</h3>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Campo etiqueta="Ambiente de origen" htmlFor="origenId">
+                            <select id="origenId" name="origenId" value={formulario.origenId} onChange={cambiarCampo} className={claseInput}>
+                                <option value="">Selecciona</option>
+                                {ambientes.map((a) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
+                            </select>
+                        </Campo>
+                        <Campo etiqueta="Destino" htmlFor="destino">
+                            <select id="destino" name="destino" value={formulario.destino} onChange={cambiarCampo} className={claseInput}>
+                                <option value="">Selecciona</option>
+                                {destinos.map((d) => <option key={d}>{d}</option>)}
+                            </select>
+                        </Campo>
+                        <Campo etiqueta="Motivo" htmlFor="motivo" className="sm:col-span-2">
+                            <input id="motivo" name="motivo" value={formulario.motivo} onChange={cambiarCampo} placeholder="Ej: Revisión técnica" className={claseInput} />
+                        </Campo>
+                    </div>
+                </section>
 
                 {formulario.origenId && (
-                    <fieldset>
-                        <legend className="mb-2 text-sm font-semibold text-[#081B28]">Elementos de {origen.nombre} ({seleccionados.length} seleccionados)</legend>
-                        <div className="max-h-56 space-y-2 overflow-y-auto rounded-[14px] border-2 border-[#edf2f7] p-2">
-                            {elementosOrigen.length === 0 && <p className="p-3 text-sm text-[#64748b]">Este ambiente no tiene elementos.</p>}
+                    <fieldset className="rounded-2xl border border-[#edf2f7] bg-white p-4 sm:p-5">
+                        <legend className="px-1 text-sm font-bold uppercase tracking-[0.04em] text-[#2F8F00]">
+                            Elementos de {origen?.nombre} ({seleccionados.length} seleccionados)
+                        </legend>
+
+                        {/* Lista de elementos visible completa en grilla (sin max-height ni overflow) */}
+                        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                            {elementosOrigen.length === 0 && (
+                                <p className="rounded-xl border border-dashed border-[#d7e4d8] p-4 text-sm text-[#64748b] sm:col-span-2">
+                                    Este ambiente no tiene elementos.
+                                </p>
+                            )}
                             {elementosOrigen.map((elemento) => (
-                                <label key={elemento.id} className="flex cursor-pointer items-center gap-3 rounded-[10px] p-2 text-sm hover:bg-[#F7F9F6]">
+                                <label key={elemento.id} className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#edf2f7] p-3 text-sm transition-colors hover:border-[#dce8dd] hover:bg-[#F7F9F6]">
                                     <input type="checkbox" checked={seleccionados.includes(elemento.id)} onChange={() => alternarElemento(elemento.id)} className="h-4 w-4 accent-[#39A900]" />
-                                    <span className="font-semibold text-[#081B28]">{elemento.id} · {elemento.nombre}</span>
-                                    <span className="ml-auto text-[#64748b]">{elemento.estado}</span>
+                                    <span className="min-w-0 flex-1">
+                                        <span className="block font-semibold text-[#081B28]">{elemento.id} · {elemento.nombre}</span>
+                                        <span className="block text-xs text-[#64748b]">{elemento.estado}</span>
+                                    </span>
                                 </label>
                             ))}
                         </div>
                     </fieldset>
                 )}
 
-                {error && <p className="text-sm text-[#dc2626]">{error}</p>}
+                {/* Error de validación del formulario */}
+                {error && <p role="alert" className="animate-inline-error rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm text-[#dc2626]">{error}</p>}
 
-                <div className="flex justify-end gap-2">
-                    <Boton variante="texto" onClick={cerrar}>Cancelar</Boton>
-                    <Boton type="submit">Registrar traslado</Boton>
+                {/* Acciones finales */}
+                <div className="flex flex-col-reverse gap-3 border-t border-[#edf2f7] pt-5 sm:flex-row sm:justify-end">
+                    <Boton variante="texto" className="w-full sm:w-auto" onClick={cerrar}>Cancelar</Boton>
+                    <Boton type="submit" className="w-full sm:w-auto">Registrar traslado</Boton>
                 </div>
             </form>
         </Modal>
