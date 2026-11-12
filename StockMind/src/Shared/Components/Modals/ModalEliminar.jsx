@@ -43,18 +43,26 @@ const ModalEliminar = ({ titulo, nombre, eliminar, onEliminado, onCerrar }) => {
 
     return (
         <Modal abierto titulo={titulo} descripcion="Esta acción no se puede deshacer." onCerrar={cerrar} ancho="max-w-[440px]">
-            <div className="flex items-start gap-3 rounded-[14px] bg-[#fef2f2] p-4">
-                <AlertTriangle className="mt-0.5 shrink-0 text-[#dc2626]" size={20} />
-                <p className="text-sm leading-6 text-[#991b1b]">
-                    ¿Seguro que deseas eliminar <span className="font-semibold">{nombre}</span>?
-                </p>
+            <div className="flex items-start gap-3 rounded-2xl border border-[#fecaca] bg-[#fffafa] p-4">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#fee2e2] text-[#dc2626]">
+                    <AlertTriangle size={20} aria-hidden="true" />
+                </span>
+                <div className="pt-0.5">
+                    <p className="text-sm font-semibold leading-6 text-[#991b1b]">
+                        ¿Seguro que deseas eliminar <span className="font-bold">{nombre}</span>?
+                    </p>
+                </div>
             </div>
 
-            {error && <p role="alert" className="mt-4 text-sm text-[#dc2626]">{error}</p>}
+            {error && (
+                <p role="alert" className="mt-4 rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm leading-5 text-[#b42318]">
+                    {error}
+                </p>
+            )}
 
-            <div className="mt-6 flex justify-end gap-2">
-                <Boton variante="texto" onClick={cerrar} disabled={eliminando}>Cancelar</Boton>
-                <Boton variante="peligro" icono={Trash2} onClick={confirmar} disabled={eliminando}>
+            <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <Boton variante="texto" className="w-full sm:w-auto" onClick={cerrar} disabled={eliminando}>Cancelar</Boton>
+                <Boton variante="peligro" className="w-full sm:w-auto" icono={Trash2} onClick={confirmar} disabled={eliminando} aria-busy={eliminando}>
                     {eliminando ? 'Eliminando...' : 'Eliminar'}
                 </Boton>
             </div>
