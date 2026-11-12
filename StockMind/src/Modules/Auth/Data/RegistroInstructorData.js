@@ -25,20 +25,5 @@ export const registroInstructorData = {
             value: 'C.E.',
             label: 'C.E.'
         }
-    ],
-
-    centros: [
-        {
-            value: 'agropecuario',
-            label: 'Centro Agropecuario - Regional Cauca'
-        },
-        {
-            value: 'ctpi',
-            label: 'CTPI - Teleinformática y Producción Industrial'
-        },
-        {
-            value: 'comercio',
-            label: 'Centro de Comercio y Servicios'
-        }
     ]
 }

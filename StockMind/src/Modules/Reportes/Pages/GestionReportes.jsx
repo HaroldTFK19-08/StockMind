@@ -8,13 +8,14 @@ import Tabla from '../../../Shared/Components/Tables/Tabla'
 import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
 import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
 import Boton from '../../../Shared/Components/UI/Boton'
+import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
 import { formatearFecha } from '../../../Shared/Utils/fechas'
 import { contarPor, incluyeTexto } from '../../../Shared/Utils/texto'
 
 import ModalDetalleReporte from '../Components/ModalDetalleReporte'
 import reportesData, { estadosReporte } from '../Data/reportesData'
 import { buscarAmbiente } from '../../Ambientes/Data/ambientesData'
-import { buscarCentro } from '../../Centros/Data/centrosData'
+import { useCentros } from '../../Centros/Hooks/Centros'
 
 const opciones = ['Todos', ...estadosReporte, 'Urgentes']
 
@@ -24,6 +25,7 @@ const opciones = ['Todos', ...estadosReporte, 'Urgentes']
  * - Administrador: <GestionReportes mostrarCentro />
  */
 const GestionReportes = ({ reportes: reportesIniciales = reportesData, puedeCambiarEstado = false, mostrarCentro = false }) => {
+    const { centros, error: errorCentros } = useCentros()
     const [reportes, setReportes] = useState(reportesIniciales)
     const [busqueda, setBusqueda] = useState('')
     const [filtro, setFiltro] = useState('Todos')
@@ -45,6 +47,7 @@ const GestionReportes = ({ reportes: reportesIniciales = reportesData, puedeCamb
 
     return (
         <section>
+            {mostrarCentro && errorCentros && <MensajeError>{errorCentros}</MensajeError>}
             <div className="mb-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
                 <StatCard etiqueta="Pendientes" valor={conteos.Pendiente} icono={Clock} color="ambar" />
                 <StatCard etiqueta="En revisión" valor={conteos['En revisión']} icono={Wrench} color="azul" />
@@ -72,7 +75,7 @@ const GestionReportes = ({ reportes: reportesIniciales = reportesData, puedeCamb
                                     <p className="text-xs">{reporte.tipoDano}</p>
                                 </td>
                                 <td>
-                                    {mostrarCentro && <p className="text-xs">{buscarCentro(ambiente.centroId).sigla}</p>}
+                                    {mostrarCentro && <p className="text-xs">{centros.find((centro) => Number(centro.id) === Number(ambiente.centroId))?.nombre ?? 'Centro no disponible'}</p>}
                                     {ambiente.nombre}
                                 </td>
                                 <td>{reporte.aprendiz}</td>

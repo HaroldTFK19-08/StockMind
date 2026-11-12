@@ -7,7 +7,7 @@ import Boton from '../../../Shared/Components/UI/Boton'
 import { fechaHoy } from '../../../Shared/Utils/fechas'
 
 import { tiposMovimiento } from '../Data/movimientosData'
-import centrosData from '../../Centros/Data/centrosData'
+import { useCentros } from '../../Centros/Hooks/Centros'
 import { categorias } from '../../Elementos/Data/inventarioData'
 
 const crearFormularioVacio = () => ({
@@ -22,6 +22,7 @@ const crearFormularioVacio = () => ({
 })
 
 const ModalNuevoMovimiento = ({ abierto, onCerrar, onGuardar }) => {
+    const { centros, cargando: cargandoCentros, error: errorCentros } = useCentros()
     const [formulario, setFormulario] = useState(crearFormularioVacio)
     const [error, setError] = useState('')
 
@@ -95,11 +96,12 @@ const ModalNuevoMovimiento = ({ abierto, onCerrar, onGuardar }) => {
                         <input id="cantidad" name="cantidad" type="number" min="1" value={formulario.cantidad} onChange={cambiarCampo} className={claseInput} />
                     </Campo>
                     <Campo etiqueta="Centro" htmlFor="centro">
-                        <select id="centro" name="centro" value={formulario.centro} onChange={cambiarCampo} className={claseInput}>
-                            <option value="">Elige</option>
-                            {centrosData.map((centro) => <option key={centro.id} value={centro.sigla}>{centro.sigla}</option>)}
+                        <select id="centro" name="centro" value={formulario.centro} onChange={cambiarCampo} className={claseInput} disabled={cargandoCentros || centros.length === 0}>
+                            <option value="">{cargandoCentros ? 'Cargando centros...' : 'Elige'}</option>
+                            {centros.map((centro) => <option key={centro.id} value={centro.nombre}>{centro.nombre}</option>)}
                         </select>
                     </Campo>
+                    {errorCentros && <p className="text-sm text-[#dc2626]">{errorCentros}</p>}
                     <Campo etiqueta="Fecha" htmlFor="fecha">
                         <input id="fecha" name="fecha" type="date" value={formulario.fecha} onChange={cambiarCampo} className={claseInput} />
                     </Campo>

@@ -1,10 +1,11 @@
 import pasos from "../Data/Pasos"
+import { actualizarPunteroTarjeta, restablecerPunteroTarjeta } from "./animacionesTarjeta"
 
 const clasesTarjetaAnimada =
-    "origin-bottom opacity-0 [will-change:opacity,translate,scale,filter] transition-[transform,box-shadow,border-color] duration-[380ms] hover:[transform:perspective(900px)_translateY(-10px)_rotateX(1.5deg)] motion-reduce:opacity-100 motion-reduce:origin-center motion-reduce:[translate:none] motion-reduce:scale-100 motion-reduce:blur-0 motion-reduce:transition-none";
+    "auth-card-3d auth-card-spotlight origin-bottom opacity-0 will-change-transform transition-[transform,box-shadow,border-color] duration-[320ms] ease-[cubic-bezier(0.2,0.75,0.25,1)] hover:-translate-y-2 hover:scale-[1.015] motion-reduce:opacity-100 motion-reduce:origin-center motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100 motion-reduce:transition-none";
 
 const clasesIconoAnimado =
-    "transition-[transform,background-color,color] duration-[420ms] group-hover:rotate-[-7deg] group-hover:scale-110 motion-reduce:transition-none";
+    "transition-[transform,background-color,color] duration-[520ms] ease-[cubic-bezier(0.2,0.75,0.25,1)] group-hover:rotate-[-7deg] group-hover:scale-110 motion-reduce:group-hover:rotate-0 motion-reduce:group-hover:scale-100 motion-reduce:transition-none";
 
 export default function Nosotros(){
     return(
@@ -40,7 +41,7 @@ export default function Nosotros(){
                             </p>
                         </div>
                         <div className="flex flex-1 flex-col gap-5">
-                            <div data-reveal-card style={{ "--auth-card-delay": "0ms" }} className={`${clasesTarjetaAnimada} rounded-[20px] border border-[#e6e6e7] bg-[#e1e2e3] p-[35px] text-center shadow-[0_10px_25px_rgba(0,0,0,0.05)]`}>
+                            <div data-reveal-card style={{ "--auth-card-delay": "0ms" }} onPointerMove={actualizarPunteroTarjeta} onPointerLeave={restablecerPunteroTarjeta} className={`${clasesTarjetaAnimada} rounded-[20px] border border-[#e6e6e7] bg-[#e1e2e3] p-[35px] text-center shadow-[0_10px_25px_rgba(0,0,0,0.05)]`}>
                                 <h3 className="mb-[5px] text-[2.5rem] font-bold text-[#39A900]">
                                     100%
                                 </h3>
@@ -48,7 +49,7 @@ export default function Nosotros(){
                                     Control Digital
                                 </p>
                             </div>
-                            <div data-reveal-card style={{ "--auth-card-delay": "100ms" }} className={`${clasesTarjetaAnimada} rounded-[20px] border border-[#e6e6e7] bg-[#e1e2e3] p-[35px] text-center shadow-[0_10px_25px_rgba(0,0,0,0.05)]`}>
+                            <div data-reveal-card style={{ "--auth-card-delay": "100ms" }} onPointerMove={actualizarPunteroTarjeta} onPointerLeave={restablecerPunteroTarjeta} className={`${clasesTarjetaAnimada} rounded-[20px] border border-[#e6e6e7] bg-[#e1e2e3] p-[35px] text-center shadow-[0_10px_25px_rgba(0,0,0,0.05)]`}>
                                 <h3 className="mb-[5px] text-[2.5rem] font-bold text-[#39A900]">
                                     Real-Time
                                 </h3>
@@ -76,6 +77,8 @@ export default function Nosotros(){
                                             key={index}
                                             data-reveal-card
                                             style={{ "--auth-card-delay": `${index * 90}ms` }}
+                                            onPointerMove={actualizarPunteroTarjeta}
+                                            onPointerLeave={restablecerPunteroTarjeta}
                                             className={`${clasesTarjetaAnimada} group rounded-[25px] border border-[#f1f5f9] bg-[#f2f5f5] px-[25px] py-10 text-center shadow-[0_4px_6px_rgba(0,0,0,0.02)] hover:border-[#39A900] hover:bg-white hover:shadow-[0_20px_40px_rgba(57,169,0,0.1)] lg:col-span-2 ${
                                                 index === 3
                                                     ? 'lg:col-start-2'

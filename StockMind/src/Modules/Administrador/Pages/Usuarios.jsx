@@ -11,12 +11,13 @@ import Boton from '../../../Shared/Components/UI/Boton'
 import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
 import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
 import MensajeExito from '../../../Shared/Components/Feedback/MensajeExito'
+import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
 import { incluyeTexto } from '../../../Shared/Utils/texto'
 
 import usuariosData, { roles } from '../Data/usuariosData'
-import centrosData from '../../Centros/Data/centrosData'
+import { useCentros } from '../../Centros/Hooks/Centros'
 
-const usuarioVacio = { nombre: '', correo: '', rol: 'Instructor', centro: 'CCYS' }
+const usuarioVacio = { nombre: '', correo: '', rol: 'Instructor', centro: '' }
 
 // Iniciales para el avatar: "Carlos Ruiz" -> "CR"
 const iniciales = (nombre) => nombre.split(' ').slice(0, 2).map((p) => p[0]).join('')
@@ -26,6 +27,7 @@ const contarRol = (usuarios, rol) => usuarios.filter((u) => u.roles.includes(rol
 
 // Gestión de usuarios (Administrador)
 const Usuarios = () => {
+    const { centros, cargando: cargandoCentros, error: errorCentros } = useCentros()
     const [usuarios, setUsuarios] = useState(usuariosData)
     const [busqueda, setBusqueda] = useState('')
     const [rol, setRol] = useState('Todos')
@@ -50,6 +52,7 @@ const Usuarios = () => {
     const guardarUsuario = (evento) => {
         evento.preventDefault()
         if (!nuevo.nombre.trim() || !nuevo.correo.includes('@')) return setError('Escribe el nombre y un correo válido')
+        if (!centros.some((centro) => String(centro.id) === nuevo.centro)) return setError('Selecciona un centro válido')
 
         setUsuarios([{ id: Date.now(), nombre: nuevo.nombre, correo: nuevo.correo, roles: [nuevo.rol], centro: nuevo.centro, activo: true }, ...usuarios])
         setMensaje(`Se creó el usuario ${nuevo.nombre}`)
@@ -61,6 +64,7 @@ const Usuarios = () => {
     return (
         <section>
             {mensaje && <MensajeExito>{mensaje}</MensajeExito>}
+            {errorCentros && <MensajeError>{errorCentros}</MensajeError>}
 
             <div className="mb-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
                 <StatCard etiqueta="Usuarios" valor={usuarios.length} icono={Users} />
@@ -99,7 +103,7 @@ const Usuarios = () => {
                                     ))}
                                 </div>
                             </td>
-                            <td>{usuario.centro}</td>
+                            <td>{centros.find((centro) => String(centro.id) === String(usuario.centro))?.nombre ?? usuario.centro}</td>
                             <td><EstadoBadge estado={usuario.activo ? 'Activo' : 'Inactivo'} /></td>
                             <td className="text-right">
                                 <Boton variante={usuario.activo ? 'peligro' : 'secundario'} className="px-3 py-1.5" onClick={() => alternarActivo(usuario.id)}>
@@ -128,8 +132,9 @@ const Usuarios = () => {
                             </select>
                         </Campo>
                         <Campo etiqueta="Centro" htmlFor="centro">
-                            <select id="centro" name="centro" value={nuevo.centro} onChange={cambiarCampo} className={claseInput}>
-                                {centrosData.map((c) => <option key={c.id} value={c.sigla}>{c.sigla}</option>)}
+                            <select id="centro" name="centro" value={nuevo.centro} onChange={cambiarCampo} className={claseInput} required disabled={cargandoCentros || centros.length === 0}>
+                                <option value="">{cargandoCentros ? 'Cargando centros...' : 'Selecciona un centro'}</option>
+                                {centros.map((centro) => <option key={centro.id} value={centro.id}>{centro.nombre}</option>)}
                             </select>
                         </Campo>
                     </div>

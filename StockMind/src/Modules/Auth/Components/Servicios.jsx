@@ -1,11 +1,12 @@
 import { CheckCircle2 } from "lucide-react";
 import servicios from "../Data/Servicios";
+import { actualizarPunteroTarjeta, restablecerPunteroTarjeta } from "./animacionesTarjeta";
 
 const clasesTarjetaAnimada =
-    "group origin-bottom opacity-0 [will-change:opacity,translate,scale,filter] transition-[transform,box-shadow,border-color] duration-[380ms] hover:[transform:perspective(900px)_translateY(-10px)_rotateX(1.5deg)] motion-reduce:opacity-100 motion-reduce:origin-center motion-reduce:[translate:none] motion-reduce:scale-100 motion-reduce:blur-0 motion-reduce:transition-none";
+    "group auth-card-3d auth-card-spotlight origin-bottom opacity-0 will-change-transform transition-[transform,box-shadow,border-color] duration-[320ms] ease-[cubic-bezier(0.2,0.75,0.25,1)] hover:-translate-y-2 hover:scale-[1.015] motion-reduce:opacity-100 motion-reduce:origin-center motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100 motion-reduce:transition-none";
 
 const clasesIconoAnimado =
-    "transition-[transform,background-color,color] duration-[420ms] group-hover:rotate-[-7deg] group-hover:scale-110 motion-reduce:transition-none";
+    "transition-[transform,background-color,color] duration-[520ms] ease-[cubic-bezier(0.2,0.75,0.25,1)] group-hover:rotate-[-7deg] group-hover:scale-110 motion-reduce:group-hover:rotate-0 motion-reduce:group-hover:scale-100 motion-reduce:transition-none";
 
 export default function Servicios(){
     return(
@@ -35,6 +36,8 @@ export default function Servicios(){
                                     key={servicio.titulo}
                                     data-reveal-card
                                     style={{ "--auth-card-delay": `${index * 120}ms` }}
+                                    onPointerMove={actualizarPunteroTarjeta}
+                                    onPointerLeave={restablecerPunteroTarjeta}
                                     className={`${clasesTarjetaAnimada} relative rounded-[30px] bg-white px-[35px] py-[50px] text-center ${
                                         servicio.destacado
                                             ? 'border-2 border-[#39A900] shadow-[0_20px_40px_rgba(57,169,0,0.1)] hover:shadow-[0_25px_50px_rgba(57,169,0,0.16)]'

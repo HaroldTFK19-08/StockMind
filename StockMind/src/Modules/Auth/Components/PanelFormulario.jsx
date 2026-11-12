@@ -12,6 +12,7 @@ import {
 import RegistroInput from './RegistroInput'
 import useRegistroInstructor from '../Hooks/RegistroInstructor'
 import { registroInstructorData } from '../Data/RegistroInstructorData'
+import { useCentros } from '../../Centros/Hooks/Centros'
 
 const PaneLFormulario = () => {
     const {
@@ -21,6 +22,7 @@ const PaneLFormulario = () => {
         errors,
         isSubmitting
     } = useRegistroInstructor()
+    const { centros, cargando: cargandoCentros, error: errorCentros } = useCentros()
 
     return (
         <section className="flex w-full items-center justify-center bg-white px-6 py-10 sm:px-10 lg:w-1/2">
@@ -184,22 +186,25 @@ const PaneLFormulario = () => {
                                     }`}
                                 >
                                     <option value="">
-                                        Seleccione Centro
+                                        {cargandoCentros ? 'Cargando centros...' : 'Seleccione Centro'}
                                     </option>
 
-                                    {registroInstructorData.centros.map(
+                                    {centros.map(
                                         (centro) => (
                                             <option
-                                                key={centro.value}
-                                                value={centro.value}
+                                                key={centro.id}
+                                                value={centro.id}
                                             >
-                                                {centro.label}
+                                                {centro.nombre}
                                             </option>
                                         )
                                     )}
                                 </select>
                             </div>
 
+                            {errorCentros && (
+                                <p className="mt-1 px-1 text-xs font-medium text-red-500">{errorCentros}</p>
+                            )}
                             {errors.centro_formacion && (
                                 <p className="mt-1 px-1 text-xs font-medium text-red-500">
                                     {errors.centro_formacion.message}

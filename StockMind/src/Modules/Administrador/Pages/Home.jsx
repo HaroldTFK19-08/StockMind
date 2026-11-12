@@ -7,16 +7,18 @@ import Tabla from '../../../Shared/Components/Tables/Tabla'
 import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
 import { formatearFecha } from '../../../Shared/Utils/fechas'
 import { contarPor } from '../../../Shared/Utils/texto'
+import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
 
 import perfilAdmin from '../Data/perfilAdmin'
 import usuariosData from '../Data/usuariosData'
-import centrosData, { buscarCentro } from '../../Centros/Data/centrosData'
+import { useCentros } from '../../Centros/Hooks/Centros'
 import { buscarAmbiente } from '../../Ambientes/Data/ambientesData'
 import inventarioData from '../../Elementos/Data/inventarioData'
 import reportesData from '../../Reportes/Data/reportesData'
 import TarjetaMindBot from '../../../Shared/Components/Cards/TarjetaMindBot'
 
 export default function HomeAdmin() {
+    const { centros, error: errorCentros } = useCentros()
     const urgentes = reportesData.filter((r) => r.prioridad === 'Alta' && r.estado !== 'Resuelto')
 
     // Elementos dañados o en reparación (los que necesitan atención)
@@ -24,6 +26,7 @@ export default function HomeAdmin() {
 
     return (
         <section className="space-y-8">
+            {errorCentros && <MensajeError>{errorCentros}</MensajeError>}
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-bold text-[#081B28] sm:text-3xl">Hola, {perfilAdmin.nombres.split(' ')[0]}</h2>
@@ -34,7 +37,7 @@ export default function HomeAdmin() {
 
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
                 <StatCard etiqueta="Elementos" valor={inventarioData.length} icono={Package} />
-                <StatCard etiqueta="Centros" valor={centrosData.length} icono={Building2} color="azul" />
+                <StatCard etiqueta="Centros" valor={centros.length} icono={Building2} color="azul" />
                 <StatCard etiqueta="Usuarios" valor={usuariosData.length} icono={Users} color="ambar" />
                 <StatCard etiqueta="Elementos dañados" valor={contarPor(inventarioData, 'estado', 'Dañado')} icono={AlertOctagon} color="rojo" />
             </div>
@@ -54,7 +57,7 @@ export default function HomeAdmin() {
                                 <tr key={elemento.id}>
                                     <td className="font-semibold text-[#081B28]">{elemento.id}</td>
                                     <td className="font-semibold text-[#081B28]">{elemento.nombre}</td>
-                                    <td>{buscarCentro(ambiente.centroId).sigla}</td>
+                                    <td>{centros.find((centro) => Number(centro.id) === Number(ambiente.centroId))?.nombre ?? 'Centro no disponible'}</td>
                                     <td>{ambiente.nombre}</td>
                                     <td><EstadoBadge estado={elemento.estado} /></td>
                                 </tr>

@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
-import { obtenerCentros } from "../Services/ListCentros";
+import { mensajeError } from "../../../Core/Services/apiUtils";
+import { obtenerCentros } from "../Services/centrosService";
 
 export function useCentros() {
     const [centros, setCentros] = useState([]);
@@ -12,8 +13,7 @@ export function useCentros() {
                 const datos = await obtenerCentros();
                 setCentros(datos);
             } catch (error) {
-                console.error(error);
-                setError("No se pudieron cargar los centros.");
+                setError(mensajeError(error));
             } finally {
                 setCargando(false);
             }
