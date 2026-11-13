@@ -7,6 +7,7 @@ import EstadoVacio from "../../../Shared/Components/Feedback/EstadoVacio"
 import {useCategoriasModal} from "../hook/useModal"
 import CategoriasModal from "../components/ModalCategoria"
 import ConfirmarEliminarCategoria from "../components/ConfirmarEliminarCategoria"
+import { mensajeError } from "../../../Core/Services/apiUtils"
 const Categorias = () => {
     const {
         categorias,
@@ -23,8 +24,6 @@ const Categorias = () => {
     const [guardando, setGuardando] = useState(false);
     const [eliminando, setEliminando] = useState(false);
     const [errorOperacion, setErrorOperacion] = useState('');
-
-    const mostrarError = (err) => err.response?.data?.message || err.message || 'Ocurrió un error inesperado.';
 
     const abrirModalNueva = () => {
         setCategoriaEditando(null);
@@ -60,7 +59,7 @@ const Categorias = () => {
             modal.cerrarModal();
             setCategoriaEditando(null);
         } catch (err) {
-            setErrorOperacion(mostrarError(err));
+            setErrorOperacion(mensajeError(err));
         } finally {
             setGuardando(false);
         }
@@ -75,7 +74,7 @@ const Categorias = () => {
             await recargarCategorias();
             setCategoriaAEliminar(null);
         } catch (err) {
-            setErrorOperacion(mostrarError(err));
+            setErrorOperacion(mensajeError(err));
         } finally {
             setEliminando(false);
         }
@@ -88,9 +87,17 @@ const Categorias = () => {
                 Aquí puedes gestionar las categorías de los elementos del inventario, consultar las que ya están registradas y mantener su clasificación organizada.
             </p>
             {error && (
-                <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-700">
-                    Error al cargar categorías: {error.message}
-                </p>
+                <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-red-50 p-4 text-sm text-red-700">
+                    <p>Error al cargar categorías: {mensajeError(error)}</p>
+                    <button
+                        type="button"
+                        onClick={() => void recargarCategorias()}
+                        disabled={loading}
+                        className="rounded-lg border border-red-200 px-3 py-1.5 font-medium hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        {loading ? 'Reintentando...' : 'Reintentar'}
+                    </button>
+                </div>
             )}
             {errorOperacion && (
                 <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-700">
@@ -120,13 +127,13 @@ const Categorias = () => {
                 <Tabla columnas={['Nombre', 'Descripción', 'Acciones']}>
                     <tr><td colSpan={3} className="py-6 text-center">Cargando categorías...</td></tr>
                 </Tabla>
-            ) : categorias.length === 0 ? (
+            ) : categorias.length === 0 && !error ? (
                 <EstadoVacio
                     titulo="Todavía no hay categorías"
                     descripcion="Crea la primera categoría para organizar los elementos del inventario."
                     icono={Layers}
                 />
-            ) : (
+            ) : categorias.length > 0 ? (
                 <Tabla columnas={['Nombre', 'Descripción', 'Acciones']}>
                     {categorias.map((categoria) => (
                         <tr key={categoria.id}>
@@ -159,7 +166,7 @@ const Categorias = () => {
                         </tr>
                     ))}
                 </Tabla>
-            )}
+            ) : null}
             <CategoriasModal
                 abierto={modal.modalAbierto}
                 onCerrar={modal.cerrarModal}
