@@ -3,8 +3,8 @@ import { AlertOctagon, Building2, ChevronRight, Package, Users } from 'lucide-re
 
 import StatCard from '../../../Shared/Components/Cards/StatCard'
 import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
-import Tabla from '../../../Shared/Components/Tables/Tabla'
 import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
+import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
 import { formatearFecha } from '../../../Shared/Utils/fechas'
 import { contarPor } from '../../../Shared/Utils/texto'
 import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
@@ -50,20 +50,36 @@ export default function HomeAdmin() {
                             Ver inventario <ChevronRight size={16} />
                         </Link>
                     </div>
-                    <Tabla columnas={['Código', 'Elemento', 'Centro', 'Ambiente', 'Estado']}>
-                        {conProblemas.map((elemento) => {
-                            const ambiente = buscarAmbiente(elemento.ambienteId)
-                            return (
-                                <tr key={elemento.id}>
-                                    <td className="font-semibold text-[#081B28]">{elemento.id}</td>
-                                    <td className="font-semibold text-[#081B28]">{elemento.nombre}</td>
-                                    <td>{centros.find((centro) => Number(centro.id) === Number(ambiente.centroId))?.nombre ?? 'Centro no disponible'}</td>
-                                    <td>{ambiente.nombre}</td>
-                                    <td><EstadoBadge estado={elemento.estado} /></td>
-                                </tr>
-                            )
-                        })}
-                    </Tabla>
+                    {conProblemas.length > 0 ? (
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            {conProblemas.map((elemento) => {
+                                const ambiente = buscarAmbiente(elemento.ambienteId)
+                                return (
+                                    <Tarjeta key={elemento.id} className="h-full">
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div>
+                                                <p className="text-xs font-semibold text-[#39A900]">{elemento.id}</p>
+                                                <h4 className="mt-1 font-bold text-[#081B28]">{elemento.nombre}</h4>
+                                            </div>
+                                            <EstadoBadge estado={elemento.estado} />
+                                        </div>
+                                        <dl className="mt-4 space-y-2 rounded-[14px] bg-[#F7F9F6] p-3 text-sm">
+                                            <div>
+                                                <dt className="text-xs text-[#64748b]">Centro</dt>
+                                                <dd className="font-semibold text-[#081B28]">{centros.find((centro) => Number(centro.id) === Number(ambiente.centroId))?.nombre ?? 'Centro no disponible'}</dd>
+                                            </div>
+                                            <div>
+                                                <dt className="text-xs text-[#64748b]">Ambiente</dt>
+                                                <dd className="font-semibold text-[#081B28]">{ambiente.nombre}</dd>
+                                            </div>
+                                        </dl>
+                                    </Tarjeta>
+                                )
+                            })}
+                        </div>
+                    ) : (
+                        <EstadoVacio titulo="No hay elementos que requieran atención" />
+                    )}
                 </div>
 
                 <Tarjeta titulo="Reportes urgentes" className="h-fit" accion={<Link to="/admin/reportes" className="text-sm font-semibold text-[#39A900] hover:underline">Ver todos</Link>}>

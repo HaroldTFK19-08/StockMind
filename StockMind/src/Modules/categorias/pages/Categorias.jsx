@@ -2,7 +2,7 @@ import { useState } from "react"
 import StatCard from "../../../Shared/Components/Cards/StatCard"
 import { useCategorias } from "../hook/categoria"
 import { Layers, Plus, Pencil, Trash2 } from "lucide-react"
-import Tabla from "../../../Shared/Components/Tables/Tabla"
+import Tarjeta from "../../../Shared/Components/Cards/Tarjeta"
 import EstadoVacio from "../../../Shared/Components/Feedback/EstadoVacio"
 import {useCategoriasModal} from "../hook/useModal"
 import CategoriasModal from "../components/ModalCategoria"
@@ -124,9 +124,7 @@ const Categorias = () => {
             </div>
 
             {loading ? (
-                <Tabla columnas={['Nombre', 'Descripción', 'Acciones']}>
-                    <tr><td colSpan={3} className="py-6 text-center">Cargando categorías...</td></tr>
-                </Tabla>
+                <Tarjeta className="text-center text-sm text-[#64748b]">Cargando categorías...</Tarjeta>
             ) : categorias.length === 0 && !error ? (
                 <EstadoVacio
                     titulo="Todavía no hay categorías"
@@ -134,17 +132,15 @@ const Categorias = () => {
                     icono={Layers}
                 />
             ) : categorias.length > 0 ? (
-                <Tabla columnas={['Nombre', 'Descripción', 'Acciones']}>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {categorias.map((categoria) => (
-                        <tr key={categoria.id}>
-                            <td className="font-medium text-[#1e293b]">
-                                {categoria.nombre}
-                            </td>
-                            <td className="text-[#64748b]">
-                                {categoria.descripcion || 'Sin descripción'}
-                            </td>
-                            <td>
-                                <div className="flex items-center gap-2">
+                        <Tarjeta key={categoria.id} className="flex h-full flex-col">
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-[#39A900]">Categoría #{categoria.id}</p>
+                                    <h2 className="mt-1 text-lg font-bold text-[#081B28]">{categoria.nombre}</h2>
+                                </div>
+                                <div className="flex shrink-0 items-center gap-1">
                                     <button
                                         type="button"
                                         onClick={() => abrirModalEdicion(categoria)}
@@ -162,10 +158,13 @@ const Categorias = () => {
                                         <Trash2 size={17} />
                                     </button>
                                 </div>
-                            </td>
-                        </tr>
+                            </div>
+                            <p className="mt-4 flex-1 text-sm leading-relaxed text-[#64748b]">
+                                {categoria.descripcion || 'Sin descripción'}
+                            </p>
+                        </Tarjeta>
                     ))}
-                </Tabla>
+                </div>
             ) : null}
             <CategoriasModal
                 abierto={modal.modalAbierto}

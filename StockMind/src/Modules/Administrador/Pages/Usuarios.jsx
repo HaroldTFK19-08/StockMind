@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { GraduationCap, Plus, UserCog, Users, Warehouse } from 'lucide-react'
 
 import StatCard from '../../../Shared/Components/Cards/StatCard'
+import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import SearchBar from '../../../Shared/Forms/SearchBar'
 import FiltroChips from '../../../Shared/Components/UI/FiltroChips'
-import Tabla from '../../../Shared/Components/Tables/Tabla'
 import Modal from '../../../Shared/Components/Modals/Modal'
 import Campo, { claseInput } from '../../../Shared/Components/Forms/Campo'
 import Boton from '../../../Shared/Components/UI/Boton'
@@ -82,37 +82,35 @@ const Usuarios = () => {
             <FiltroChips opciones={['Todos', ...roles]} valor={rol} onCambiar={setRol} conteos={conteos} />
 
             {filtrados.length > 0 ? (
-                <Tabla columnas={['Usuario', 'Roles', 'Centro', 'Estado', '']}>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {filtrados.map((usuario) => (
-                        <tr key={usuario.id}>
-                            <td>
-                                <div className="flex items-center gap-3">
-                                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#E8F7E3] text-sm font-bold text-[#2F8F00]">
-                                        {iniciales(usuario.nombre)}
-                                    </span>
-                                    <div>
-                                        <p className="font-semibold text-[#081B28]">{usuario.nombre}</p>
-                                        <p className="text-xs">{usuario.correo}</p>
-                                    </div>
+                        <Tarjeta key={usuario.id} className="flex h-full flex-col">
+                            <div className="flex items-center gap-3">
+                                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#E8F7E3] text-sm font-bold text-[#2F8F00]">
+                                    {iniciales(usuario.nombre)}
+                                </span>
+                                <div className="min-w-0">
+                                    <h3 className="truncate font-bold text-[#081B28]">{usuario.nombre}</h3>
+                                    <p className="truncate text-sm text-[#64748b]">{usuario.correo}</p>
                                 </div>
-                            </td>
-                            <td>
-                                <div className="flex flex-wrap gap-1">
-                                    {usuario.roles.map((r) => (
-                                        <span key={r} className="rounded-full bg-[#F4F7FA] px-2.5 py-1 text-xs font-semibold text-[#475569]">{r}</span>
-                                    ))}
-                                </div>
-                            </td>
-                            <td>{centros.find((centro) => String(centro.id) === String(usuario.centro))?.nombre ?? usuario.centro}</td>
-                            <td><EstadoBadge estado={usuario.activo ? 'Activo' : 'Inactivo'} /></td>
-                            <td className="text-right">
-                                <Boton variante={usuario.activo ? 'peligro' : 'secundario'} className="px-3 py-1.5" onClick={() => alternarActivo(usuario.id)}>
-                                    {usuario.activo ? 'Desactivar' : 'Activar'}
-                                </Boton>
-                            </td>
-                        </tr>
+                            </div>
+                            <div className="mt-5 flex flex-wrap gap-1">
+                                {usuario.roles.map((r) => (
+                                    <span key={r} className="rounded-full bg-[#F4F7FA] px-2.5 py-1 text-xs font-semibold text-[#475569]">{r}</span>
+                                ))}
+                            </div>
+                            <dl className="mt-4 rounded-[14px] bg-[#F7F9F6] p-3 text-sm">
+                                <dt className="text-xs text-[#64748b]">Centro</dt>
+                                <dd className="font-semibold text-[#081B28]">{centros.find((centro) => String(centro.id) === String(usuario.centro))?.nombre ?? usuario.centro}</dd>
+                                <dt className="mt-3 text-xs text-[#64748b]">Estado</dt>
+                                <dd className="mt-1"><EstadoBadge estado={usuario.activo ? 'Activo' : 'Inactivo'} /></dd>
+                            </dl>
+                            <Boton variante={usuario.activo ? 'peligro' : 'secundario'} className="mt-4 w-full" onClick={() => alternarActivo(usuario.id)}>
+                                {usuario.activo ? 'Desactivar' : 'Activar'}
+                            </Boton>
+                        </Tarjeta>
                     ))}
-                </Tabla>
+                </div>
             ) : (
                 <EstadoVacio titulo="No hay usuarios con ese filtro" descripcion="Busca por otro nombre o cambia el rol." />
             )}

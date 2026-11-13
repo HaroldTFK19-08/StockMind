@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { ArrowLeftRight, ArrowRight, Package, Plus, Truck } from 'lucide-react'
 
 import StatCard from '../../../Shared/Components/Cards/StatCard'
+import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import SearchBar from '../../../Shared/Forms/SearchBar'
-import Tabla from '../../../Shared/Components/Tables/Tabla'
 import Modal from '../../../Shared/Components/Modals/Modal'
 import Boton from '../../../Shared/Components/UI/Boton'
 import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
@@ -60,25 +60,32 @@ const Traslados = ({ ambientes = ambientesData }) => {
             <SearchBar placeholder="Buscar por código, motivo, origen o destino..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
 
             {filtrados.length > 0 ? (
-                <Tabla columnas={['Código', 'Motivo', 'Recorrido', 'Elementos', 'Fecha', 'Estado', '']}>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {filtrados.map((traslado) => (
-                        <tr key={traslado.id}>
-                            <td className="font-semibold text-[#081B28]">{traslado.id}</td>
-                            <td>{traslado.motivo}</td>
-                            <td>
-                                <span className="flex items-center gap-2">
-                                    {traslado.origen} <ArrowRight size={14} className="shrink-0 text-[#39A900]" /> {traslado.destino}
-                                </span>
-                            </td>
-                            <td>{traslado.elementos.length}</td>
-                            <td className="whitespace-nowrap">{formatearFecha(traslado.fecha)}</td>
-                            <td><EstadoBadge estado={traslado.estado} /></td>
-                            <td className="text-right">
+                        <Tarjeta key={traslado.id} titulo={traslado.id} className="flex h-full flex-col">
+                            <p className="text-sm text-[#64748b]">{traslado.motivo}</p>
+                            <div className="mt-4 flex items-center justify-between gap-2 rounded-[14px] bg-[#F7F9F6] p-3 text-sm font-semibold text-[#081B28]">
+                                <span className="min-w-0 truncate">{traslado.origen}</span>
+                                <ArrowRight size={16} className="shrink-0 text-[#39A900]" />
+                                <span className="min-w-0 truncate text-right">{traslado.destino}</span>
+                            </div>
+                            <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Elementos</dt>
+                                    <dd className="font-semibold text-[#081B28]">{traslado.elementos.length}</dd>
+                                </div>
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Fecha</dt>
+                                    <dd className="font-semibold text-[#081B28]">{formatearFecha(traslado.fecha)}</dd>
+                                </div>
+                            </dl>
+                            <div className="mt-4 flex items-center justify-between gap-3">
+                                <EstadoBadge estado={traslado.estado} />
                                 <Boton variante="secundario" className="px-3 py-1.5" onClick={() => setDetalle(traslado)}>Detalles</Boton>
-                            </td>
-                        </tr>
+                            </div>
+                        </Tarjeta>
                     ))}
-                </Tabla>
+                </div>
             ) : (
                 <EstadoVacio titulo="No hay traslados con esa búsqueda" />
             )}

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ArrowDownToLine, ArrowUpFromLine, Boxes, Plus } from 'lucide-react'
 
 import StatCard from '../../../Shared/Components/Cards/StatCard'
-import Tabla from '../../../Shared/Components/Tables/Tabla'
+import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import Boton from '../../../Shared/Components/UI/Boton'
 import FiltroChips from '../../../Shared/Components/UI/FiltroChips'
 import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
@@ -47,21 +47,37 @@ const Movimientos = () => {
 
             <FiltroChips opciones={['Todos', ...tiposMovimiento]} valor={filtro} onCambiar={setFiltro} />
             {visibles.length > 0 ? (
-                <Tabla columnas={['Tipo', 'Elemento', 'Cantidad', 'Centro', 'Responsable', 'Fecha']}>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {visibles.map((m) => (
-                        <tr key={m.id}>
-                            <td><EstadoBadge estado={m.tipo} /></td>
-                            <td>
-                                <p className="font-semibold text-[#081B28]">{m.elemento}</p>
-                                <p className="text-xs">{m.categoria}</p>
-                            </td>
-                            <td>{m.cantidad}</td>
-                            <td>{m.centro}</td>
-                            <td>{m.responsable}</td>
-                            <td className="whitespace-nowrap">{formatearFecha(m.fecha)}</td>
-                        </tr>
+                        <Tarjeta key={m.id} className="flex h-full flex-col">
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <h3 className="font-bold text-[#081B28]">{m.elemento}</h3>
+                                    <p className="text-sm text-[#64748b]">{m.categoria}</p>
+                                </div>
+                                <EstadoBadge estado={m.tipo} />
+                            </div>
+                            <dl className="mt-5 grid grid-cols-2 gap-3 rounded-[14px] bg-[#F7F9F6] p-3 text-sm">
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Cantidad</dt>
+                                    <dd className="font-semibold text-[#081B28]">{m.cantidad}</dd>
+                                </div>
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Fecha</dt>
+                                    <dd className="font-semibold text-[#081B28]">{formatearFecha(m.fecha)}</dd>
+                                </div>
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Centro</dt>
+                                    <dd className="font-semibold text-[#081B28]">{m.centro}</dd>
+                                </div>
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Responsable</dt>
+                                    <dd className="font-semibold text-[#081B28]">{m.responsable}</dd>
+                                </div>
+                            </dl>
+                        </Tarjeta>
                     ))}
-                </Tabla>
+                </div>
             ) : (
                 <EstadoVacio titulo="No hay movimientos para mostrar" />
             )}

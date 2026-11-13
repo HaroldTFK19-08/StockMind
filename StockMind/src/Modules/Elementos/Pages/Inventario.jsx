@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Archive, CircleCheck, Package, Pencil, Plus, Trash2, Wrench } from 'lucide-react'
+import { Archive, CircleCheck, Eye, Package, Pencil, Plus, Trash2, Wrench } from 'lucide-react'
 
 import StatCard from '../../../Shared/Components/Cards/StatCard'
+import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import SearchBar from '../../../Shared/Forms/SearchBar'
 import FiltroChips from '../../../Shared/Components/UI/FiltroChips'
-import Tabla from '../../../Shared/Components/Tables/Tabla'
 import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
 import Boton from '../../../Shared/Components/UI/Boton'
 import BotonIcono from '../../../Shared/Components/UI/BotonIcono'
@@ -19,6 +19,7 @@ import { useCarga } from '../../../Shared/Hooks/useCarga'
 import { capitalizar, contarPor, incluyeTexto } from '../../../Shared/Utils/texto'
 
 import FotoElemento from '../Components/FotoElemento'
+import ModalDetalleElemento from '../Components/ModalDetalleElemento'
 import ModalElemento from '../Components/ModalElemento'
 import { estadosElemento, ubicacionDe } from '../Data/opcionesElemento'
 import { eliminarElemento, obtenerElementos } from '../Services/elementosService'
@@ -67,6 +68,7 @@ const Inventario = ({ puedeAgregar = false }) => {
     const [categoria, setCategoria] = useState('Todas')
     const [estado, setEstado] = useState('')
     const [ubicacion, setUbicacion] = useState(ubicacionUrl)
+    const [elementoAConsultar, setElementoAConsultar] = useState(null)
     const [modal, setModal] = useState(null) // null = cerrado | { elemento: null } = nuevo | { elemento } = editar
     const [elementoAEliminar, setElementoAEliminar] = useState(null)
     const [mensaje, setMensaje] = useState('')
@@ -98,8 +100,6 @@ const Inventario = ({ puedeAgregar = false }) => {
         setMensaje(respuesta.message)
         recargar()
     }
-
-    const columnas = ['Código', 'Elemento', 'Categoría', 'Ubicación', 'Condición', 'Estado']
 
     return (
         <section>
@@ -141,31 +141,45 @@ const Inventario = ({ puedeAgregar = false }) => {
             <FiltroChips opciones={['Todas', ...nombresCategorias]} valor={categoria} onCambiar={setCategoria} conteos={conteoCategorias} />
 
             {filtrados.length > 0 ? (
-                <Tabla columnas={puedeAgregar ? [...columnas, 'Acciones'] : columnas}>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {filtrados.map((elemento) => (
-                        <tr key={elemento.id}>
-                            <td className="font-semibold text-[#081B28]">{elemento.codigo_inventario}</td>
-                            <td>
-                                <div className="flex items-center gap-3">
-                                    <FotoElemento elemento={elemento} />
-                                    <span className="font-semibold text-[#081B28]">{elemento.nombre}</span>
+                        <Tarjeta key={elemento.id} className="flex h-full flex-col">
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="flex min-w-0 items-center gap-3">
+                                    <FotoElemento elemento={elemento} tamano="h-12 w-12" />
+                                    <div className="min-w-0">
+                                        <h3 className="truncate font-bold text-[#081B28]">{elemento.nombre}</h3>
+                                        <p className="text-sm text-[#64748b]">{elemento.codigo_inventario}</p>
+                                    </div>
                                 </div>
-                            </td>
-                            <td>{elemento.category?.nombre}</td>
-                            <td>{ubicacionDe(elemento)}</td>
-                            <td><EstadoBadge estado={capitalizar(elemento.condicion)} /></td>
-                            <td><EstadoBadge estado={capitalizar(elemento.estado)} /></td>
-                            {puedeAgregar && (
-                                <td>
-                                    <div className="flex items-center gap-1">
+                                <EstadoBadge estado={capitalizar(elemento.estado)} />
+                            </div>
+                            <dl className="mt-5 grid grid-cols-2 gap-3 rounded-[14px] bg-[#F7F9F6] p-3 text-sm">
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Categoría</dt>
+                                    <dd className="font-semibold text-[#081B28]">{elemento.category?.nombre ?? 'Sin categoría'}</dd>
+                                </div>
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Condición</dt>
+                                    <dd className="mt-1"><EstadoBadge estado={capitalizar(elemento.condicion)} /></dd>
+                                </div>
+                                <div className="col-span-2">
+                                    <dt className="text-xs text-[#64748b]">Ubicación</dt>
+                                    <dd className="font-semibold text-[#081B28]">{ubicacionDe(elemento)}</dd>
+                                </div>
+                            </dl>
+                            <div className="mt-4 flex justify-end gap-1">
+                                <Boton variante="secundario" icono={Eye} className="px-3 py-1.5" onClick={() => setElementoAConsultar(elemento)}>Ver</Boton>
+                                {puedeAgregar && (
+                                    <>
                                         <BotonIcono icono={Pencil} etiqueta={`Editar ${elemento.nombre}`} onClick={() => setModal({ elemento })} />
                                         <BotonIcono icono={Trash2} etiqueta={`Eliminar ${elemento.nombre}`} variante="peligro" onClick={() => setElementoAEliminar(elemento)} />
-                                    </div>
-                                </td>
-                            )}
-                        </tr>
+                                    </>
+                                )}
+                            </div>
+                        </Tarjeta>
                     ))}
-                </Tabla>
+                </div>
             ) : elementos.length === 0 ? (
                 <EstadoVacio titulo="El inventario está vacío" descripcion="Todavía no se ha registrado ningún elemento." icono={Package} />
             ) : (
@@ -180,6 +194,14 @@ const Inventario = ({ puedeAgregar = false }) => {
                     almacenes={almacenes}
                     onGuardado={alTerminar}
                     onCerrar={() => setModal(null)}
+                />
+            )}
+
+            {elementoAConsultar && (
+                <ModalDetalleElemento
+                    key={elementoAConsultar.id}
+                    elementoId={elementoAConsultar.id}
+                    onCerrar={() => setElementoAConsultar(null)}
                 />
             )}
 

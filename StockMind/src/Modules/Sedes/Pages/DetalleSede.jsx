@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ArrowLeft, DoorOpen, Package, Pencil, Plus, Trash2, Warehouse } from 'lucide-react'
+import { ArrowLeft, DoorOpen, Eye, Package, Pencil, Plus, Trash2, Warehouse } from 'lucide-react'
 
 import Boton from '../../../Shared/Components/UI/Boton'
 import BotonIcono from '../../../Shared/Components/UI/BotonIcono'
 import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
-import Tabla from '../../../Shared/Components/Tables/Tabla'
+import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import Cargando from '../../../Shared/Components/Feedback/Cargando'
 import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
 import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
@@ -20,6 +20,7 @@ import { eliminarAlmacen, obtenerAlmacenesDeSede } from '../../Almacenes/Service
 import TarjetaAmbiente from '../../Ambientes/Components/TarjetaAmbiente'
 import ModalAmbiente from '../../Ambientes/Components/ModalAmbiente'
 import ModalAlmacen from '../../Almacenes/Components/ModalAlmacen'
+import ModalDetalleAlmacen from '../../Almacenes/Components/ModalDetalleAlmacen'
 
 /**
  * Ambientes y almacenes de una sede. El id viene de la URL: /admin/sedes/:id
@@ -43,6 +44,7 @@ const DetalleSede = ({
     // tipo: 'ambiente' o 'almacen'. registro: null = nuevo, objeto = editar
     const [modal, setModal] = useState(null)
     const [aEliminar, setAEliminar] = useState(null)
+    const [almacenAConsultar, setAlmacenAConsultar] = useState(null)
     const [mensaje, setMensaje] = useState('')
 
     if (cargando) return <Cargando texto="Cargando sede..." />
@@ -107,25 +109,34 @@ const DetalleSede = ({
             </div>
 
             {almacenes.length > 0 ? (
-                <Tabla columnas={['Almacén', 'Elementos guardados', 'Capacidad', 'Estado', 'Acciones']}>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {almacenes.map((almacen) => (
-                        <tr key={almacen.id}>
-                            <td className="font-semibold text-[#081B28]">{almacen.nombre}</td>
-                            <td>{almacen.elements_count ?? 0}</td>
-                            <td>{almacen.capacidad_elementos}</td>
-                            <td><EstadoBadge estado={capitalizar(almacen.estado)} /></td>
-                            <td>
-                                <div className="flex items-center gap-1">
+                        <Tarjeta key={almacen.id} titulo={almacen.nombre} className="flex h-full flex-col">
+                            <div className="flex items-center justify-between gap-3">
+                                <p className="text-sm text-[#64748b]">Almacén #{almacen.id}</p>
+                                <EstadoBadge estado={capitalizar(almacen.estado)} />
+                            </div>
+                            <dl className="mt-4 grid grid-cols-2 gap-3 rounded-[14px] bg-[#F7F9F6] p-3 text-sm">
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Elementos guardados</dt>
+                                    <dd className="font-semibold text-[#081B28]">{almacen.elements_count ?? 0}</dd>
+                                </div>
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Capacidad</dt>
+                                    <dd className="font-semibold text-[#081B28]">{almacen.capacidad_elementos}</dd>
+                                </div>
+                            </dl>
+                            <div className="mt-4 flex items-center justify-end gap-1">
+                                    <Boton variante="secundario" icono={Eye} className="px-3 py-1.5" onClick={() => setAlmacenAConsultar(almacen)}>Ver</Boton>
                                     <Boton to={`${rutaInventario}?almacen=${almacen.id}`} variante="secundario" icono={Package} className="px-3 py-1.5">
                                         Ver elementos
                                     </Boton>
                                     <BotonIcono icono={Pencil} etiqueta={`Editar ${almacen.nombre}`} onClick={() => setModal({ tipo: 'almacen', registro: almacen })} />
                                     <BotonIcono icono={Trash2} etiqueta={`Eliminar ${almacen.nombre}`} variante="peligro" onClick={() => setAEliminar({ tipo: 'almacen', registro: almacen })} />
-                                </div>
-                            </td>
-                        </tr>
+                            </div>
+                        </Tarjeta>
                     ))}
-                </Tabla>
+                </div>
             ) : (
                 <EstadoVacio titulo="Esta sede todavía no tiene almacenes" descripcion="Crea el primero con el botón «Nuevo almacén»." icono={Warehouse} />
             )}
@@ -136,6 +147,14 @@ const DetalleSede = ({
             )}
             {modal?.tipo === 'almacen' && (
                 <ModalAlmacen almacen={modal.registro} sedeId={sede.id} onGuardado={alTerminar} onCerrar={() => setModal(null)} />
+            )}
+
+            {almacenAConsultar && (
+                <ModalDetalleAlmacen
+                    key={almacenAConsultar.id}
+                    almacenId={almacenAConsultar.id}
+                    onCerrar={() => setAlmacenAConsultar(null)}
+                />
             )}
 
             {aEliminar && (

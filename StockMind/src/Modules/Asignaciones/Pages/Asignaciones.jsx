@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { ClipboardCheck, PackageCheck, Plus, Users } from 'lucide-react'
 
 import StatCard from '../../../Shared/Components/Cards/StatCard'
+import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import SearchBar from '../../../Shared/Forms/SearchBar'
 import FiltroChips from '../../../Shared/Components/UI/FiltroChips'
-import Tabla from '../../../Shared/Components/Tables/Tabla'
 import Boton from '../../../Shared/Components/UI/Boton'
 import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
 import MensajeExito from '../../../Shared/Components/Feedback/MensajeExito'
@@ -76,21 +76,32 @@ const Asignaciones = () => {
             <FiltroChips opciones={['Todas', ...jornadas]} valor={jornada} onCambiar={setJornada} conteos={conteos} />
 
             {filtradas.length > 0 ? (
-                <Tabla columnas={['Código', 'Elemento', 'Aprendiz a cargo', 'Documento', 'Jornada', 'Desde', '']}>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {filtradas.map((asignacion) => (
-                        <tr key={asignacion.id}>
-                            <td className="font-semibold text-[#081B28]">{asignacion.elementoId}</td>
-                            <td>{buscarElemento(asignacion.elementoId).nombre}</td>
-                            <td className="font-semibold text-[#081B28]">{asignacion.aprendiz}</td>
-                            <td className="whitespace-nowrap">{asignacion.tipoDocumento} {asignacion.documento}</td>
-                            <td>{asignacion.jornada}</td>
-                            <td className="whitespace-nowrap">{formatearFecha(asignacion.fecha)}</td>
-                            <td className="text-right">
-                                <Boton variante="secundario" className="px-3 py-1.5" onClick={() => devolver(asignacion)}>Registrar devolución</Boton>
-                            </td>
-                        </tr>
+                        <Tarjeta key={asignacion.id} titulo={buscarElemento(asignacion.elementoId).nombre} className="flex h-full flex-col">
+                            <p className="text-sm font-semibold text-[#39A900]">Código {asignacion.elementoId}</p>
+                            <dl className="mt-4 grid grid-cols-2 gap-3 rounded-[14px] bg-[#F7F9F6] p-3 text-sm">
+                                <div className="col-span-2">
+                                    <dt className="text-xs text-[#64748b]">Aprendiz a cargo</dt>
+                                    <dd className="font-semibold text-[#081B28]">{asignacion.aprendiz}</dd>
+                                </div>
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Documento</dt>
+                                    <dd className="font-semibold text-[#081B28]">{asignacion.tipoDocumento} {asignacion.documento}</dd>
+                                </div>
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Jornada</dt>
+                                    <dd className="font-semibold text-[#081B28]">{asignacion.jornada}</dd>
+                                </div>
+                                <div className="col-span-2">
+                                    <dt className="text-xs text-[#64748b]">Asignado desde</dt>
+                                    <dd className="font-semibold text-[#081B28]">{formatearFecha(asignacion.fecha)}</dd>
+                                </div>
+                            </dl>
+                            <Boton variante="secundario" className="mt-4 w-full" onClick={() => devolver(asignacion)}>Registrar devolución</Boton>
+                        </Tarjeta>
                     ))}
-                </Tabla>
+                </div>
             ) : (
                 <EstadoVacio titulo="No hay asignaciones con ese filtro" descripcion="Busca por otro aprendiz o cambia la jornada." />
             )}

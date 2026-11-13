@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { AlertOctagon, AlertTriangle, ArrowLeft, CircleCheck, Package, Wrench } from 'lucide-react'
 
 import StatCard from '../../../Shared/Components/Cards/StatCard'
+import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import SearchBar from '../../../Shared/Forms/SearchBar'
-import Tabla from '../../../Shared/Components/Tables/Tabla'
 import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
 import Boton from '../../../Shared/Components/UI/Boton'
 import Cargando from '../../../Shared/Components/Feedback/Cargando'
@@ -61,8 +61,6 @@ const DetalleAmbiente = ({ puedeReportar = false }) => {
         setMensaje(`Reporte enviado para ${reporte.elemento} (${reporte.placa})`)
     }
 
-    const columnas = ['Código', 'Elemento', 'Categoría', 'Condición', 'Estado']
-
     return (
         <section>
             <Boton variante="texto" icono={ArrowLeft} className="mb-4 px-0" onClick={() => navigate(-1)}>
@@ -94,35 +92,46 @@ const DetalleAmbiente = ({ puedeReportar = false }) => {
             </div>
 
             {filtrados.length > 0 ? (
-                <Tabla columnas={puedeReportar ? [...columnas, ''] : columnas}>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {filtrados.map((elemento) => (
-                        <tr key={elemento.id}>
-                            <td className="font-semibold text-[#081B28]">{elemento.codigo_inventario}</td>
-                            <td>
-                                <div className="flex items-center gap-3">
-                                    <FotoElemento elemento={elemento} />
-                                    <span className="font-semibold text-[#081B28]">{elemento.nombre}</span>
+                        <Tarjeta key={elemento.id} className="flex h-full flex-col">
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="flex min-w-0 items-center gap-3">
+                                    <FotoElemento elemento={elemento} tamano="h-12 w-12" />
+                                    <div className="min-w-0">
+                                        <h3 className="truncate font-bold text-[#081B28]">{elemento.nombre}</h3>
+                                        <p className="text-sm text-[#64748b]">{elemento.codigo_inventario}</p>
+                                    </div>
                                 </div>
-                            </td>
-                            <td>{elemento.category?.nombre}</td>
-                            <td><EstadoBadge estado={capitalizar(elemento.condicion)} /></td>
-                            <td><EstadoBadge estado={capitalizar(elemento.estado)} /></td>
+                                <EstadoBadge estado={capitalizar(elemento.estado)} />
+                            </div>
+                            <dl className="mt-5 grid grid-cols-2 gap-3 rounded-[14px] bg-[#F7F9F6] p-3 text-sm">
+                                <div className="col-span-2">
+                                    <dt className="text-xs text-[#64748b]">Categoría</dt>
+                                    <dd className="font-semibold text-[#081B28]">{elemento.category?.nombre ?? 'Sin categoría'}</dd>
+                                </div>
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Condición</dt>
+                                    <dd className="mt-1"><EstadoBadge estado={capitalizar(elemento.condicion)} /></dd>
+                                </div>
+                                <div>
+                                    <dt className="text-xs text-[#64748b]">Estado</dt>
+                                    <dd className="mt-1"><EstadoBadge estado={capitalizar(elemento.estado)} /></dd>
+                                </div>
+                            </dl>
                             {puedeReportar && (
-                                <td className="text-right">
-                                    {/* El formulario de reporte usa "placa": aquí es el código de inventario */}
-                                    <Boton
-                                        variante="secundario"
-                                        icono={AlertTriangle}
-                                        className="px-3 py-1.5"
-                                        onClick={() => setElementoAReportar({ ...elemento, placa: elemento.codigo_inventario })}
-                                    >
-                                        Reportar
-                                    </Boton>
-                                </td>
+                                <Boton
+                                    variante="secundario"
+                                    icono={AlertTriangle}
+                                    className="mt-4 w-full"
+                                    onClick={() => setElementoAReportar({ ...elemento, placa: elemento.codigo_inventario })}
+                                >
+                                    Reportar
+                                </Boton>
                             )}
-                        </tr>
+                        </Tarjeta>
                     ))}
-                </Tabla>
+                </div>
             ) : elementos.length === 0 ? (
                 <EstadoVacio titulo="Este ambiente todavía no tiene elementos" descripcion="Los elementos se registran desde el inventario." icono={Package} />
             ) : (
