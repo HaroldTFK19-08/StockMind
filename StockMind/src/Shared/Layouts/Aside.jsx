@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { LogOut, X } from "lucide-react";
 import StockMind from "../../assets/Capa 1.svg";
@@ -8,18 +9,41 @@ import StockMind from "../../assets/Capa 1.svg";
  * En celular se muestra como panel deslizable (abierto / onCerrar).
  */
 export default function NavegacionLayout({ enlaces = [], abierto = false, onCerrar }) {
+    useEffect(() => {
+        if (!abierto) return;
+
+        const alPresionarEscape = (evento) => {
+            if (evento.key === "Escape") onCerrar();
+        };
+
+        const cuerpo = document.body;
+        const desbordamientoAnterior = cuerpo.style.overflow;
+        cuerpo.style.overflow = "hidden";
+        window.addEventListener("keydown", alPresionarEscape);
+
+        return () => {
+            cuerpo.style.overflow = desbordamientoAnterior;
+            window.removeEventListener("keydown", alPresionarEscape);
+        };
+    }, [abierto, onCerrar]);
+
     return (
         <>
             {/* Fondo oscuro detrás del menú (solo celular) */}
-            <div
+            <button
+                type="button"
                 onClick={onCerrar}
+                aria-label="Cerrar menú"
+                tabIndex={abierto ? 0 : -1}
                 className={`fixed inset-0 z-30 bg-[#081B28]/40 transition-opacity lg:hidden ${
                     abierto ? "opacity-100" : "pointer-events-none opacity-0"
                 }`}
             />
 
             <aside
-                className={`fixed left-0 top-0 z-40 flex h-screen w-[250px] flex-col border-r border-[#e9efea] bg-white shadow-[8px_0_30px_rgba(8,27,40,0.03)] transition-transform duration-300 lg:translate-x-0 ${
+                id="menu-principal"
+                aria-label="Navegación principal"
+                className={`fixed left-0 top-0 z-40 flex h-dvh w-[250px] flex-col border-r border-[#e9efea] bg-white shadow-[8px_0_30px_rgba(8,27,40,0.03)] transition-transform duration-300 lg:translate-x-0 ${
                     abierto ? "translate-x-0" : "-translate-x-full"
                 }`}
             >

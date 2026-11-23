@@ -1,4 +1,4 @@
-import { useEffect, useId } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { X } from 'lucide-react'
 
@@ -10,13 +10,32 @@ import { X } from 'lucide-react'
 const Modal = ({ abierto, titulo, descripcion, onCerrar, children, ancho = 'max-w-[560px]', ocultarBarra = false }) => {
     const tituloId = useId()
     const descripcionId = useId()
+    const contenedorRef = useRef(null)
+    const elementoAnteriorRef = useRef(null)
+    const claseDesbordamiento = ocultarBarra
+        ? '[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+        : 'overflow-y-auto'
 
     // Cerrar con la tecla Escape (solo cuando el modal está abierto).
     useEffect(() => {
         if (!abierto) return
+        elementoAnteriorRef.current = document.activeElement
+
+        const temporizador = window.requestAnimationFrame(() => {
+            contenedorRef.current?.querySelector('[data-modal-close]')?.focus()
+        })
+
         const alPresionar = (evento) => evento.key === 'Escape' && onCerrar()
+        const desbordamientoAnterior = document.body.style.overflow
+        document.body.style.overflow = 'hidden'
         window.addEventListener('keydown', alPresionar)
-        return () => window.removeEventListener('keydown', alPresionar)
+
+        return () => {
+            window.cancelAnimationFrame(temporizador)
+            document.body.style.overflow = desbordamientoAnterior
+            window.removeEventListener('keydown', alPresionar)
+            elementoAnteriorRef.current?.focus?.()
+        }
     }, [abierto, onCerrar])
 
     return (
@@ -32,6 +51,7 @@ const Modal = ({ abierto, titulo, descripcion, onCerrar, children, ancho = 'max-
                     transition={{ duration: 0.2 }}
                 >
                     <motion.div
+                        ref={contenedorRef}
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby={tituloId}
@@ -45,7 +65,7 @@ const Modal = ({ abierto, titulo, descripcion, onCerrar, children, ancho = 'max-
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 12, scale: 0.98 }}
                         transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                        className={`relative max-h-[calc(100vh-2rem)] w-full overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden rounded-[28px] border border-[#e4eee2] bg-white p-5 shadow-[0_30px_90px_rgba(8,27,40,0.22)] sm:max-h-[calc(100vh-3rem)] sm:p-7 ${ancho}`}
+                        className={`relative max-h-[calc(100vh-2rem)] w-full overflow-y-auto rounded-[28px] border border-[#e4eee2] bg-white p-5 shadow-[0_30px_90px_rgba(8,27,40,0.22)] sm:max-h-[calc(100vh-3rem)] sm:p-7 ${claseDesbordamiento} ${ancho}`}
                     >
                         <motion.div
                             // Barra/acento superior animada: mantiene identidad visual (verdes SENA).
@@ -63,6 +83,7 @@ const Modal = ({ abierto, titulo, descripcion, onCerrar, children, ancho = 'max-
                             </div>
                             <motion.button
                                 type="button"
+                                data-modal-close
                                 onClick={onCerrar}
                                 aria-label="Cerrar"
                                 whileHover={{ rotate: 90, scale: 1.04 }}

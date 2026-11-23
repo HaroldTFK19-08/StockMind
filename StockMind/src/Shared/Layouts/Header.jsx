@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Bell, Menu, UserRound } from "lucide-react";
 
-export default function Cabecera({ contenido, enlacePerfil, enlaceNotificaciones, onAbrirMenu }) {
+export default function Cabecera({ contenido, enlacePerfil, enlaceNotificaciones, onAbrirMenu, menuAbierto = false }) {
     const claseBoton =
         "flex h-10 w-10 items-center justify-center rounded-xl text-[#081B28] transition-[color,background-color,border-color,box-shadow,transform] duration-[180ms] hover:-translate-y-px active:translate-y-0 disabled:hover:translate-y-0 hover:bg-[#F1F7F0] hover:text-[#2F8F00]";
 
@@ -9,7 +9,14 @@ export default function Cabecera({ contenido, enlacePerfil, enlaceNotificaciones
         <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-[#e9efea] bg-white/95 px-5 shadow-[0_4px_18px_rgba(8,27,40,0.03)] backdrop-blur-md sm:px-8">
             <div className="flex items-center gap-3">
                 {/* Botón de menú: solo en celular */}
-                <button type="button" onClick={onAbrirMenu} aria-label="Abrir menú" className={`${claseBoton} lg:hidden`}>
+                <button
+                    type="button"
+                    onClick={onAbrirMenu}
+                    aria-label="Abrir menú"
+                    aria-controls="menu-principal"
+                    aria-expanded={menuAbierto}
+                    className={`${claseBoton} lg:hidden`}
+                >
                     <Menu size={21} />
                 </button>
                 <h1 className="text-xl font-semibold text-[#081B28] sm:text-2xl">{contenido}</h1>

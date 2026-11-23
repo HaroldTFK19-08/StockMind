@@ -79,7 +79,6 @@ const Categorias = () => {
             setEliminando(false);
         }
     }
-
     return (
         <div className="-mt-3 space-y-6 p-6">
             <h1 className="text-2xl font-semibold text-[#1e293b]">Gestión de Categorías</h1>
@@ -122,7 +121,6 @@ const Categorias = () => {
                     Nueva Categoría
                 </button>
             </div>
-
             {loading ? (
                 <Tarjeta className="text-center text-sm text-[#64748b]">Cargando categorías...</Tarjeta>
             ) : categorias.length === 0 && !error ? (
@@ -189,5 +187,4 @@ const Categorias = () => {
         </div>
     )
 }
-
 export default Categorias;

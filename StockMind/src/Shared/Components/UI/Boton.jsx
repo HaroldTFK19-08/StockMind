@@ -20,7 +20,7 @@ const Boton = ({ to, variante = 'primario', icono: Icono, children, className = 
 
     const contenido = (
         <>
-            {Icono && <Icono size={16} />}
+            {Icono && <Icono size={16} aria-hidden="true" />}
             {children}
         </>
     )
