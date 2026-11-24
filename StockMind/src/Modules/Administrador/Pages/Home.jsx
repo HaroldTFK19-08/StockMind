@@ -1,98 +1,162 @@
-import { Link } from 'react-router-dom'
-import { AlertOctagon, Building2, ChevronRight, Package, Users } from 'lucide-react'
+import { Link } from "react-router-dom";
+import {
+  AlertOctagon,
+  Building2,
+  ChevronRight,
+  Package,
+  Users,
+} from "lucide-react";
 
-import StatCard from '../../../Shared/Components/Cards/StatCard'
-import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
-import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
-import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
-import { formatearFecha } from '../../../Shared/Utils/fechas'
-import { contarPor } from '../../../Shared/Utils/texto'
-import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
+import StatCard from "../../../Shared/Components/Cards/StatCard";
+import Tarjeta from "../../../Shared/Components/Cards/Tarjeta";
+import EstadoBadge from "../../../Shared/Components/UI/EstadoBadge";
+import EstadoVacio from "../../../Shared/Components/Feedback/EstadoVacio";
+import { formatearFecha } from "../../../Shared/Utils/fechas";
+import { contarPor } from "../../../Shared/Utils/texto";
+import MensajeError from "../../../Shared/Components/Feedback/MensajeError";
 
-import perfilAdmin from '../Data/perfilAdmin'
-import usuariosData from '../Data/usuariosData'
-import { useCentros } from '../../Centros/Hooks/Centros'
-import { buscarAmbiente } from '../../Ambientes/Data/ambientesData'
-import inventarioData from '../../Elementos/Data/inventarioData'
-import reportesData from '../../Reportes/Data/reportesData'
-import TarjetaMindBot from '../../../Shared/Components/Cards/TarjetaMindBot'
+import perfilAdmin from "../Data/perfilAdmin";
+import usuariosData from "../Data/usuariosData";
+import { useCentros } from "../../Centros/Hooks/Centros";
+import { buscarAmbiente } from "../../Ambientes/Data/ambientesData";
+import inventarioData from "../../Elementos/Data/inventarioData";
+import reportesData from "../../Reportes/Data/reportesData";
 
 export default function HomeAdmin() {
-    const { centros, error: errorCentros } = useCentros()
-    const urgentes = reportesData.filter((r) => r.prioridad === 'Alta' && r.estado !== 'Resuelto')
+  const { centros, error: errorCentros } = useCentros();
+  const urgentes = reportesData.filter(
+    (r) => r.prioridad === "Alta" && r.estado !== "Resuelto",
+  );
 
-    // Elementos dañados o en reparación (los que necesitan atención)
-    const conProblemas = inventarioData.filter((e) => e.estado !== 'Buen estado')
+  // Elementos dañados o en reparación (los que necesitan atención)
+  const conProblemas = inventarioData.filter((e) => e.estado !== "Buen estado");
 
-    return (
-        <section className="space-y-8">
-            {errorCentros && <MensajeError>{errorCentros}</MensajeError>}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                    <h2 className="text-2xl font-bold text-[#081B28] sm:text-3xl">Hola, {perfilAdmin.nombres.split(' ')[0]}</h2>
-                    <p className="mt-1 text-sm text-[#64748b]">Resumen del inventario en los centros de formación.</p>
-                </div>
-                <TarjetaMindBot />
-            </div>
+  return (
+    <section className="space-y-8">
+      {errorCentros && <MensajeError>{errorCentros}</MensajeError>}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-[#081B28] sm:text-3xl">
+            Hola, {perfilAdmin.nombres.split(" ")[0]}
+          </h2>
+          <p className="mt-1 text-sm text-[#64748b]">
+            Resumen del inventario en los centros de formación.
+          </p>
+        </div>
+      </div>
 
-            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-                <StatCard etiqueta="Elementos" valor={inventarioData.length} icono={Package} />
-                <StatCard etiqueta="Centros" valor={centros.length} icono={Building2} color="azul" />
-                <StatCard etiqueta="Usuarios" valor={usuariosData.length} icono={Users} color="ambar" />
-                <StatCard etiqueta="Elementos dañados" valor={contarPor(inventarioData, 'estado', 'Dañado')} icono={AlertOctagon} color="rojo" />
-            </div>
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          etiqueta="Elementos"
+          valor={inventarioData.length}
+          icono={Package}
+        />
+        <StatCard
+          etiqueta="Centros"
+          valor={centros.length}
+          icono={Building2}
+          color="azul"
+        />
+        <StatCard
+          etiqueta="Usuarios"
+          valor={usuariosData.length}
+          icono={Users}
+          color="ambar"
+        />
+        <StatCard
+          etiqueta="Elementos dañados"
+          valor={contarPor(inventarioData, "estado", "Dañado")}
+          icono={AlertOctagon}
+          color="rojo"
+        />
+      </div>
 
-            <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
-                <div>
-                    <div className="mb-4 flex items-center justify-between">
-                        <h3 className="text-lg font-bold text-[#081B28]">Elementos que necesitan atención</h3>
-                        <Link to="/admin/inventario" className="flex items-center gap-1 text-sm font-semibold text-[#39A900] hover:underline">
-                            Ver inventario <ChevronRight size={16} />
-                        </Link>
+      <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-lg font-bold text-[#081B28]">
+              Elementos que necesitan atención
+            </h3>
+            <Link
+              to="/admin/inventario"
+              className="flex items-center gap-1 text-sm font-semibold text-[#39A900] hover:underline"
+            >
+              Ver inventario <ChevronRight size={16} />
+            </Link>
+          </div>
+          {conProblemas.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {conProblemas.map((elemento) => {
+                const ambiente = buscarAmbiente(elemento.ambienteId);
+                return (
+                  <Tarjeta key={elemento.id} className="h-full">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-semibold text-[#39A900]">
+                          {elemento.id}
+                        </p>
+                        <h4 className="mt-1 font-bold text-[#081B28]">
+                          {elemento.nombre}
+                        </h4>
+                      </div>
+                      <EstadoBadge estado={elemento.estado} />
                     </div>
-                    {conProblemas.length > 0 ? (
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            {conProblemas.map((elemento) => {
-                                const ambiente = buscarAmbiente(elemento.ambienteId)
-                                return (
-                                    <Tarjeta key={elemento.id} className="h-full">
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div>
-                                                <p className="text-xs font-semibold text-[#39A900]">{elemento.id}</p>
-                                                <h4 className="mt-1 font-bold text-[#081B28]">{elemento.nombre}</h4>
-                                            </div>
-                                            <EstadoBadge estado={elemento.estado} />
-                                        </div>
-                                        <dl className="mt-4 space-y-2 rounded-[14px] bg-[#F7F9F6] p-3 text-sm">
-                                            <div>
-                                                <dt className="text-xs text-[#64748b]">Centro</dt>
-                                                <dd className="font-semibold text-[#081B28]">{centros.find((centro) => Number(centro.id) === Number(ambiente.centroId))?.nombre ?? 'Centro no disponible'}</dd>
-                                            </div>
-                                            <div>
-                                                <dt className="text-xs text-[#64748b]">Ambiente</dt>
-                                                <dd className="font-semibold text-[#081B28]">{ambiente.nombre}</dd>
-                                            </div>
-                                        </dl>
-                                    </Tarjeta>
-                                )
-                            })}
-                        </div>
-                    ) : (
-                        <EstadoVacio titulo="No hay elementos que requieran atención" />
-                    )}
-                </div>
-
-                <Tarjeta titulo="Reportes urgentes" className="h-fit" accion={<Link to="/admin/reportes" className="text-sm font-semibold text-[#39A900] hover:underline">Ver todos</Link>}>
-                    <ul className="space-y-3">
-                        {urgentes.map((reporte) => (
-                            <li key={reporte.id} className="rounded-[14px] border border-[#fecaca] bg-[#fef2f2]/50 p-3">
-                                <p className="text-sm font-semibold text-[#081B28]">{reporte.elemento}</p>
-                                <p className="mt-0.5 text-xs text-[#64748b]">{buscarAmbiente(reporte.ambienteId).nombre} · {formatearFecha(reporte.fecha)}</p>
-                            </li>
-                        ))}
-                    </ul>
-                </Tarjeta>
+                    <dl className="mt-4 space-y-2 rounded-[14px] bg-[#F7F9F6] p-3 text-sm">
+                      <div>
+                        <dt className="text-xs text-[#64748b]">Centro</dt>
+                        <dd className="font-semibold text-[#081B28]">
+                          {centros.find(
+                            (centro) =>
+                              Number(centro.id) === Number(ambiente.centroId),
+                          )?.nombre ?? "Centro no disponible"}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs text-[#64748b]">Ambiente</dt>
+                        <dd className="font-semibold text-[#081B28]">
+                          {ambiente.nombre}
+                        </dd>
+                      </div>
+                    </dl>
+                  </Tarjeta>
+                );
+              })}
             </div>
-        </section>
-    )
+          ) : (
+            <EstadoVacio titulo="No hay elementos que requieran atención" />
+          )}
+        </div>
+
+        <Tarjeta
+          titulo="Reportes urgentes"
+          className="h-fit"
+          accion={
+            <Link
+              to="/admin/reportes"
+              className="text-sm font-semibold text-[#39A900] hover:underline"
+            >
+              Ver todos
+            </Link>
+          }
+        >
+          <ul className="space-y-3">
+            {urgentes.map((reporte) => (
+              <li
+                key={reporte.id}
+                className="rounded-[14px] border border-[#fecaca] bg-[#fef2f2]/50 p-3"
+              >
+                <p className="text-sm font-semibold text-[#081B28]">
+                  {reporte.elemento}
+                </p>
+                <p className="mt-0.5 text-xs text-[#64748b]">
+                  {buscarAmbiente(reporte.ambienteId).nombre} ·{" "}
+                  {formatearFecha(reporte.fecha)}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </Tarjeta>
+      </div>
+    </section>
+  );
 }

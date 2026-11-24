@@ -18,8 +18,8 @@ const buscarColor = (estado) =>
     Object.keys(colores).find((color) => colores[color].includes(estado)) ?? 'gris'
 
 const EstadoBadge = ({ estado }) => (
-    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${estilos[buscarColor(estado)]}`}>
-        <span className="h-1.5 w-1.5 rounded-full bg-current" />
+    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-black/5 ${estilos[buscarColor(estado)]}`}>
+        <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
         {estado}
     </span>
 )

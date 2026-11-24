@@ -1,4 +1,5 @@
 import { motion } from 'motion/react'
+import { aparecerArriba, transicionSuave, viewportUnaVez } from '../../Utils/motion'
 
 /**
  * Caja blanca base para agrupar contenido.
@@ -8,10 +9,10 @@ import { motion } from 'motion/react'
 const Tarjeta = ({ titulo, accion, children, className = '' }) => (
     <motion.section
         // Animación suave al aparecer (coherente con el estilo del proyecto).
-        initial={{ opacity: 0, y: 12 }}
+        {...aparecerArriba}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.15 }}
-        transition={{ duration: 0.35, ease: [0.2, 0.7, 0.2, 1] }}
+        viewport={viewportUnaVez}
+        transition={transicionSuave}
         whileHover={{ y: -3 }}
         className={`rounded-[20px] border border-[#e9efea] bg-white p-6 shadow-[0_8px_24px_rgba(8,27,40,0.04)] transition-[box-shadow,border-color] duration-[220ms] hover:border-[#dce8dd] hover:shadow-[0_14px_32px_rgba(8,27,40,0.07)] ${className}`}
     >

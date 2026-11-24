@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from 'motion/react'
 
 // Clase base para inputs, selects y textareas (consistencia visual en formularios).
-// Mejora foco/hover con transiciones suaves sin cambiar su uso en los módulos.
+// Estilo moderno: superficie suave, bordes sutiles, buen contraste y foco de marca.
 export const claseInput =
-    'w-full rounded-[12px] border-2 border-[#edf2f7] bg-white px-4 py-2.5 text-sm text-[#081B28] outline-none transition-all duration-200 placeholder:text-[#94a3b8] hover:border-[#dce8dd] focus:border-[#39A900] focus:bg-white focus:shadow-[0_0_0_4px_rgba(73,169,25,0.1)]'
+    'w-full rounded-[14px] border border-[#dfe8e1] bg-[#fcfdfc] px-4 py-3 text-sm text-[#081B28] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition-all duration-200 placeholder:text-[#94a3b8] hover:border-[#cfe0d1] hover:bg-white focus:border-[#39A900] focus:bg-white focus:shadow-[0_0_0_4px_rgba(57,169,0,0.12)] disabled:cursor-not-allowed disabled:bg-[#f3f6f4] disabled:text-[#64748b]'
 
 /**
  * Etiqueta + campo + mensaje de error.

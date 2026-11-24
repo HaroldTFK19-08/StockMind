@@ -237,9 +237,19 @@
     color: #081b28;
     font-family: "Plus Jakarta Sans", sans-serif;
     text-rendering: optimizeLegibility;
+    /* accent-color aplica el color de marca a controles nativos (checkbox, radio, range, progress)
+       de forma accesible y consistente (modern-web-guidance: brand-consistent-forms). */
+    accent-color: #39a900;
   }
   ::selection {
     background: rgb(57 169 0 / 24%);
+  }
+
+  /* Estilo base moderno para controles de formulario (mantiene identidad visual de StockMind). */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
+  select,
+  textarea {
+    font: inherit;
   }
   .skip-link {
     position: fixed;

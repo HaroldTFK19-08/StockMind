@@ -12,9 +12,9 @@ const Modal = ({ abierto, titulo, descripcion, onCerrar, children, ancho = 'max-
     const descripcionId = useId()
     const contenedorRef = useRef(null)
     const elementoAnteriorRef = useRef(null)
-    const claseDesbordamiento = ocultarBarra
-        ? '[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
-        : 'overflow-y-auto'
+    // Oculta la barra de scroll visualmente pero mantiene el desplazamiento si el contenido
+    // excede el alto del viewport (mejor UX en pantallas pequeñas, sin barras visibles).
+    const claseDesbordamiento = '[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
 
     // Cerrar con la tecla Escape (solo cuando el modal está abierto).
     useEffect(() => {

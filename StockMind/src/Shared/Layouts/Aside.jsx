@@ -43,26 +43,28 @@ export default function NavegacionLayout({ enlaces = [], abierto = false, onCerr
             <aside
                 id="menu-principal"
                 aria-label="Navegación principal"
-                className={`fixed left-0 top-0 z-40 flex h-dvh w-[250px] flex-col border-r border-[#e9efea] bg-white shadow-[8px_0_30px_rgba(8,27,40,0.03)] transition-transform duration-300 lg:translate-x-0 ${
+                className={`fixed left-0 top-0 z-40 flex h-dvh w-[260px] flex-col border-r border-[#e9efea] bg-white/98 shadow-[8px_0_30px_rgba(8,27,40,0.03)] backdrop-blur-sm transition-transform duration-300 lg:translate-x-0 ${
                     abierto ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
-                {/* Logo */}
-                <div className="relative flex h-[100px] items-center justify-center border-b border-gray-100">
-                    <img src={StockMind} alt="StockMind" className="w-[150px]" />
+                {/* Encabezado del sidebar: logo y cierre en móvil */}
+                <div className="relative flex h-[96px] items-center justify-center border-b border-[#eef3ee] px-6">
+                    <div className="absolute inset-x-6 top-0 h-1 rounded-b-full bg-gradient-to-r from-[#2F8F00] via-[#39A900] to-[#8AFD5D]" />
+                    <img src={StockMind} alt="StockMind" className="w-[145px]" />
                     <button
                         type="button"
                         onClick={onCerrar}
                         aria-label="Cerrar menú"
-                        className="absolute right-3 top-3 rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden"
+                        className="absolute right-3 top-3 rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[#081B28] lg:hidden"
                     >
                         <X size={18} />
                     </button>
                 </div>
 
-                {/* Enlaces */}
-                <nav className="flex-1 overflow-y-auto px-3 py-6">
-                    <ul className="space-y-2">
+                {/* Enlaces de navegación del panel */}
+                <nav className="flex-1 overflow-y-auto px-3 py-5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                    <p className="px-4 pb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#94a3b8]">Navegación</p>
+                    <ul className="space-y-1.5">
                         {enlaces.map((enlace) => {
                             const Icono = enlace.icono;
                             return (
@@ -72,14 +74,14 @@ export default function NavegacionLayout({ enlaces = [], abierto = false, onCerr
                                         end={enlace.exacto}
                                         onClick={onCerrar}
                                         className={({ isActive }) =>
-                                            `relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-[color,background-color,transform] duration-[180ms] hover:translate-x-0.5 ${
+                                            `group relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-200 ${
                                                 isActive
-                                                    ? "bg-[#eff8ec] font-semibold text-[#2f7d20] before:absolute before:left-0 before:h-7 before:w-1 before:rounded-r-full before:bg-[#39a900]"
-                                                    : "text-gray-600 hover:bg-[#f5f8f5] hover:text-[#081b28]"
+                                                    ? "bg-[#eff8ec] font-semibold text-[#2f7d20] shadow-[inset_0_0_0_1px_rgba(57,169,0,0.08)] before:absolute before:left-0 before:h-7 before:w-1 before:rounded-r-full before:bg-[#39a900]"
+                                                    : "text-gray-600 hover:translate-x-0.5 hover:bg-[#f5f8f5] hover:text-[#081b28]"
                                             }`
                                         }
                                     >
-                                        <Icono size={19} strokeWidth={1.9} />
+                                        <Icono size={19} strokeWidth={1.9} className="shrink-0" />
                                         <span>{enlace.titulo}</span>
                                     </NavLink>
                                 </li>
