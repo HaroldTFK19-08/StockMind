@@ -21,24 +21,34 @@ const CampoArchivo = ({
     accept,
     required = false,
     onChange,
+    onBlur,
+    inputRef,
     archivo,
     textoAyuda = 'Formatos permitidos según el formulario.',
     placeholder = 'Haz clic para seleccionar un archivo',
+    titulo = 'Subir archivo',
+    compacto = false,
     icono: Icono = ImagePlus,
     className = '',
 }) => {
     // Nombre visible del archivo seleccionado (si existe).
     const nombreArchivo = archivo?.name ?? ''
+    const clasesContenedor = compacto
+        ? 'gap-2 rounded-xl p-2'
+        : 'gap-4 rounded-2xl p-4'
+    const clasesIcono = compacto
+        ? 'h-9 w-9 rounded-lg ring-0'
+        : 'h-12 w-12 rounded-xl ring-4 ring-[#39A900]/5'
 
     return (
         <div className={className}>
             {/* Etiqueta visual que actúa como área interactiva del input de archivo */}
             <label
                 htmlFor={id}
-                className="group relative flex cursor-pointer items-center gap-4 rounded-2xl border-2 border-dashed border-[#d7e4d8] bg-gradient-to-br from-[#fbfdfb] to-[#f4f9f3] p-4 transition-all duration-200 hover:border-[#39A900]/60 hover:bg-[#f7fbf6] hover:shadow-[0_8px_22px_rgba(57,169,0,0.08)] focus-within:border-[#39A900] focus-within:shadow-[0_0_0_4px_rgba(57,169,0,0.10)]"
+                className={`group relative flex cursor-pointer items-center border border-dashed border-[#cbd5e1] bg-slate-50 transition-all duration-200 hover:border-[#39A900]/60 hover:bg-[#f7fbf6] hover:shadow-[0_8px_22px_rgba(57,169,0,0.08)] focus-within:border-[#39A900] focus-within:shadow-[0_0_0_4px_rgba(57,169,0,0.10)] ${clasesContenedor}`}
             >
                 {/* Icono principal para reforzar visualmente que es una carga de archivo/imagen */}
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#39A900]/10 text-[#2F8F00] ring-4 ring-[#39A900]/5 transition-transform duration-200 group-hover:scale-[1.03]">
+                <span className={`flex shrink-0 items-center justify-center bg-[#39A900]/10 text-[#2F8F00] transition-transform duration-200 group-hover:scale-[1.03] ${clasesIcono}`}>
                     <Icono size={22} />
                 </span>
 
@@ -46,7 +56,7 @@ const CampoArchivo = ({
                 <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-2 text-sm font-semibold text-[#081B28]">
                         <UploadCloud size={16} className="text-[#2F8F00]" />
-                        {nombreArchivo ? 'Archivo seleccionado' : 'Subir archivo'}
+                        {nombreArchivo ? 'Archivo seleccionado' : titulo}
                     </span>
                     <span className="mt-1 block truncate text-sm text-[#475569]">
                         {nombreArchivo || placeholder}
@@ -67,6 +77,8 @@ const CampoArchivo = ({
                     accept={accept}
                     required={required}
                     onChange={onChange}
+                    onBlur={onBlur}
+                    ref={inputRef}
                     className="sr-only"
                 />
             </label>

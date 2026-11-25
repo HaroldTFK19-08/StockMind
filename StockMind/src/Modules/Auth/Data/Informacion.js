@@ -18,7 +18,7 @@ export const loginData = {
     },
     rutas: {
         inicio: '/',
-        registro: '/registropaso1',
+        registro: '/registro',
         inicioAprendiz: '/aprendiz/home'
     }
 }

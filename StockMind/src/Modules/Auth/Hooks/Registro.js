@@ -1,41 +1,42 @@
 import { useForm } from 'react-hook-form'
 
-const useRegistroInstructor = () => {
+const useRegistro = () => {
     const {
         register,
         handleSubmit,
+        watch,
         formState: {
             errors,
             isSubmitting
         }
     } = useForm({
         mode: 'onTouched',
-
         defaultValues: {
             nombre_1: '',
             nombre_2: '',
             apellido_1: '',
             apellido_2: '',
-            tipo_identificacion: '',
-            identificacion: '',
+            foto_perfil: null,
+            tipo_identidad: 'CC',
+            numero_identidad: '',
             telefono: '',
-            centro_formacion: '',
             email: '',
             password: ''
         }
     })
 
-    const registrarInstructor = async (datos) => {
-        console.log('Datos del instructor:', datos)
+    const registrarUsuario = async (datos) => {
+        console.log('Datos del usuario:', datos)
     }
 
     return {
         register,
         handleSubmit,
-        registrarInstructor,
+        watch,
+        registrarUsuario,
         errors,
         isSubmitting
     }
 }
 
-export default useRegistroInstructor
+export default useRegistro

@@ -6,11 +6,13 @@ const RegistroInput = ({
     icon: Icon,
     name,
     type = 'text',
+    label,
     placeholder,
     register,
     error,
     rules,
-    password = false
+    password = false,
+    autoComplete
 }) => {
     const [visible, setVisible] = useState(false)
 
@@ -19,7 +21,16 @@ const RegistroInput = ({
         : type
 
     return (
-        <div className="mb-4 w-full">
+        <div className="mb-3 w-full">
+            {label && (
+                <label
+                    htmlFor={name}
+                    className="mb-1.5 block text-[13px] font-semibold text-slate-700"
+                >
+                    {label}
+                </label>
+            )}
+
             {/* Contenedor del campo con icono y estados visuales mejorados (hover/focus/error). */}
             <div className="group relative">
                 <Icon
@@ -36,11 +47,16 @@ const RegistroInput = ({
                     id={name}
                     type={tipoInput}
                     placeholder={placeholder}
+                    autoComplete={autoComplete}
+                    spellCheck={type === 'email' ? false : undefined}
+                    required={Boolean(rules && rules.required)}
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? `${name}-error` : undefined}
                     {...register(name, rules)}
-                    className={`w-full rounded-xl border bg-[#F3F4F6] px-[45px] py-3.5 pr-12 text-sm text-text-primary outline-none transition-all duration-300 placeholder:text-gray-500 hover:bg-[#eef2ee] focus:bg-white focus:ring-4 ${
+                    className={`min-h-11 w-full rounded-xl border bg-slate-50 px-[45px] py-2.5 pr-12 text-sm text-text-primary outline-none transition-all duration-300 placeholder:text-slate-400 hover:border-slate-400 hover:bg-white focus:bg-white focus:ring-4 ${
                         error
                             ? 'border-red-400 focus:border-red-400 focus:ring-red-500/10'
-                            : 'border-transparent focus:border-sena/30 focus:ring-sena/10'
+                            : 'border-slate-300 focus:border-sena focus:ring-sena/20'
                     }`}
                 />
 
@@ -48,6 +64,7 @@ const RegistroInput = ({
                     <button
                         type="button"
                         onClick={() => setVisible((prev) => !prev)}
+                        aria-pressed={visible}
                         className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-white/70 hover:text-sena"
                         aria-label={
                             visible
@@ -73,6 +90,8 @@ const RegistroInput = ({
                         animate={{ opacity: 1, y: 0, height: 'auto' }}
                         exit={{ opacity: 0, y: -2, height: 0 }}
                         transition={{ duration: 0.2 }}
+                        id={`${name}-error`}
+                        role="alert"
                         className="mt-1.5 overflow-hidden px-1 text-xs font-medium text-red-500"
                     >
                         {error.message}

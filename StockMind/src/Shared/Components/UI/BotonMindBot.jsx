@@ -5,7 +5,7 @@ import MindBot from '../../../assets/mindbot-logo.svg'
 
 // Rutas donde NO se debe mostrar el botón flotante de MindBot.
 // El usuario solicitó excluir login y registro; Inicio ya tiene su propio acceso a MindBot.
-const RUTAS_OCULTAS = ['/', '/login', '/registropaso1', '/registroaprendiz', '/registroinstructor']
+const RUTAS_OCULTAS = ['/', '/login', '/registro']
 
 /**
  * Botón flotante de MindBot.

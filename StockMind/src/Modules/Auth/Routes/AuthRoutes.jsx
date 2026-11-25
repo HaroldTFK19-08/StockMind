@@ -1,19 +1,18 @@
-import { Routes, Route } from "react-router-dom"
+import { Navigate, Routes, Route } from "react-router-dom"
 
 import Inicio from "../Pages/Inicio"
 import Login from "../Pages/Login"
-import RegistroPaso1 from "../Pages/Paso1"
-import RegisterAprendiz from "../Pages/RegisterAprendiz"
-import RegisterInstructor from "../Pages/RegisterInstructor"
+import Register from "../Pages/Register"
 
 const AuthRoutes = () => {
     return (
         <Routes>
             <Route path="/" element={<Inicio />} />
             <Route path="login" element={<Login />} />
-            <Route path="registropaso1" element={<RegistroPaso1 />} />
-            <Route path="registroaprendiz" element={<RegisterAprendiz />} />
-            <Route path="registroinstructor" element={<RegisterInstructor />} />
+            <Route path="registro" element={<Register />} />
+            <Route path="registropaso1" element={<Navigate to="/registro" replace />} />
+            <Route path="registroaprendiz" element={<Navigate to="/registro" replace />} />
+            <Route path="registroinstructor" element={<Navigate to="/registro" replace />} />
         </Routes>
     )
 }
