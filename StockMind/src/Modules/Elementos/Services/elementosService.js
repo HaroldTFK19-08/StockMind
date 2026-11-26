@@ -17,6 +17,22 @@ export const obtenerElementosDeAmbiente = async (ambienteId) => {
 
 export const obtenerElemento = (id) => obtenerUno(`/elementos/${id}`)
 
+export const verPdfElementos = async () => {
+    const respuesta = await api.get('/elementos/pdf/ver', {
+        responseType: 'blob',
+        headers: { Accept: 'application/pdf' },
+    })
+    return respuesta.data
+}
+
+export const descargarPdfElementos = async () => {
+    const respuesta = await api.get('/elementos/pdf/descargar', {
+        responseType: 'blob',
+        headers: { Accept: 'application/pdf' },
+    })
+    return respuesta.data
+}
+
 // Se envían como FormData porque llevan la imagen del elemento
 export const crearElemento = (elemento) => crearConArchivos('/elementos', elemento)
 

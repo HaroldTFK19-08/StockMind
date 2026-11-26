@@ -14,13 +14,10 @@ import {api} from "../Config/api"
 // Trae TODOS los registros de una ruta. Si viene paginada, pide las páginas que falten.
 export const obtenerTodos = async (ruta) => {
     const primera = (await api.get(ruta)).data
-
     // Respuesta sin paginar: ya es la lista completa
     if (Array.isArray(primera)) return primera
-
     const lista = [...(primera.data ?? [])]
     const ultimaPagina = primera.last_page ?? 1
-
     for (let pagina = 2; pagina <= ultimaPagina; pagina++) {
         const respuesta = await api.get(ruta, { params: { page: pagina } })
         lista.push(...respuesta.data.data)
@@ -46,20 +43,17 @@ const aFormData = (datos) => {
 
 // La instancia de axios envía JSON por defecto; para archivos hay que cambiar el Content-Type.
 const conArchivos = { headers: { 'Content-Type': 'multipart/form-data' } }
-
 // POST con archivos (crear)
 export const crearConArchivos = async (ruta, datos) => {
     const respuesta = await api.post(ruta, aFormData(datos), conArchivos)
     return respuesta.data
 }
-
 // PUT con archivos (editar). PHP no lee archivos en un PUT real, por eso
 // se envía como POST con _method=PUT y Laravel lo trata como PUT.
 export const actualizarConArchivos = async (ruta, datos) => {
     const respuesta = await api.post(ruta, aFormData({ ...datos, _method: 'PUT' }), conArchivos)
     return respuesta.data
 }
-
 // Mensaje seguro para mostrar al usuario cuando una petición falla.
 // No se exponen detalles internos del cliente/red para evitar filtrar información.
 export const mensajeError = (error) => {
@@ -71,20 +65,16 @@ export const mensajeError = (error) => {
         if (status === 403) return 'No tienes permisos para realizar esta acción.'
         if (status === 404) return 'No se encontró el registro solicitado.'
         if (status === 429) return 'Se hicieron demasiadas peticiones. Espera un momento e intenta de nuevo.'
-
         // Solo mostramos el mensaje enviado por la API (validaciones/reglas de negocio).
         // Para errores 5xx u otros casos, usamos un texto genérico.
         if (status >= 400 && status < 500 && typeof data?.message === 'string' && data.message.trim()) {
             return data.message
         }
-
         return 'Ocurrió un error inesperado.'
     }
-
     if (error.request) return 'El servidor no está disponible. Intenta de nuevo más tarde.'
     return 'Ocurrió un error inesperado.'
 }
-
 // Errores de validación por campo: { nombre: "El nombre es obligatorio." }
 export const erroresDeCampos = (error) => {
     const errores = error.response?.data?.errors ?? {}
