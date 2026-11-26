@@ -1,23 +1,23 @@
-import PanelRegistro from '../Components/PanelRegistro'
-import PanelFormularioRegistro from '../Components/PanelFormularioRegistro'
+import PanelRegistro from "../Components/PanelRegistro";
+import PanelFormularioRegistro from "../Components/PanelFormularioRegistro";
 
 // Página de registro:
-// - Mantiene la estructura de dos paneles (información + formulario).
-// - Mejora el contenedor visual para una apariencia más profesional y moderna.
+// - Mantiene la estructura de dos paneles del módulo Auth.
+// - La página ocupa el viewport: el panel izquierdo queda fijo y el derecho tiene scroll.
 const Register = () => {
-    return (
-        <main className="relative flex h-[100dvh] items-center justify-center overflow-hidden bg-[linear-gradient(180deg,#f7faf6_0%,#f4f8f4_45%,#f5f8f5_100%)] px-4 py-4 sm:px-6">
-            {/* Decoración suave de fondo (no interactiva) */}
-            <div className="pointer-events-none absolute -left-20 top-10 h-56 w-56 rounded-full bg-[#39A900]/8 blur-3xl" />
-            <div className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-[#8AFD5D]/10 blur-3xl" />
+  return (
+    <main className="relative flex h-[100dvh] items-center justify-center overflow-hidden bg-[linear-gradient(145deg,#f4f9f1_0%,#f7faf7_45%,#eef5ea_100%)] p-4 sm:p-6 lg:p-8">
+      {/* Decoración suave de fondo (no interactiva) */}
+      <div className="pointer-events-none absolute -left-24 -top-20 h-72 w-72 rounded-full bg-[#39A900]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-[#8AFD5D]/12 blur-3xl" />
 
-            {/* Card principal: altura limitada al viewport para evitar scroll en la página */}
-            <div className="relative flex h-full max-h-[760px] w-full max-w-[1180px] overflow-hidden rounded-[28px] border border-[#e6ece5] bg-white shadow-[0_24px_70px_rgba(8,27,40,0.12)]">
-                <PanelRegistro />
-                <PanelFormularioRegistro />
-            </div>
-        </main>
-    )
-}
+      {/* Card principal a altura de viewport: solo el panel derecho scrollea */}
+      <div className="relative flex h-full min-h-0 w-full max-w-[1200px] overflow-hidden rounded-[30px] border border-[#dfe8dc] bg-white shadow-[0_24px_80px_rgba(15,23,42,0.10)]">
+        <PanelRegistro />
+        <PanelFormularioRegistro />
+      </div>
+    </main>
+  );
+};
 
-export default Register
+export default Register;

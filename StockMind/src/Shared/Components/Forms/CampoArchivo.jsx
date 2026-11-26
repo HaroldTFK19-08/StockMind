@@ -1,17 +1,19 @@
-import { ImagePlus, UploadCloud } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { ImagePlus, UploadCloud, X } from 'lucide-react'
 
 /**
  * Campo visual para seleccionar archivos/imágenes en formularios.
  * - Mantiene un <input type="file"> real (oculto) para conservar el comportamiento
- *   nativo y la compatibilidad con hooks como useFormulario (evento onChange).
- * - Muestra una zona clickeable con icono, texto principal y nombre del archivo.
+ *   nativo y la compatibilidad con hooks como useFormulario/react-hook-form.
+ * - Muestra una zona clickeable con icono, texto, nombre del archivo y vista previa
+ *   cuando el archivo seleccionado es una imagen.
  *
  * Props principales:
- * - id/name: identificadores del input (name es clave para guardar en el estado del formulario).
+ * - id/name: identificadores del input (name es clave para guardar en el estado).
  * - accept: tipos permitidos (ej. "image/jpeg,image/png,image/webp").
  * - required: si el archivo es obligatorio.
- * - onChange: manejador del input (ej. formulario.cambiar).
- * - archivo: valor actual (File | null | undefined) para mostrar el nombre seleccionado.
+ * - onChange/onBlur/inputRef: integración con formularios controlados por hooks.
+ * - archivo: valor actual (File | null | undefined) para mostrar nombre/preview.
  * - textoAyuda: mensaje secundario (formatos/tamaño recomendado).
  * - icono: componente de icono opcional (por defecto ImagePlus).
  */
@@ -31,45 +33,73 @@ const CampoArchivo = ({
     icono: Icono = ImagePlus,
     className = '',
 }) => {
-    // Nombre visible del archivo seleccionado (si existe).
     const nombreArchivo = archivo?.name ?? ''
+    const esImagen = Boolean(archivo?.type?.startsWith('image/'))
+    const [previewUrl, setPreviewUrl] = useState('')
+
+    // Genera/revoca URL temporal para vista previa de imágenes seleccionadas.
+    useEffect(() => {
+        if (!archivo || !esImagen) {
+            setPreviewUrl('')
+            return undefined
+        }
+
+        const url = URL.createObjectURL(archivo)
+        setPreviewUrl(url)
+        return () => URL.revokeObjectURL(url)
+    }, [archivo, esImagen])
+
+    // Clases visuales según modo compacto (usado en formularios densos/registro).
     const clasesContenedor = compacto
-        ? 'gap-2 rounded-xl p-2'
+        ? 'gap-3 rounded-xl p-3'
         : 'gap-4 rounded-2xl p-4'
+    const clasesPreview = compacto
+        ? 'h-12 w-12 rounded-xl'
+        : 'h-14 w-14 rounded-xl'
     const clasesIcono = compacto
-        ? 'h-9 w-9 rounded-lg ring-0'
+        ? 'h-11 w-11 rounded-xl'
         : 'h-12 w-12 rounded-xl ring-4 ring-[#39A900]/5'
 
     return (
         <div className={className}>
-            {/* Etiqueta visual que actúa como área interactiva del input de archivo */}
+            {/* Área interactiva: toda la tarjeta dispara el selector de archivo */}
             <label
                 htmlFor={id}
-                className={`group relative flex cursor-pointer items-center border border-dashed border-[#cbd5e1] bg-slate-50 transition-all duration-200 hover:border-[#39A900]/60 hover:bg-[#f7fbf6] hover:shadow-[0_8px_22px_rgba(57,169,0,0.08)] focus-within:border-[#39A900] focus-within:shadow-[0_0_0_4px_rgba(57,169,0,0.10)] ${clasesContenedor}`}
+                className={`group relative flex cursor-pointer items-center border border-dashed border-[#cbd5e1] bg-[#f8fafc] transition-all duration-200 hover:border-[#39A900]/55 hover:bg-[#f7fbf6] hover:shadow-[0_8px_22px_rgba(57,169,0,0.08)] focus-within:border-[#39A900] focus-within:shadow-[0_0_0_4px_rgba(57,169,0,0.10)] ${clasesContenedor}`}
             >
-                {/* Icono principal para reforzar visualmente que es una carga de archivo/imagen */}
-                <span className={`flex shrink-0 items-center justify-center bg-[#39A900]/10 text-[#2F8F00] transition-transform duration-200 group-hover:scale-[1.03] ${clasesIcono}`}>
-                    <Icono size={22} />
-                </span>
+                {/* Vista previa para imágenes o icono genérico */}
+                {previewUrl ? (
+                    <span className={`relative shrink-0 overflow-hidden border border-[#dbe7d8] bg-white shadow-sm ${clasesPreview}`}>
+                        <img
+                            src={previewUrl}
+                            alt="Vista previa del archivo seleccionado"
+                            className="h-full w-full object-cover"
+                        />
+                    </span>
+                ) : (
+                    <span className={`flex shrink-0 items-center justify-center bg-[#39A900]/10 text-[#2F8F00] transition-transform duration-200 group-hover:scale-[1.03] ${clasesIcono}`}>
+                        <Icono size={compacto ? 20 : 22} />
+                    </span>
+                )}
 
-                {/* Texto descriptivo + estado del archivo seleccionado */}
+                {/* Texto descriptivo + estado actual */}
                 <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-2 text-sm font-semibold text-[#081B28]">
-                        <UploadCloud size={16} className="text-[#2F8F00]" />
+                        <UploadCloud size={15} className="text-[#2F8F00]" />
                         {nombreArchivo ? 'Archivo seleccionado' : titulo}
                     </span>
-                    <span className="mt-1 block truncate text-sm text-[#475569]">
+                    <span className="mt-0.5 block truncate text-sm text-[#475569]">
                         {nombreArchivo || placeholder}
                     </span>
-                    <span className="mt-1 block text-xs text-[#64748b]">{textoAyuda}</span>
+                    <span className="mt-0.5 block text-xs text-[#64748b]">{textoAyuda}</span>
                 </span>
 
-                {/* Badge lateral con acción sugerida */}
-                <span className="hidden shrink-0 rounded-xl border border-[#dce8dd] bg-white px-3 py-2 text-xs font-semibold text-[#2F8F00] shadow-sm sm:inline-flex">
+                {/* Acción sugerida */}
+                <span className="hidden shrink-0 rounded-lg border border-[#dce8dd] bg-white px-3 py-2 text-xs font-semibold text-[#2F8F00] shadow-sm sm:inline-flex">
                     {nombreArchivo ? 'Cambiar' : 'Seleccionar'}
                 </span>
 
-                {/* Input real de archivo (oculto visualmente pero funcional y accesible por label) */}
+                {/* Input real (oculto, accesible por label) */}
                 <input
                     id={id}
                     name={name}
