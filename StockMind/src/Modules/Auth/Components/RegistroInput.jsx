@@ -21,11 +21,11 @@ const RegistroInput = ({
         : type
 
     return (
-        <div className="mb-3 w-full">
+        <div className="mb-2.5 w-full">
             {label && (
                 <label
                     htmlFor={name}
-                    className="mb-1.5 block text-[13px] font-semibold text-slate-700"
+                    className="mb-1 block text-[13px] font-semibold text-slate-700"
                 >
                     {label}
                 </label>
@@ -36,7 +36,7 @@ const RegistroInput = ({
                 <Icon
                     size={18}
                     strokeWidth={2}
-                    className={`pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
+                    className={`pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
                         error
                             ? 'text-red-500'
                             : 'text-gray-500 group-hover:text-sena-dark group-focus-within:text-sena'
@@ -53,7 +53,7 @@ const RegistroInput = ({
                     aria-invalid={Boolean(error)}
                     aria-describedby={error ? `${name}-error` : undefined}
                     {...register(name, rules)}
-                    className={`min-h-11 w-full rounded-xl border bg-slate-50 px-[45px] py-2.5 pr-12 text-sm text-text-primary outline-none transition-all duration-300 placeholder:text-slate-400 hover:border-slate-400 hover:bg-white focus:bg-white focus:ring-4 ${
+                    className={`min-h-10 w-full rounded-xl border bg-slate-50 px-[42px] py-2 pr-11 text-sm text-text-primary outline-none transition-all duration-300 placeholder:text-slate-400 hover:border-slate-400 hover:bg-white focus:bg-white focus:ring-4 ${
                         error
                             ? 'border-red-400 focus:border-red-400 focus:ring-red-500/10'
                             : 'border-slate-300 focus:border-sena focus:ring-sena/20'

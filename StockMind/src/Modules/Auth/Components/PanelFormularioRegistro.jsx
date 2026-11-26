@@ -21,9 +21,10 @@ const ERROR_ANIMATION = {
   transition: { duration: 0.2 },
 };
 
-const SECTION_CLASS = "rounded-2xl border border-slate-200/80 p-4 sm:p-5";
+// Clases compactas para que el formulario quepa en pantalla sin scroll.
+const SECTION_CLASS = "rounded-2xl border border-slate-200/80 p-3 sm:p-3.5";
 const SECTION_TITLE_CLASS =
-  "mb-4 text-xs font-bold uppercase tracking-[0.12em] text-[#2f8f00]";
+  "mb-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-[#2f8f00]";
 
 // Panel del formulario de registro (lado derecho en desktop).
 const PanelFormularioRegistro = () => {
@@ -41,41 +42,38 @@ const PanelFormularioRegistro = () => {
   const tipoIdentidadError = errors.tipo_identidad;
 
   return (
-    <section className="flex w-full items-center justify-center bg-white px-4 py-8 sm:px-8 sm:py-10 lg:w-[58%] lg:px-10">
+    <section className="flex w-full items-center justify-center overflow-y-auto bg-white px-4 py-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:px-6 lg:w-[60%] lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: [0.2, 0.7, 0.2, 1] }}
-        className="w-full max-w-[560px]"
+        className="w-full max-w-[620px]"
       >
-        {/* Encabezado del formulario */}
-        <header className="mb-6 text-center">
+        {/* Encabezado compacto para maximizar espacio del formulario */}
+        <header className="mb-3 text-center">
           <img
             src={registroData.logo}
             alt="StockMind"
-            className="mx-auto mb-3 block w-[112px] object-contain sm:w-[124px]"
+            className="mx-auto mb-1.5 block w-[92px] object-contain sm:w-[104px]"
           />
-          <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#39a900]">
-            Registro
-          </p>
-          <h1 className="text-2xl font-bold tracking-[-0.5px] text-text-primary sm:text-[32px]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#39a900]">Registro</p>
+          <h1 className="text-2xl font-bold tracking-[-0.5px] text-text-primary sm:text-[28px]">
             {registroData.titulo}
           </h1>
-          <p className="mt-2 text-sm leading-6 text-text-secondary">
-            {registroData.subtitulo}
-          </p>
+          <p className="mt-0.5 text-sm text-text-secondary">{registroData.subtitulo}</p>
         </header>
 
         <form
           onSubmit={handleSubmit(registrarUsuario)}
           noValidate
-          className="space-y-5"
+          className="space-y-3"
         >
           {/* Sección: foto de perfil */}
           <section className={`${SECTION_CLASS} bg-[#fbfdfb]`}>
-            <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-[#2f8f00]">
-              Perfil
-            </h2>
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#2f8f00]">Perfil</h2>
+              <span className="text-[11px] text-[#64748b]">Opcional</span>
+            </div>
             <CampoArchivo
               id="foto_perfil"
               name={fotoPerfilInput.name}
@@ -95,7 +93,7 @@ const PanelFormularioRegistro = () => {
           <section className={`${SECTION_CLASS} bg-white`}>
             <h2 className={SECTION_TITLE_CLASS}>Datos personales</h2>
 
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
               <RegistroInput
                 icon={User}
                 name="nombre_1"
@@ -121,7 +119,7 @@ const PanelFormularioRegistro = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
               <RegistroInput
                 icon={UserRound}
                 name="apellido_1"
@@ -147,13 +145,13 @@ const PanelFormularioRegistro = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-[0.44fr_1fr]">
-              <div className="mb-3">
+            <div className="grid grid-cols-1 gap-x-3 sm:grid-cols-[0.44fr_1fr]">
+              <div className="mb-2.5">
                 <label
                   htmlFor="tipo_identidad"
-                  className="mb-1.5 block text-[13px] font-semibold text-slate-700"
+                  className="mb-1 block text-[13px] font-semibold text-slate-700"
                 >
-                  Tipo de identidad
+                  Tipo ID
                 </label>
                 <select
                   id="tipo_identidad"
@@ -162,7 +160,7 @@ const PanelFormularioRegistro = () => {
                   {...register("tipo_identidad", {
                     required: "Selecciona un tipo de identidad",
                   })}
-                  className={`min-h-11 w-full rounded-xl border bg-slate-50 px-3.5 py-2.5 text-sm text-text-primary outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-sena/20 ${
+                  className={`min-h-10 w-full rounded-xl border bg-slate-50 px-3 py-2 text-sm text-text-primary outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-sena/20 ${
                     tipoIdentidadError
                       ? "border-red-400 focus:border-red-500 focus:ring-red-500/15"
                       : "border-slate-300 hover:border-slate-400 focus:border-sena"
@@ -208,7 +206,7 @@ const PanelFormularioRegistro = () => {
           <section className={`${SECTION_CLASS} bg-white`}>
             <h2 className={SECTION_TITLE_CLASS}>Contacto y acceso</h2>
 
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
               <RegistroInput
                 icon={Phone}
                 name="telefono"
@@ -243,7 +241,7 @@ const PanelFormularioRegistro = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2 sm:items-start">
+            <div className="grid grid-cols-1 gap-x-3 sm:grid-cols-[1fr_auto] sm:items-end">
               <RegistroInput
                 icon={Lock}
                 name="password"
@@ -264,7 +262,7 @@ const PanelFormularioRegistro = () => {
                 type="submit"
                 disabled={isSubmitting}
                 aria-busy={isSubmitting}
-                className="mt-1 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#2f8f00] px-5 py-3 text-sm font-bold text-white shadow-[0_8px_20px_rgba(57,169,0,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#277500] hover:shadow-[0_12px_26px_rgba(57,169,0,0.24)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 sm:mt-[27px]"
+                className="mb-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#2f8f00] px-6 py-2.5 text-sm font-bold text-white shadow-[0_8px_20px_rgba(57,169,0,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#277500] hover:shadow-[0_12px_26px_rgba(57,169,0,0.24)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 sm:min-w-[170px]"
               >
                 {isSubmitting ? (
                   <>
