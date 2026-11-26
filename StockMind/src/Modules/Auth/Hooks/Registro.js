@@ -11,6 +11,7 @@ const useRegistro = () => {
         }
     } = useForm({
         mode: 'onTouched',
+        shouldFocusError: false,
         defaultValues: {
             nombre_1: '',
             nombre_2: '',
@@ -21,7 +22,8 @@ const useRegistro = () => {
             numero_identidad: '',
             telefono: '',
             email: '',
-            password: ''
+            password: '',
+            password_confirmation: ''
         }
     })
 

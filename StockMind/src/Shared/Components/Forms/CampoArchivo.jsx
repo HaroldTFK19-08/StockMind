@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ImagePlus, UploadCloud, X } from 'lucide-react'
+import { ImagePlus, UploadCloud } from 'lucide-react'
 
 /**
  * Campo visual para seleccionar archivos/imágenes en formularios.
@@ -51,13 +51,13 @@ const CampoArchivo = ({
 
     // Clases visuales según modo compacto (usado en formularios densos/registro).
     const clasesContenedor = compacto
-        ? 'gap-3 rounded-xl p-3'
+        ? 'gap-1.5 rounded-lg p-1.5'
         : 'gap-4 rounded-2xl p-4'
     const clasesPreview = compacto
-        ? 'h-12 w-12 rounded-xl'
+        ? 'h-7 w-7 rounded-lg'
         : 'h-14 w-14 rounded-xl'
     const clasesIcono = compacto
-        ? 'h-11 w-11 rounded-xl'
+        ? 'h-7 w-7 rounded-lg'
         : 'h-12 w-12 rounded-xl ring-4 ring-[#39A900]/5'
 
     return (
@@ -78,24 +78,26 @@ const CampoArchivo = ({
                     </span>
                 ) : (
                     <span className={`flex shrink-0 items-center justify-center bg-[#39A900]/10 text-[#2F8F00] transition-transform duration-200 group-hover:scale-[1.03] ${clasesIcono}`}>
-                        <Icono size={compacto ? 20 : 22} />
+                        <Icono size={compacto ? 14 : 22} />
                     </span>
                 )}
 
                 {/* Texto descriptivo + estado actual */}
                 <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-2 text-sm font-semibold text-[#081B28]">
-                        <UploadCloud size={15} className="text-[#2F8F00]" />
+                    <span className={`flex items-center gap-1.5 font-semibold text-[#081B28] ${compacto ? 'text-[10px]' : 'text-sm'}`}>
+                        <UploadCloud size={compacto ? 12 : 15} className="shrink-0 text-[#2F8F00]" />
                         {nombreArchivo ? 'Archivo seleccionado' : titulo}
                     </span>
-                    <span className="mt-0.5 block truncate text-sm text-[#475569]">
+                    <span className={`mt-0.5 block truncate text-[#475569] ${compacto ? 'text-[9px]' : 'text-sm'}`}>
                         {nombreArchivo || placeholder}
                     </span>
-                    <span className="mt-0.5 block text-xs text-[#64748b]">{textoAyuda}</span>
+                    <span className={`mt-0.5 block text-[#64748b] ${compacto ? 'hidden text-[8px] min-[640px]:block' : 'text-xs'}`}>
+                        {textoAyuda}
+                    </span>
                 </span>
 
                 {/* Acción sugerida */}
-                <span className="hidden shrink-0 rounded-lg border border-[#dce8dd] bg-white px-3 py-2 text-xs font-semibold text-[#2F8F00] shadow-sm sm:inline-flex">
+                <span className={`shrink-0 rounded-md border border-[#dce8dd] bg-white font-semibold text-[#2F8F00] shadow-sm ${compacto ? 'px-1 py-0.5 text-[8px]' : 'hidden px-3 py-2 text-xs sm:inline-flex'}`}>
                     {nombreArchivo ? 'Cambiar' : 'Seleccionar'}
                 </span>
 

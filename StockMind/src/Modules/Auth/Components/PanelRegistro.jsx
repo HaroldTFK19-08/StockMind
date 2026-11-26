@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Link, useNavigate } from "react-router-dom";
-import { House, LogIn, CircleHelp, ArrowLeft, ShieldCheck, Boxes } from "lucide-react";
+import { House, LogIn, CircleHelp, ArrowLeft } from "lucide-react";
 
 import Sena from "../../../assets/SENAblanco.svg";
 
@@ -10,11 +10,11 @@ const PanelRegistro = () => {
   const navigate = useNavigate();
 
   return (
-    <aside className="relative hidden w-[40%] overflow-hidden bg-[linear-gradient(160deg,#287a00_0%,#39A900_48%,#2f8f00_100%)] text-white lg:flex">
+    <aside className="relative hidden min-[540px]:flex min-[540px]:w-[42%] overflow-hidden bg-[#39A900] text-white">
       {/* Decoración de fondo */}
-      <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
-      <div className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-[#b7ff8a]/12 blur-2xl" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-[linear-gradient(180deg,rgba(255,255,255,0.14),transparent)]" />
+      <div className="pointer-events-none absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(255,255,255,0.3)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.3)_1px,transparent_1px)] [background-size:22px_22px]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(145deg,rgba(255,255,255,0.08),transparent_42%)]" />
+      <div className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-[#b7ff8a]/10 blur-3xl" />
       <div className="pointer-events-none absolute inset-y-0 right-0 w-px bg-white/10" />
 
       {/* Botón volver */}
@@ -31,70 +31,47 @@ const PanelRegistro = () => {
         initial={{ opacity: 0, x: -14 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.35, ease: [0.2, 0.7, 0.2, 1] }}
-        className="relative z-10 flex h-full w-full flex-col justify-center px-8 pb-8 pt-20 xl:px-10 xl:pb-10 xl:pt-20"
+        className="relative z-10 flex h-full w-full flex-col justify-between px-6 pb-6 pt-20 xl:px-9 xl:pb-8"
       >
-        {/* Marca */}
-        <div className="mb-6 inline-flex w-fit items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-3.5 py-2.5 backdrop-blur-sm">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/12">
-            <img src={Sena} alt="Logo SENA" className="h-7 w-7 object-contain" />
+        <div className="inline-flex w-fit items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-2.5 py-2 backdrop-blur-sm">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/12">
+            <img src={Sena} alt="Logo SENA" className="h-5 w-5 object-contain" />
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/70">Plataforma</p>
-            <p className="text-base font-bold leading-none tracking-[-0.02em]">StockMind</p>
+            <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-white/70">Plataforma SENA</p>
+            <p className="text-xs font-bold leading-tight">StockMind</p>
           </div>
         </div>
 
-        {/* Mensaje principal */}
-        <h2 className="max-w-[340px] text-[32px] font-bold leading-[1.15] tracking-[-0.03em] xl:text-[36px]">
-          Crea tu cuenta
-          <span className="block text-white/90">y gestiona con confianza</span>
-        </h2>
-        <p className="mt-3 max-w-[350px] text-sm leading-6 text-white/85">
-          Accede a StockMind para administrar inventario, movimientos y reportes de forma clara.
-        </p>
-
-        {/* Beneficios compactos */}
-        <div className="mt-7 space-y-2.5">
-          <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/15">
-              <ShieldCheck size={18} />
-            </span>
-            <div>
-              <p className="text-sm font-semibold">Datos protegidos</p>
-              <p className="text-xs leading-5 text-white/78">Tu información se usa para crear tu acceso.</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/15">
-              <Boxes size={18} />
-            </span>
-            <div>
-              <p className="text-sm font-semibold">Gestión centralizada</p>
-              <p className="text-xs leading-5 text-white/78">Controla elementos y movimientos en un solo lugar.</p>
-            </div>
-          </div>
+        <div className="my-auto py-10">
+          <h2 className="max-w-[340px] text-[22px] font-bold leading-[1.12] tracking-[-0.03em] xl:text-[32px]">
+            Crea tu cuenta y gestiona con claridad
+          </h2>
+          <p className="mt-3 max-w-[300px] text-xs leading-5 text-white/85">
+            Controla inventario, movimientos y reportes desde un solo lugar.
+          </p>
         </div>
 
-        {/* Accesos rápidos */}
-        <nav className="mt-7">
-          <p className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/60">Accesos rápidos</p>
-          <ul className="flex flex-wrap gap-2">
+        <nav>
+          <p className="mb-2 text-[8px] font-bold uppercase tracking-[0.14em] text-white/65">
+            Accesos rápidos
+          </p>
+          <ul className="flex flex-wrap gap-1.5">
             <li>
-              <Link to="/" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-white/90 transition-all duration-200 hover:bg-white/12 hover:text-white">
-                <House size={16} />
+              <Link to="/" className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-2.5 py-1.5 text-[10px] font-medium text-white transition-colors hover:bg-white/20">
+                <House size={12} />
                 <span>Inicio</span>
               </Link>
             </li>
             <li>
-              <Link to="/login" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-white/90 transition-all duration-200 hover:bg-white/12 hover:text-white">
-                <LogIn size={16} />
+              <Link to="/login" className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-2.5 py-1.5 text-[10px] font-medium text-white transition-colors hover:bg-white/20">
+                <LogIn size={12} />
                 <span>Iniciar sesión</span>
               </Link>
             </li>
             <li>
-              <button type="button" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-white/90 transition-all duration-200 hover:bg-white/12 hover:text-white">
-                <CircleHelp size={16} />
+              <button type="button" className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-2.5 py-1.5 text-[10px] font-medium text-white transition-colors hover:bg-white/20">
+                <CircleHelp size={12} />
                 <span>Ayuda</span>
               </button>
             </li>

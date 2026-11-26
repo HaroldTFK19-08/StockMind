@@ -21,11 +21,11 @@ const RegistroInput = ({
         : type
 
     return (
-        <div className="mb-2.5 w-full">
+        <div className="mb-0.5 w-full">
             {label && (
                 <label
                     htmlFor={name}
-                    className="mb-1 block text-[13px] font-semibold text-slate-700"
+                    className="mb-0.5 block text-xs font-semibold text-slate-700"
                 >
                     {label}
                 </label>
@@ -34,7 +34,7 @@ const RegistroInput = ({
             {/* Contenedor del campo con icono y estados visuales mejorados (hover/focus/error). */}
             <div className="group relative">
                 <Icon
-                    size={18}
+                    size={16}
                     strokeWidth={2}
                     className={`pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
                         error
@@ -53,7 +53,7 @@ const RegistroInput = ({
                     aria-invalid={Boolean(error)}
                     aria-describedby={error ? `${name}-error` : undefined}
                     {...register(name, rules)}
-                    className={`min-h-10 w-full rounded-xl border bg-slate-50 px-[42px] py-2 pr-11 text-sm text-text-primary outline-none transition-all duration-300 placeholder:text-slate-400 hover:border-slate-400 hover:bg-white focus:bg-white focus:ring-4 ${
+                    className={`min-h-9 w-full rounded-lg border bg-white px-9 py-2 pr-10 text-[13px] text-text-primary outline-none transition-all duration-300 placeholder:text-slate-400 hover:border-slate-400 focus:ring-4 ${
                         error
                             ? 'border-red-400 focus:border-red-400 focus:ring-red-500/10'
                             : 'border-slate-300 focus:border-sena focus:ring-sena/20'
@@ -73,31 +73,32 @@ const RegistroInput = ({
                         }
                     >
                         {visible ? (
-                            <EyeOff size={18} />
+                            <EyeOff size={16} />
                         ) : (
-                            <Eye size={18} />
+                            <Eye size={16} />
                         )}
                     </button>
                 )}
             </div>
 
-            {/* Mensaje de error animado para feedback inmediato sin cambiar la estructura del formulario. */}
-            <AnimatePresence initial={false}>
-                {error && (
-                    <motion.p
-                        key={error.message}
-                        initial={{ opacity: 0, y: -4, height: 0 }}
-                        animate={{ opacity: 1, y: 0, height: 'auto' }}
-                        exit={{ opacity: 0, y: -2, height: 0 }}
-                        transition={{ duration: 0.2 }}
-                        id={`${name}-error`}
-                        role="alert"
-                        className="mt-1.5 overflow-hidden px-1 text-xs font-medium text-red-500"
-                    >
-                        {error.message}
-                    </motion.p>
-                )}
-            </AnimatePresence>
+            <div className="mt-0.5 h-3 px-1 min-[540px]:h-6 lg:h-3">
+                <AnimatePresence initial={false}>
+                    {error && (
+                        <motion.p
+                            key={error.message}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            id={`${name}-error`}
+                            role="alert"
+                            className="text-[10px] font-medium leading-3 text-red-500"
+                        >
+                            {error.message}
+                        </motion.p>
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
     )
 }

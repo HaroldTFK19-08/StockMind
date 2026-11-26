@@ -8,19 +8,114 @@ import {
   Lock,
   LoaderCircle,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import RegistroInput from "./RegistroInput";
 import useRegistro from "../Hooks/Registro";
 import { registroData } from "../Data/RegistroData";
 import CampoArchivo from "../../../Shared/Components/Forms/CampoArchivo";
 
-// Animación reutilizable para errores del select.
-const ERROR_ANIMATION = {
-  initial: { opacity: 0, y: -4, height: 0 },
-  animate: { opacity: 1, y: 0, height: "auto" },
-  exit: { opacity: 0, y: -2, height: 0 },
-  transition: { duration: 0.2 },
+const enfocarPrimerError = (erroresFormulario) => {
+  const primerCampo = Object.keys(erroresFormulario)[0];
+  if (primerCampo) {
+    document.getElementById(primerCampo)?.focus({ preventScroll: true });
+  }
 };
+
+const crearReglasRegistro = (password) => ({
+  nombre_1: {
+    required: "El primer nombre es obligatorio",
+    minLength: { value: 2, message: "Mínimo 2 caracteres" },
+  },
+  apellido_1: {
+    required: "El primer apellido es obligatorio",
+    minLength: { value: 2, message: "Mínimo 2 caracteres" },
+  },
+  tipo_identidad: {
+    required: "Selecciona un tipo de identidad",
+  },
+  numero_identidad: {
+    required: "El número de identidad es obligatorio",
+    minLength: { value: 5, message: "Mínimo 5 caracteres" },
+  },
+  telefono: {
+    required: "El teléfono es obligatorio",
+    minLength: { value: 7, message: "Teléfono no válido" },
+  },
+  email: {
+    required: "El correo es obligatorio",
+    pattern: {
+      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      message: "Ingresa un correo válido",
+    },
+  },
+  password: {
+    required: "La contraseña es obligatoria",
+    minLength: { value: 8, message: "Mínimo 8 caracteres" },
+  },
+  password_confirmation: {
+    required: "Confirma tu contraseña",
+    validate: (valor) => valor === password || "Las contraseñas no coinciden",
+  },
+});
+
+const SeccionFormulario = ({ titulo, children }) => (
+  <div>
+    <div className="mb-1 flex items-center gap-2">
+      <h2 className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#2f8f00]">
+        {titulo}
+      </h2>
+      <div className="h-px flex-1 bg-[#e6ede4]" />
+    </div>
+    {children}
+  </div>
+);
+
+const SelectIdentidad = ({ register, error, opciones }) => (
+  <div className="mb-0.5">
+    <label
+      htmlFor="tipo_identidad"
+      className="mb-1 block text-xs font-semibold text-slate-700"
+    >
+      Tipo de identidad
+    </label>
+    <select
+      id="tipo_identidad"
+      autoComplete="off"
+      aria-invalid={Boolean(error)}
+      {...register("tipo_identidad")}
+      className={`min-h-9 w-full rounded-lg border bg-white px-3 py-2 text-[13px] text-[#18212f] outline-none transition-all duration-200 focus:ring-4 focus:ring-[#39A900]/15 ${
+        error
+          ? "border-red-400 focus:border-red-500 focus:ring-red-500/10"
+          : "border-[#d7e1d3] hover:border-slate-400 focus:border-[#39A900]"
+      }`}
+    >
+      <option value="">Selecciona un tipo</option>
+      {opciones.map((tipo) => (
+        <option key={tipo.value} value={tipo.value}>
+          {tipo.label}
+        </option>
+      ))}
+    </select>
+    <div className="mt-0.5 h-3 px-1 min-[540px]:h-6 lg:h-3">
+      <AnimatePresence initial={false}>
+        {error && (
+          <motion.p
+            key={error.message}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-[10px] font-medium leading-3 text-red-500"
+            role="alert"
+          >
+            {error.message}
+          </motion.p>
+        )}
+      </AnimatePresence>
+    </div>
+  </div>
+);
 
 // Panel derecho del registro.
 // Este panel es el único con scroll; el izquierdo permanece fijo (definido en Register/PanelRegistro).
@@ -34,47 +129,47 @@ const PanelFormularioRegistro = () => {
     isSubmitting,
   } = useRegistro();
 
-  // Integración del campo de archivo con react-hook-form.
-  const fotoPerfilInput = register("foto_perfil");
+  const password = watch("password");
+  const reglas = crearReglasRegistro(password);
+  const fotoPerfilInput = register("foto_perfil", {
+    onChange: undefined,
+  });
   const fotoPerfil = watch("foto_perfil")?.[0];
-  const tipoIdentidadError = errors.tipo_identidad;
+
+  // Registra el campo tipo_identidad con sus reglas una sola vez
+  const registroTipoIdentidad = register("tipo_identidad", reglas.tipo_identidad);
 
   return (
-    <section className="w-full overflow-y-auto bg-white px-6 py-8 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:px-10 sm:py-10 lg:w-[60%] lg:px-12">
+    <section className="w-full overflow-y-auto bg-white px-5 py-5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden min-[540px]:w-[58%] min-[540px]:px-5 min-[540px]:pb-3 min-[540px]:pt-7 xl:px-9 xl:py-6">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: [0.2, 0.7, 0.2, 1] }}
-        className="mx-auto w-full max-w-[640px]"
+        className="mx-auto w-full max-w-[620px]"
       >
-        {/* Encabezado */}
-        <header className="mb-8">
+        <header className="mb-1">
           <img
             src={registroData.logo}
             alt="Logo StockMind"
-            className="mb-5 h-11 w-auto object-contain sm:h-12"
+            className="mb-0 h-4 w-auto object-contain"
           />
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#39A900]">
+          <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#2f8f00]">
             Registro
           </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-[-0.03em] text-[#18212f] sm:text-[34px]">
+          <h1 className="mt-0.5 text-[17px] font-bold leading-5 tracking-[-0.03em] text-[#18212f]">
             {registroData.titulo}
           </h1>
-          <p className="mt-2 max-w-[520px] text-sm leading-6 text-[#64748b]">
-            {registroData.subtitulo}
+          <p className="mt-0.5 max-w-[520px] text-[10px] leading-[12px] text-[#64748b]">
+            Completa tus datos para comenzar.
           </p>
         </header>
 
-        <form onSubmit={handleSubmit(registrarUsuario)} noValidate className="space-y-8">
-          {/* Sección: Perfil */}
-          <div>
-            <div className="mb-4 flex items-center gap-3">
-              <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2f8f00]">
-                Perfil
-              </h2>
-              <div className="h-px flex-1 bg-[#e6ede4]" />
-            </div>
-
+        <form
+          onSubmit={handleSubmit(registrarUsuario, enfocarPrimerError)}
+          noValidate
+          className="space-y-1.5"
+        >
+          <SeccionFormulario titulo="Perfil">
             <CampoArchivo
               id="foto_perfil"
               name={fotoPerfilInput.name}
@@ -88,18 +183,10 @@ const PanelFormularioRegistro = () => {
               textoAyuda="JPG, PNG o WEBP."
               compacto
             />
-          </div>
+          </SeccionFormulario>
 
-          {/* Sección: Datos personales */}
-          <div>
-            <div className="mb-4 flex items-center gap-3">
-              <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2f8f00]">
-                Datos personales
-              </h2>
-              <div className="h-px flex-1 bg-[#e6ede4]" />
-            </div>
-
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+          <SeccionFormulario titulo="Datos personales">
+            <div className="grid grid-cols-1 gap-x-4 min-[540px]:grid-cols-2">
               <RegistroInput
                 icon={User}
                 name="nombre_1"
@@ -108,10 +195,7 @@ const PanelFormularioRegistro = () => {
                 register={register}
                 error={errors.nombre_1}
                 autoComplete="given-name"
-                rules={{
-                  required: "El primer nombre es obligatorio",
-                  minLength: { value: 2, message: "Mínimo 2 caracteres" },
-                }}
+                rules={reglas.nombre_1}
               />
               <RegistroInput
                 icon={User}
@@ -124,7 +208,7 @@ const PanelFormularioRegistro = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-4 min-[540px]:grid-cols-2">
               <RegistroInput
                 icon={UserRound}
                 name="apellido_1"
@@ -133,10 +217,7 @@ const PanelFormularioRegistro = () => {
                 register={register}
                 error={errors.apellido_1}
                 autoComplete="family-name"
-                rules={{
-                  required: "El primer apellido es obligatorio",
-                  minLength: { value: 2, message: "Mínimo 2 caracteres" },
-                }}
+                rules={reglas.apellido_1}
               />
               <RegistroInput
                 icon={UserRound}
@@ -148,145 +229,107 @@ const PanelFormularioRegistro = () => {
                 autoComplete="off"
               />
             </div>
+          </SeccionFormulario>
 
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-[0.38fr_1fr]">
-              {/* Select con el mismo lenguaje visual que RegistroInput */}
-              <div className="mb-3">
-                <label
-                  htmlFor="tipo_identidad"
-                  className="mb-1.5 block text-[13px] font-semibold text-slate-700"
-                >
-                  Tipo de identidad
-                </label>
-                <select
-                  id="tipo_identidad"
-                  autoComplete="off"
-                  aria-invalid={Boolean(tipoIdentidadError)}
-                  {...register("tipo_identidad", {
-                    required: "Selecciona un tipo de identidad",
-                  })}
-                  className={`min-h-11 w-full rounded-xl border bg-slate-50 px-4 py-2.5 text-sm text-[#18212f] outline-none transition-all duration-200 focus:bg-white focus:ring-4 focus:ring-[#39A900]/15 ${
-                    tipoIdentidadError
-                      ? "border-red-400 focus:border-red-500 focus:ring-red-500/10"
-                      : "border-slate-300 hover:border-slate-400 focus:border-[#39A900]"
-                  }`}
-                >
-                  {registroData.tiposIdentidad.map((tipo) => (
-                    <option key={tipo.value} value={tipo.value}>
-                      {tipo.label}
-                    </option>
-                  ))}
-                </select>
-                <AnimatePresence initial={false}>
-                  {tipoIdentidadError && (
-                    <motion.p
-                      key={tipoIdentidadError.message}
-                      {...ERROR_ANIMATION}
-                      className="mt-1.5 overflow-hidden px-1 text-xs font-medium text-red-500"
-                      role="alert"
-                    >
-                      {tipoIdentidadError.message}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </div>
-
+          <SeccionFormulario titulo="Identificación y contacto">
+            <div className="grid grid-cols-1 gap-x-4 min-[540px]:grid-cols-[0.72fr_1.28fr]">
+              <SelectIdentidad
+                register={() => registroTipoIdentidad}
+                error={errors.tipo_identidad}
+                opciones={registroData.tiposIdentidad}
+              />
               <RegistroInput
                 icon={CreditCard}
                 name="numero_identidad"
                 label="Número de identidad"
-                placeholder="Número de documento"
+                placeholder="Ej. 1023456789"
                 register={register}
                 error={errors.numero_identidad}
                 autoComplete="off"
-                rules={{
-                  required: "El número de identidad es obligatorio",
-                  minLength: { value: 5, message: "Mínimo 5 caracteres" },
-                }}
+                rules={reglas.numero_identidad}
               />
             </div>
-          </div>
 
-          {/* Sección: Contacto y acceso */}
-          <div>
-            <div className="mb-4 flex items-center gap-3">
-              <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2f8f00]">
-                Contacto y acceso
-              </h2>
-              <div className="h-px flex-1 bg-[#e6ede4]" />
-            </div>
-
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-4 min-[540px]:grid-cols-2">
               <RegistroInput
                 icon={Phone}
                 name="telefono"
                 type="tel"
                 label="Teléfono"
-                placeholder="Número de teléfono"
+                placeholder="Ej. 300 123 4567"
                 register={register}
                 error={errors.telefono}
                 autoComplete="tel"
-                rules={{
-                  required: "El teléfono es obligatorio",
-                  minLength: { value: 7, message: "Teléfono no válido" },
-                }}
+                rules={reglas.telefono}
               />
               <RegistroInput
                 icon={Mail}
                 name="email"
                 type="email"
                 label="Correo electrónico"
-                placeholder="correo@ejemplo.com"
+                placeholder="nombre@correo.com"
                 register={register}
                 error={errors.email}
                 autoComplete="username"
-                rules={{
-                  required: "El correo es obligatorio",
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "Ingresa un correo válido",
-                  },
-                }}
+                rules={reglas.email}
               />
             </div>
+          </SeccionFormulario>
 
-            <RegistroInput
-              icon={Lock}
-              name="password"
-              type="password"
-              label="Contraseña"
-              placeholder="Crea una contraseña segura"
-              register={register}
-              error={errors.password}
-              autoComplete="new-password"
-              password
-              rules={{
-                required: "La contraseña es obligatoria",
-                minLength: { value: 6, message: "Mínimo 6 caracteres" },
-              }}
-            />
-          </div>
+          <SeccionFormulario titulo="Seguridad">
+            <div className="grid grid-cols-1 gap-x-4 min-[540px]:grid-cols-2">
+              <RegistroInput
+                icon={Lock}
+                name="password"
+                type="password"
+                label="Contraseña"
+                placeholder="Mínimo 8 caracteres"
+                register={register}
+                error={errors.password}
+                autoComplete="new-password"
+                password
+                rules={reglas.password}
+              />
+              <RegistroInput
+                icon={Lock}
+                name="password_confirmation"
+                type="password"
+                label="Repetir contraseña"
+                placeholder="Confirma tu contraseña"
+                register={register}
+                error={errors.password_confirmation}
+                autoComplete="new-password"
+                password
+                rules={reglas.password_confirmation}
+              />
+            </div>
+          </SeccionFormulario>
 
-          {/* Acción principal */}
-          <div className="flex flex-col items-center pt-2">
+          <div className="flex flex-col gap-3 pt-1 min-[540px]:flex-row min-[540px]:items-center min-[540px]:justify-between">
             <button
               type="submit"
               disabled={isSubmitting}
               aria-busy={isSubmitting}
-              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#39A900] px-6 text-sm font-bold tracking-wide text-white shadow-[0_10px_24px_rgba(57,169,0,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2f8f00] hover:shadow-[0_14px_28px_rgba(57,169,0,0.28)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 sm:w-auto sm:min-w-[220px]"
+              className="inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-lg bg-[#2f8f00] px-5 text-xs font-bold text-white shadow-[0_5px_12px_rgba(57,169,0,0.18)] transition-colors hover:bg-[#277500] disabled:cursor-not-allowed disabled:opacity-70 min-[540px]:w-auto"
             >
               {isSubmitting ? (
                 <>
-                  <LoaderCircle size={18} className="animate-spin" />
-                  <span>REGISTRANDO...</span>
+                  <LoaderCircle size={15} className="animate-spin" />
+                  <span>Creando cuenta...</span>
                 </>
               ) : (
-                registroData.boton
+                <>
+                  Crear cuenta
+                  <span aria-hidden="true">→</span>
+                </>
               )}
             </button>
 
-            <p className="mt-4 text-center text-xs leading-5 text-[#94a3b8]">
-              Al registrarte, tus datos se usarán para crear tu acceso a StockMind.
+            <p className="text-center text-[10px] text-[#64748b] min-[540px]:text-right">
+              ¿Ya tienes cuenta?{" "}
+              <Link to="/login" className="font-semibold text-[#2f8f00] hover:underline">
+                Inicia sesión
+              </Link>
             </p>
           </div>
         </form>
