@@ -1,50 +1,22 @@
-import { useState } from 'react'
-
 import Modal from '../../../Shared/Components/Modals/Modal'
 import Campo, { claseInput } from '../../../Shared/Components/Forms/Campo'
 import Boton from '../../../Shared/Components/UI/Boton'
-import inventarioData from '../../Elementos/Data/inventarioData'
-import { destinosExtra } from '../Data/trasladosData'
+import useFormularioNuevoTraslado from '../Hooks/useFormularioNuevoTraslado'
 
-const formularioVacio = { origenId: '', destino: '', motivo: '' }
-
-const ModalNuevoTraslado = ({ abierto, ambientes, onCerrar, onGuardar }) => {
-    const [formulario, setFormulario] = useState(formularioVacio)
-    const [seleccionados, setSeleccionados] = useState([])
-    const [error, setError] = useState('')
-
-    // Elementos que están en el ambiente de origen elegido
-    const elementosOrigen = inventarioData.filter((e) => e.ambienteId === Number(formulario.origenId))
-    const origen = ambientes.find((a) => a.id === Number(formulario.origenId))
-
-    // Destinos: los otros ambientes + taller y almacén
-    const destinos = [...ambientes.filter((a) => a.id !== Number(formulario.origenId)).map((a) => a.nombre), ...destinosExtra]
-
-    const cambiarCampo = (evento) => {
-        const { name, value } = evento.target
-        setFormulario({ ...formulario, [name]: value })
-        if (name === 'origenId') setSeleccionados([]) // si cambia el origen, se limpia la selección
-    }
-
-    const alternarElemento = (id) => {
-        setSeleccionados(seleccionados.includes(id) ? seleccionados.filter((s) => s !== id) : [...seleccionados, id])
-    }
-
-    const cerrar = () => {
-        setFormulario(formularioVacio)
-        setSeleccionados([])
-        setError('')
-        onCerrar()
-    }
-
-    const guardar = (evento) => {
-        evento.preventDefault()
-        if (!formulario.origenId || !formulario.destino || !formulario.motivo.trim()) return setError('Completa origen, destino y motivo')
-        if (seleccionados.length === 0) return setError('Selecciona los elementos a trasladar')
-
-        onGuardar({ origen: origen.nombre, destino: formulario.destino, motivo: formulario.motivo, elementos: seleccionados })
-        cerrar()
-    }
+const ModalNuevoTraslado = ({ abierto, ambientes, elementos, danteaccountId, onCerrar, onGuardar }) => {
+    const {
+        alternarElemento,
+        cambiarCampo,
+        cerrar,
+        destinos,
+        elementosOrigen,
+        error,
+        formulario,
+        guardando,
+        guardar,
+        origen,
+        seleccionados,
+    } = useFormularioNuevoTraslado({ ambientes, elementos, danteaccountId, onCerrar, onGuardar })
 
     return (
         <Modal abierto={abierto} titulo="Nuevo traslado" descripcion="Mueve elementos de un ambiente a otro lugar." onCerrar={cerrar} ancho="max-w-[760px]">
@@ -61,12 +33,20 @@ const ModalNuevoTraslado = ({ abierto, ambientes, onCerrar, onGuardar }) => {
                                 {ambientes.map((a) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
                             </select>
                         </Campo>
-                        <Campo etiqueta="Destino" htmlFor="destino">
-                            <select id="destino" name="destino" value={formulario.destino} onChange={cambiarCampo} className={claseInput}>
+                        <Campo etiqueta="Ambiente de destino" htmlFor="destinoId">
+                            <select id="destinoId" name="destinoId" value={formulario.destinoId} onChange={cambiarCampo} className={claseInput} disabled={!formulario.origenId}>
                                 <option value="">Selecciona</option>
-                                {destinos.map((d) => <option key={d}>{d}</option>)}
+                                {destinos.map((ambiente) => <option key={ambiente.id} value={ambiente.id}>{ambiente.nombre}</option>)}
                             </select>
                         </Campo>
+                        {!danteaccountId && (
+                            <Campo etiqueta="ID de cuenta Cuentadante" htmlFor="danteaccountId">
+                                <>
+                                    <input id="danteaccountId" name="danteaccountId" type="number" min="1" value={formulario.danteaccountId} onChange={cambiarCampo} placeholder="ID asignado por el sistema" className={claseInput} />
+                                    <p className="mt-1 text-xs text-[#64748b]">El backend lo exige; consúltalo con el administrador del sistema.</p>
+                                </>
+                            </Campo>
+                        )}
                         <Campo etiqueta="Motivo" htmlFor="motivo" className="sm:col-span-2">
                             <input id="motivo" name="motivo" value={formulario.motivo} onChange={cambiarCampo} placeholder="Ej: Revisión técnica" className={claseInput} />
                         </Campo>
@@ -90,7 +70,7 @@ const ModalNuevoTraslado = ({ abierto, ambientes, onCerrar, onGuardar }) => {
                                 <label key={elemento.id} className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#edf2f7] p-3 text-sm transition-colors hover:border-[#dce8dd] hover:bg-[#F7F9F6]">
                                     <input type="checkbox" checked={seleccionados.includes(elemento.id)} onChange={() => alternarElemento(elemento.id)} className="h-4 w-4 accent-[#39A900]" />
                                     <span className="min-w-0 flex-1">
-                                        <span className="block font-semibold text-[#081B28]">{elemento.id} · {elemento.nombre}</span>
+                                        <span className="block font-semibold text-[#081B28]">{elemento.codigo_inventario} · {elemento.nombre}</span>
                                         <span className="block text-xs text-[#64748b]">{elemento.estado}</span>
                                     </span>
                                 </label>
@@ -105,7 +85,7 @@ const ModalNuevoTraslado = ({ abierto, ambientes, onCerrar, onGuardar }) => {
                 {/* Acciones finales */}
                 <div className="flex flex-col-reverse gap-3 border-t border-[#edf2f7] pt-5 sm:flex-row sm:justify-end">
                     <Boton variante="texto" className="w-full sm:w-auto" onClick={cerrar}>Cancelar</Boton>
-                    <Boton type="submit" className="w-full sm:w-auto">Registrar traslado</Boton>
+                    <Boton type="submit" disabled={guardando} className="w-full sm:w-auto">{guardando ? 'Registrando...' : 'Registrar traslado'}</Boton>
                 </div>
             </form>
         </Modal>
