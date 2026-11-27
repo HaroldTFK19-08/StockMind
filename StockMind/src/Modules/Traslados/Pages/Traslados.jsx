@@ -1,54 +1,60 @@
-import { useState } from 'react'
-import { ArrowLeftRight, ArrowRight, Package, Plus, Truck } from 'lucide-react'
+import { ArrowLeftRight, ArrowRight, Package, Plus, Trash2, Truck } from 'lucide-react'
 
+import FotoElemento from '../../Elementos/Components/FotoElemento'
+import Boton from '../../../Shared/Components/UI/Boton'
+import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
+import Cargando from '../../../Shared/Components/Feedback/Cargando'
+import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
+import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
+import MensajeExito from '../../../Shared/Components/Feedback/MensajeExito'
 import StatCard from '../../../Shared/Components/Cards/StatCard'
 import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import SearchBar from '../../../Shared/Forms/SearchBar'
 import Modal from '../../../Shared/Components/Modals/Modal'
-import Boton from '../../../Shared/Components/UI/Boton'
-import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
-import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
-import MensajeExito from '../../../Shared/Components/Feedback/MensajeExito'
-import { fechaHoy, formatearFecha } from '../../../Shared/Utils/fechas'
-import { contarPor, incluyeTexto } from '../../../Shared/Utils/texto'
+import ModalEliminar from '../../../Shared/Components/Modals/ModalEliminar'
+import { formatearFecha } from '../../../Shared/Utils/fechas'
 
 import ModalNuevoTraslado from '../Components/ModalNuevoTraslado'
-import trasladosData from '../Data/trasladosData'
-import ambientesData from '../../Ambientes/Data/ambientesData'
-import inventarioData from '../../Elementos/Data/inventarioData'
-import FotoElemento from '../../Elementos/Components/FotoElemento'
+import useTraslados from '../Hooks/useTraslados'
 
-// Traslados de elementos entre ambientes (Cuentadante)
-const Traslados = ({ ambientes = ambientesData }) => {
-    const [traslados, setTraslados] = useState(trasladosData)
-    const [busqueda, setBusqueda] = useState('')
-    const [detalle, setDetalle] = useState(null)
-    const [modalNuevo, setModalNuevo] = useState(false)
-    const [mensaje, setMensaje] = useState('')
+const Traslados = ({ ambientes: ambientesIniciales = [], danteaccountId }) => {
+    const {
+        ambientes,
+        busqueda,
+        cargando,
+        datos,
+        detalle,
+        elementos,
+        eliminarSeleccionado,
+        error,
+        filtrados,
+        guardarTraslado,
+        mensaje,
+        marcarRecibido,
+        modalNuevo,
+        abrirDetalle,
+        setBusqueda,
+        setDetalle,
+        setModalNuevo,
+        setTrasladoAEliminar,
+        totalElementos,
+        terminarEliminacion,
+        trasladoAEliminar,
+        traslados,
+        trasladosPendientes,
+    } = useTraslados(ambientesIniciales)
 
-    const totalElementos = traslados.reduce((suma, t) => suma + t.elementos.length, 0)
-
-    const filtrados = traslados.filter((t) => incluyeTexto(t.id + t.motivo + t.origen + t.destino, busqueda))
-
-    const guardarTraslado = (nuevo) => {
-        const id = `TR-${String(traslados.length + 1).padStart(3, '0')}`
-        setTraslados([{ ...nuevo, id, fecha: fechaHoy(), estado: 'En tránsito' }, ...traslados])
-        setMensaje(`Traslado ${id} registrado`)
-    }
-
-    const marcarRecibido = (id) => {
-        setTraslados(traslados.map((t) => (t.id === id ? { ...t, estado: 'Completado' } : t)))
-        setDetalle(null)
-        setMensaje(`El traslado ${id} quedó completado`)
-    }
+    if (cargando) return <Cargando texto="Cargando traslados..." />
+    if (!datos) return <MensajeError>{error}</MensajeError>
 
     return (
         <section>
             {mensaje && <MensajeExito>{mensaje}</MensajeExito>}
+            {error && <MensajeError>{error}</MensajeError>}
 
             <div className="mb-8 grid gap-5 sm:grid-cols-3">
                 <StatCard etiqueta="Traslados registrados" valor={traslados.length} icono={ArrowLeftRight} />
-                <StatCard etiqueta="En tránsito" valor={contarPor(traslados, 'estado', 'En tránsito')} icono={Truck} color="azul" />
+                <StatCard etiqueta="Pendientes o aprobados" valor={trasladosPendientes} icono={Truck} color="azul" />
                 <StatCard etiqueta="Elementos trasladados" valor={totalElementos} icono={Package} color="ambar" />
             </div>
 
@@ -57,12 +63,16 @@ const Traslados = ({ ambientes = ambientesData }) => {
                 <Boton icono={Plus} onClick={() => setModalNuevo(true)}>Nuevo traslado</Boton>
             </div>
 
-            <SearchBar placeholder="Buscar por código, motivo, origen o destino..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
+            <SearchBar
+                placeholder="Buscar por código, motivo, origen o destino..."
+                value={busqueda}
+                onChange={(evento) => setBusqueda(evento.target.value)}
+            />
 
             {filtrados.length > 0 ? (
                 <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {filtrados.map((traslado) => (
-                        <Tarjeta key={traslado.id} titulo={traslado.id} className="flex h-full flex-col">
+                        <Tarjeta key={traslado.apiId} titulo={traslado.id} className="flex h-full flex-col">
                             <p className="text-sm text-[#64748b]">{traslado.motivo}</p>
                             <div className="mt-4 flex items-center justify-between gap-2 rounded-[14px] bg-[#F7F9F6] p-3 text-sm font-semibold text-[#081B28]">
                                 <span className="min-w-0 truncate">{traslado.origen}</span>
@@ -72,7 +82,7 @@ const Traslados = ({ ambientes = ambientesData }) => {
                             <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
                                 <div>
                                     <dt className="text-xs text-[#64748b]">Elementos</dt>
-                                    <dd className="font-semibold text-[#081B28]">{traslado.elementos.length}</dd>
+                                    <dd className="font-semibold text-[#081B28]">{traslado.cantidadElementos}</dd>
                                 </div>
                                 <div>
                                     <dt className="text-xs text-[#64748b]">Fecha</dt>
@@ -80,8 +90,10 @@ const Traslados = ({ ambientes = ambientesData }) => {
                                 </div>
                             </dl>
                             <div className="mt-4 flex items-center justify-between gap-3">
-                                <EstadoBadge estado={traslado.estado} />
-                                <Boton variante="secundario" className="px-3 py-1.5" onClick={() => setDetalle(traslado)}>Detalles</Boton>
+                                <EstadoBadge estado={traslado.estadoEtiqueta} />
+                                <Boton variante="secundario" className="px-3 py-1.5" onClick={() => abrirDetalle(traslado.apiId)}>
+                                    Detalles
+                                </Boton>
                             </div>
                         </Tarjeta>
                     ))}
@@ -90,33 +102,66 @@ const Traslados = ({ ambientes = ambientesData }) => {
                 <EstadoVacio titulo="No hay traslados con esa búsqueda" />
             )}
 
-            {/* Detalle del traslado */}
-            <Modal abierto={Boolean(detalle)} titulo={`Traslado ${detalle?.id}`} descripcion={detalle && `${detalle.origen} → ${detalle.destino} · ${detalle.motivo}`} onCerrar={() => setDetalle(null)}>
+            <Modal
+                abierto={Boolean(detalle)}
+                titulo={`Traslado ${detalle?.id}`}
+                descripcion={detalle && `${detalle.origen} → ${detalle.destino} · ${detalle.motivo}`}
+                onCerrar={() => setDetalle(null)}
+            >
                 {detalle && (
                     <>
                         <ul className="divide-y divide-[#f1f5f9] rounded-[14px] border border-[#f1f5f9]">
-                            {detalle.elementos.map((id) => {
-                                const elemento = inventarioData.find((e) => e.id === id)
-                                return (
-                                    <li key={id} className="flex items-center gap-3 p-3">
-                                        <FotoElemento elemento={elemento} />
-                                        <div className="flex-1">
-                                            <p className="text-sm font-semibold text-[#081B28]">{elemento.nombre}</p>
-                                            <p className="text-xs text-[#64748b]">{elemento.id} · {elemento.placa}</p>
-                                        </div>
-                                        <EstadoBadge estado={elemento.estado} />
-                                    </li>
-                                )
-                            })}
+                            {detalle.elementos.map((elemento) => (
+                                <li key={elemento.id} className="flex items-center gap-3 p-3">
+                                    <FotoElemento elemento={elemento} />
+                                    <div className="flex-1">
+                                        <p className="text-sm font-semibold text-[#081B28]">{elemento.nombre ?? 'Elemento'}</p>
+                                        <p className="text-xs text-[#64748b]">{elemento.codigo_inventario ?? elemento.id}</p>
+                                    </div>
+                                    <EstadoBadge estado={elemento.estado ?? 'Sin estado'} />
+                                </li>
+                            ))}
                         </ul>
-                        {detalle.estado === 'En tránsito' && (
-                            <Boton className="mt-5 w-full" onClick={() => marcarRecibido(detalle.id)}>Confirmar llegada</Boton>
+                        {detalle.estado === 'aprobado' && (
+                            <Boton className="mt-5 w-full" onClick={() => marcarRecibido(detalle)}>
+                                Confirmar llegada
+                            </Boton>
+                        )}
+                        {['pendiente', 'rechazado'].includes(detalle.estado) && (
+                            <Boton
+                                variante="peligro"
+                                icono={Trash2}
+                                className="mt-3 w-full"
+                                onClick={() => {
+                                    setDetalle(null)
+                                    setTrasladoAEliminar(detalle)
+                                }}
+                            >
+                                Eliminar traslado
+                            </Boton>
                         )}
                     </>
                 )}
             </Modal>
 
-            <ModalNuevoTraslado abierto={modalNuevo} ambientes={ambientes} onCerrar={() => setModalNuevo(false)} onGuardar={guardarTraslado} />
+            {trasladoAEliminar && (
+                <ModalEliminar
+                    titulo="Eliminar traslado"
+                    nombre={trasladoAEliminar.id}
+                    eliminar={eliminarSeleccionado}
+                    onEliminado={terminarEliminacion}
+                    onCerrar={() => setTrasladoAEliminar(null)}
+                />
+            )}
+
+            <ModalNuevoTraslado
+                abierto={modalNuevo}
+                ambientes={ambientes}
+                elementos={elementos}
+                danteaccountId={danteaccountId}
+                onCerrar={() => setModalNuevo(false)}
+                onGuardar={guardarTraslado}
+            />
         </section>
     )
 }

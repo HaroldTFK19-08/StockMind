@@ -1,117 +1,153 @@
-import { useState } from 'react'
-import { ClipboardCheck, PackageCheck, Plus, Users } from 'lucide-react'
+import { ClipboardCheck, Download, FileText, PackageCheck, Plus, RefreshCw, Users } from 'lucide-react'
 
 import StatCard from '../../../Shared/Components/Cards/StatCard'
-import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import SearchBar from '../../../Shared/Forms/SearchBar'
 import FiltroChips from '../../../Shared/Components/UI/FiltroChips'
 import Boton from '../../../Shared/Components/UI/Boton'
 import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
 import MensajeExito from '../../../Shared/Components/Feedback/MensajeExito'
-import { fechaHoy, formatearFecha } from '../../../Shared/Utils/fechas'
-import { contarPor, incluyeTexto } from '../../../Shared/Utils/texto'
-
+import ModalEliminar from '../../../Shared/Components/Modals/ModalEliminar'
 import ModalNuevaAsignacion from '../Components/ModalNuevaAsignacion'
-import asignacionesData, { jornadas } from '../Data/asignacionesData'
-import inventarioData from '../../Elementos/Data/inventarioData'
+import TarjetaAsignacion from '../Components/TarjetaAsignacion'
+import DetalleAsignacion from '../Components/DetalleAsignacion'
+import useAsignaciones from '../Hooks/useAsignaciones'
 
-// Busca el elemento del inventario por su código
-const buscarElemento = (id) => inventarioData.find((e) => e.id === id)
-
-// Asignaciones de elementos a aprendices (Cuentadante)
 const Asignaciones = () => {
-    const [asignaciones, setAsignaciones] = useState(asignacionesData)
-    const [busqueda, setBusqueda] = useState('')
-    const [jornada, setJornada] = useState('Todas')
-    const [modalAbierto, setModalAbierto] = useState(false)
-    const [mensaje, setMensaje] = useState('')
+    const {
+        abrirDetalle,
+        abrirEdicion,
+        abrirNueva,
+        asignacionAEliminar,
+        asignacionEnEdicion,
+        asignaciones,
+        aprendices,
+        aprendicesUnicos,
+        busqueda,
+        cargando,
+        cargandoDetalle,
+        cerrarDetalle,
+        conteos,
+        descargarPdf,
+        detalle,
+        detalleAbierto,
+        devolver,
+        eliminarSeleccionada,
+        elementosDisponibles,
+        elementosFormulario,
+        error,
+        filtradas,
+        filtro,
+        guardarAsignacion,
+        instructores,
+        mensaje,
+        modalAbierto,
+        pdfCargando,
+        recargar,
+        setAsignacionAEliminar,
+        setBusqueda,
+        setFiltro,
+        setModalAbierto,
+        terminarEliminacion,
+        verPdf,
+    } = useAsignaciones()
 
-    // Elementos en buen estado que todavía no están asignados
-    const idsAsignados = asignaciones.map((a) => a.elementoId)
-    const disponibles = inventarioData.filter((e) => e.estado === 'Buen estado' && !idsAsignados.includes(e.id))
-
-    const aprendicesUnicos = new Set(asignaciones.map((a) => a.documento)).size
-
-    const filtradas = asignaciones.filter((a) => {
-        const elemento = buscarElemento(a.elementoId)
-        return (jornada === 'Todas' || a.jornada === jornada) && incluyeTexto(a.aprendiz + a.documento + elemento.nombre + a.elementoId, busqueda)
-    })
-
-    const conteos = { Todas: asignaciones.length }
-    jornadas.forEach((j) => (conteos[j] = contarPor(asignaciones, 'jornada', j)))
-
-    // Crea una asignación por cada elemento seleccionado
-    const guardarAsignacion = (datosAprendiz, elementosSeleccionados) => {
-        const nuevas = elementosSeleccionados.map((elementoId, indice) => ({
-            ...datosAprendiz,
-            id: Date.now() + indice,
-            elementoId,
-            fecha: fechaHoy(),
-        }))
-        setAsignaciones([...nuevas, ...asignaciones])
-        setMensaje(`Se asignaron ${nuevas.length} elemento(s) a ${datosAprendiz.aprendiz}`)
-    }
-
-    const devolver = (asignacion) => {
-        setAsignaciones(asignaciones.filter((a) => a.id !== asignacion.id))
-        setMensaje(`${asignacion.aprendiz} devolvió el elemento ${asignacion.elementoId}`)
+    const estados = ['Todas', 'Activa', 'Devuelta', 'Vencida']
+    const editarDesdeDetalle = (asignacion) => {
+        cerrarDetalle()
+        abrirEdicion(asignacion.apiId)
     }
 
     return (
         <section>
             {mensaje && <MensajeExito>{mensaje}</MensajeExito>}
 
+            {error && (
+                <div role="alert" className="mb-6 flex flex-col gap-3 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-4 text-sm text-[#b42318] sm:flex-row sm:items-center sm:justify-between">
+                    <p>{error}</p>
+                    <Boton variante="secundario" icono={RefreshCw} onClick={recargar}>Reintentar</Boton>
+                </div>
+            )}
+
             <div className="mb-8 grid gap-5 sm:grid-cols-3">
-                <StatCard etiqueta="Asignaciones activas" valor={asignaciones.length} icono={ClipboardCheck} />
+                <StatCard etiqueta="Asignaciones activas" valor={conteos.Activa} icono={ClipboardCheck} />
                 <StatCard etiqueta="Aprendices con elementos" valor={aprendicesUnicos} icono={Users} color="azul" />
-                <StatCard etiqueta="Elementos disponibles" valor={disponibles.length} icono={PackageCheck} color="ambar" />
+                <StatCard etiqueta="Elementos disponibles" valor={elementosDisponibles.length} icono={PackageCheck} color="ambar" />
             </div>
 
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-lg font-bold text-[#081B28]">Asignaciones</h2>
-                <Boton icono={Plus} onClick={() => setModalAbierto(true)}>Nueva asignación</Boton>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                    <Boton variante="secundario" icono={FileText} onClick={verPdf} disabled={pdfCargando}>
+                        Ver PDF
+                    </Boton>
+                    <Boton variante="secundario" icono={Download} onClick={descargarPdf} disabled={pdfCargando}>
+                        Descargar PDF
+                    </Boton>
+                    <Boton icono={Plus} onClick={abrirNueva}>Nueva asignación</Boton>
+                </div>
             </div>
 
-            <SearchBar placeholder="Buscar por aprendiz, documento o elemento..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
-            <FiltroChips opciones={['Todas', ...jornadas]} valor={jornada} onCambiar={setJornada} conteos={conteos} />
+            <SearchBar
+                placeholder="Buscar por aprendiz, documento o elemento..."
+                value={busqueda}
+                onChange={(evento) => setBusqueda(evento.target.value)}
+            />
+            <FiltroChips opciones={estados} valor={filtro} onCambiar={setFiltro} conteos={conteos} />
 
-            {filtradas.length > 0 ? (
+            {cargando && !asignaciones.length ? (
+                <p role="status" className="py-12 text-center text-sm text-[#64748b]">Cargando asignaciones...</p>
+            ) : filtradas.length ? (
                 <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {filtradas.map((asignacion) => (
-                        <Tarjeta key={asignacion.id} titulo={buscarElemento(asignacion.elementoId).nombre} className="flex h-full flex-col">
-                            <p className="text-sm font-semibold text-[#39A900]">Código {asignacion.elementoId}</p>
-                            <dl className="mt-4 grid grid-cols-2 gap-3 rounded-[14px] bg-[#F7F9F6] p-3 text-sm">
-                                <div className="col-span-2">
-                                    <dt className="text-xs text-[#64748b]">Aprendiz a cargo</dt>
-                                    <dd className="font-semibold text-[#081B28]">{asignacion.aprendiz}</dd>
-                                </div>
-                                <div>
-                                    <dt className="text-xs text-[#64748b]">Documento</dt>
-                                    <dd className="font-semibold text-[#081B28]">{asignacion.tipoDocumento} {asignacion.documento}</dd>
-                                </div>
-                                <div>
-                                    <dt className="text-xs text-[#64748b]">Jornada</dt>
-                                    <dd className="font-semibold text-[#081B28]">{asignacion.jornada}</dd>
-                                </div>
-                                <div className="col-span-2">
-                                    <dt className="text-xs text-[#64748b]">Asignado desde</dt>
-                                    <dd className="font-semibold text-[#081B28]">{formatearFecha(asignacion.fecha)}</dd>
-                                </div>
-                            </dl>
-                            <Boton variante="secundario" className="mt-4 w-full" onClick={() => devolver(asignacion)}>Registrar devolución</Boton>
-                        </Tarjeta>
+                        <TarjetaAsignacion
+                            key={asignacion.apiId}
+                            asignacion={asignacion}
+                            onVer={(registro) => abrirDetalle(registro.apiId)}
+                            onEditar={editarDesdeDetalle}
+                            onDevolver={devolver}
+                            onEliminar={setAsignacionAEliminar}
+                        />
                     ))}
                 </div>
             ) : (
-                <EstadoVacio titulo="No hay asignaciones con ese filtro" descripcion="Busca por otro aprendiz o cambia la jornada." />
+                <EstadoVacio
+                    titulo={busqueda || filtro !== 'Todas' ? 'No hay asignaciones con ese filtro' : 'Aún no hay asignaciones'}
+                    descripcion={busqueda || filtro !== 'Todas'
+                        ? 'Prueba con otro término o cambia el estado seleccionado.'
+                        : 'Crea una asignación para registrar la entrega de un elemento.'}
+                />
             )}
 
-            <ModalNuevaAsignacion
-                abierto={modalAbierto}
-                disponibles={disponibles}
-                onCerrar={() => setModalAbierto(false)}
-                onGuardar={guardarAsignacion}
+            {modalAbierto && (
+                <ModalNuevaAsignacion
+                    abierto
+                    asignacion={asignacionEnEdicion}
+                    aprendices={aprendices}
+                    instructores={instructores}
+                    elementos={elementosFormulario}
+                    onCerrar={() => setModalAbierto(false)}
+                    onGuardar={guardarAsignacion}
+                />
+            )}
+
+            <DetalleAsignacion
+                abierto={detalleAbierto}
+                asignacion={detalle}
+                cargando={cargandoDetalle}
+                onCerrar={cerrarDetalle}
+                onEditar={editarDesdeDetalle}
+                onDevolver={devolver}
             />
+
+            {asignacionAEliminar && (
+                <ModalEliminar
+                    titulo="Eliminar asignación"
+                    nombre={`la asignación de ${asignacionAEliminar.apprenticeName} para ${asignacionAEliminar.element?.nombre ?? 'este elemento'}`}
+                    eliminar={eliminarSeleccionada}
+                    onEliminado={terminarEliminacion}
+                    onCerrar={() => setAsignacionAEliminar(null)}
+                />
+            )}
         </section>
     )
 }

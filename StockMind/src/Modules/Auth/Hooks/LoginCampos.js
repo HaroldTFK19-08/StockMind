@@ -1,36 +1,58 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+
+import { erroresDeCampos, mensajeError } from '../../../Core/Services/apiUtils'
+import useAuth from './useAuth'
+import { rutaPrincipalUsuario } from '../Utils/roles'
 
 const useLogin = () => {
     const {
         register,
         handleSubmit,
-        formState: {
-            errors,
-            isSubmitting
-        }
+        setError,
+        clearErrors,
+        formState: { errors, isSubmitting },
     } = useForm({
         mode: 'onTouched',
         defaultValues: {
             email: '',
-            password: ''
-        }
+            password: '',
+        },
     })
+    const { iniciarSesion: autenticar, cerrarSesion, error: errorSesion, limpiarError } = useAuth()
+    const [errorGeneral, setErrorGeneral] = useState('')
 
-    // DEMO (sin backend): el panel se elige por el correo.
-    // Importante: esto NO es un control de acceso real. La autorización debe validarse en el backend.
-    // Se devuelve solo una ruta interna permitida para evitar redirecciones abiertas.
-    const rutasPermitidas = ['/admin/home', '/instructor/home', '/cuentadante/home', '/aprendiz/home']
+    const iniciarSesion = async (credenciales) => {
+        clearErrors()
+        limpiarError()
+        setErrorGeneral('')
 
-    const iniciarSesion = async (datos) => {
-        const correo = String(datos?.email || '').trim().toLowerCase()
-
-        let ruta = '/aprendiz/home'
-        if (correo.startsWith('admin')) ruta = '/admin/home'
-        else if (correo.startsWith('instructor')) ruta = '/instructor/home'
-        else if (correo.startsWith('cuentadante')) ruta = '/cuentadante/home'
-
-        // Defensa extra: si por error cambia la lógica, solo navegamos a rutas conocidas.
-        return rutasPermitidas.includes(ruta) ? ruta : '/aprendiz/home'
+        try {
+            const usuario = await autenticar(credenciales)
+            const ruta = rutaPrincipalUsuario(usuario)
+            if (!ruta) {
+                await cerrarSesion()
+                setErrorGeneral('Tu cuenta no tiene un rol habilitado para acceder a la plataforma.')
+                return null
+            }
+            return ruta
+        } catch (err) {
+            const erroresServidor = erroresDeCampos(err)
+            Object.entries(erroresServidor).forEach(([campo, mensaje]) => {
+                setError(campo, { type: 'server', message: mensaje })
+            })
+            if (Object.keys(erroresServidor).length === 0) {
+                const mensajeServidor = err.response?.status === 403
+                    ? err.response.data?.message
+                    : null
+                setErrorGeneral(
+                    typeof mensajeServidor === 'string' && mensajeServidor.trim()
+                        ? mensajeServidor
+                        : mensajeError(err),
+                )
+            }
+            return null
+        }
     }
 
     return {
@@ -38,7 +60,8 @@ const useLogin = () => {
         handleSubmit,
         iniciarSesion,
         errors,
-        isSubmitting
+        error: errorGeneral || errorSesion,
+        isSubmitting,
     }
 }
 

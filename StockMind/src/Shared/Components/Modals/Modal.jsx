@@ -7,11 +7,16 @@ import { X } from 'lucide-react'
  * <Modal abierto={abierto} titulo="Nuevo traslado" onCerrar={() => setAbierto(false)}>...</Modal>
  * Usa motion/AnimatePresence para animar apertura y cierre sin cambiar la API del componente.
  */
-const Modal = ({ abierto, titulo, descripcion, onCerrar, children, ancho = 'max-w-[560px]', ocultarBarra = false }) => {
+const Modal = ({ abierto, titulo, descripcion, onCerrar, children, ancho = 'max-w-[560px]' }) => {
     const tituloId = useId()
     const descripcionId = useId()
     const contenedorRef = useRef(null)
     const elementoAnteriorRef = useRef(null)
+    const onCerrarRef = useRef(onCerrar)
+
+    useEffect(() => {
+        onCerrarRef.current = onCerrar
+    }, [onCerrar])
     // Oculta la barra de scroll visualmente pero mantiene el desplazamiento si el contenido
     // excede el alto del viewport (mejor UX en pantallas pequeñas, sin barras visibles).
     const claseDesbordamiento = '[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
@@ -22,10 +27,11 @@ const Modal = ({ abierto, titulo, descripcion, onCerrar, children, ancho = 'max-
         elementoAnteriorRef.current = document.activeElement
 
         const temporizador = window.requestAnimationFrame(() => {
-            contenedorRef.current?.querySelector('[data-modal-close]')?.focus()
+            const objetivo = contenedorRef.current?.querySelector('[autofocus], [data-modal-close]')
+            objetivo?.focus()
         })
 
-        const alPresionar = (evento) => evento.key === 'Escape' && onCerrar()
+        const alPresionar = (evento) => evento.key === 'Escape' && onCerrarRef.current()
         const desbordamientoAnterior = document.body.style.overflow
         document.body.style.overflow = 'hidden'
         window.addEventListener('keydown', alPresionar)
@@ -36,7 +42,7 @@ const Modal = ({ abierto, titulo, descripcion, onCerrar, children, ancho = 'max-
             window.removeEventListener('keydown', alPresionar)
             elementoAnteriorRef.current?.focus?.()
         }
-    }, [abierto, onCerrar])
+    }, [abierto])
 
     return (
         <AnimatePresence>

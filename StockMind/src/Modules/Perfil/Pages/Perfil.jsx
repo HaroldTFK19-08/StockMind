@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { KeyRound, LogOut, Pencil } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import Boton from '../../../Shared/Components/UI/Boton'
@@ -8,18 +9,25 @@ import MensajeExito from '../../../Shared/Components/Feedback/MensajeExito'
 import DatoPerfil from '../Components/DatoPerfil'
 import Interruptor from '../Components/Interruptor'
 import ModalContrasena from '../Components/ModalContrasena'
+import useAuth from '../../Auth/Hooks/useAuth'
 
 /**
  * Página de perfil. La usan todos los roles, cada uno le pasa sus datos:
  * <Perfil usuario={perfilAprendiz} rutaEditar="/aprendiz/perfil/editar" />
  */
 const Perfil = ({ usuario, rutaEditar }) => {
+    const navigate = useNavigate()
+    const { cerrarSesion } = useAuth()
     const [notificaciones, setNotificaciones] = useState(true)
     const [correosResumen, setCorreosResumen] = useState(false)
     const [modalAbierto, setModalAbierto] = useState(false)
     const [mensaje, setMensaje] = useState('')
 
     const nombreCompleto = `${usuario.nombres} ${usuario.apellidos}`
+    const salir = async () => {
+        await cerrarSesion()
+        navigate('/login', { replace: true })
+    }
 
     return (
         <section>
@@ -47,7 +55,7 @@ const Perfil = ({ usuario, rutaEditar }) => {
                             <Boton variante="secundario" icono={KeyRound} className="w-full" onClick={() => setModalAbierto(true)}>
                                 Cambiar contraseña
                             </Boton>
-                            <Boton to="/login" variante="peligro" icono={LogOut} className="w-full">
+                            <Boton onClick={salir} variante="peligro" icono={LogOut} className="w-full">
                                 Cerrar sesión
                             </Boton>
                         </div>

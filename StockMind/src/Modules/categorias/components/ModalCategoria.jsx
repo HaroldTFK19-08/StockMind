@@ -3,13 +3,12 @@ import Modal from '../../../Shared/Components/Modals/Modal'
 const CategoriasModal = ({
     abierto,
     onCerrar,
-    nombre,
-    setNombre,
-    descripcion,
-    setDescripcion,
+    formulario,
+    cambiarCampo,
     onSubmit,
     titulo = "Registrar nueva categoría",
     guardando = false,
+    error = "",
 }) => {
     return (
         <Modal
@@ -29,27 +28,32 @@ const CategoriasModal = ({
                     <div className="space-y-4">
                         <div>
                             {/* Etiqueta del campo nombre */}
-                            <label className="mb-1.5 block text-sm font-semibold text-[#081B28]">
+                            <label htmlFor="nombre-categoria" className="mb-1.5 block text-sm font-semibold text-[#081B28]">
                                 Nombre
                             </label>
                             <input
                                 type="text"
-                                value={nombre}
-                                onChange={(e) => setNombre(e.target.value)}
+                                id="nombre-categoria"
+                                autoFocus
+                                value={formulario.nombre}
+                                onChange={(evento) => cambiarCampo("nombre", evento.target.value)}
                                 required
                                 placeholder="Ej. Tecnología"
+                                aria-invalid={Boolean(error)}
+                                aria-describedby={error ? "error-categoria" : undefined}
                                 className="w-full rounded-[12px] border-2 border-[#edf2f7] bg-white px-4 py-2.5 text-sm text-[#081B28] outline-none transition-all duration-200 placeholder:text-[#94a3b8] hover:border-[#dce8dd] focus:border-[#39A900] focus:shadow-[0_0_0_4px_rgba(73,169,25,0.1)]"
                             />
                         </div>
 
                         <div>
                             {/* Etiqueta del campo descripción */}
-                            <label className="mb-1.5 block text-sm font-semibold text-[#081B28]">
+                            <label htmlFor="descripcion-categoria" className="mb-1.5 block text-sm font-semibold text-[#081B28]">
                                 Descripción
                             </label>
                             <textarea
-                                value={descripcion}
-                                onChange={(e) => setDescripcion(e.target.value)}
+                                id="descripcion-categoria"
+                                value={formulario.descripcion}
+                                onChange={(evento) => cambiarCampo("descripcion", evento.target.value)}
                                 rows="3"
                                 placeholder="Ej. Elementos y equipos tecnológicos..."
                                 className="w-full rounded-[12px] border-2 border-[#edf2f7] bg-white px-4 py-2.5 text-sm text-[#081B28] outline-none transition-all duration-200 placeholder:text-[#94a3b8] hover:border-[#dce8dd] focus:border-[#39A900] focus:shadow-[0_0_0_4px_rgba(73,169,25,0.1)]"
@@ -57,6 +61,16 @@ const CategoriasModal = ({
                         </div>
                     </div>
                 </section>
+
+                {error && (
+                    <p
+                        id="error-categoria"
+                        role="alert"
+                        className="rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm text-[#b42318]"
+                    >
+                        {error}
+                    </p>
+                )}
 
                 {/* Acciones del formulario: cancelar/cerrar o guardar registro */}
                 <div className="flex flex-col-reverse gap-3 border-t border-[#edf2f7] pt-5 sm:flex-row sm:justify-end">

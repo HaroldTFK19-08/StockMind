@@ -1,4 +1,8 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+
+import { erroresDeCampos, mensajeError } from '../../../Core/Services/apiUtils'
+import useAuth from './useAuth'
 
 const useRegistro = () => {
     const {
@@ -8,9 +12,13 @@ const useRegistro = () => {
         formState: {
             errors,
             isSubmitting
-        }
+        },
+        setError,
+        clearErrors,
+        reset,
     } = useForm({
         mode: 'onTouched',
+        shouldFocusError: false,
         defaultValues: {
             nombre_1: '',
             nombre_2: '',
@@ -21,12 +29,29 @@ const useRegistro = () => {
             numero_identidad: '',
             telefono: '',
             email: '',
-            password: ''
+            password: '',
+            password_confirmation: ''
         }
     })
+    const { registrarCuenta } = useAuth()
+    const [mensaje, setMensaje] = useState('')
 
     const registrarUsuario = async (datos) => {
-        console.log('Datos del usuario:', datos)
+        clearErrors()
+        setMensaje('')
+        try {
+            const respuesta = await registrarCuenta(datos)
+            setMensaje(respuesta.mensaje)
+            reset()
+        } catch (err) {
+            const erroresServidor = erroresDeCampos(err)
+            Object.entries(erroresServidor).forEach(([campo, mensajeCampo]) => {
+                setError(campo, { type: 'server', message: mensajeCampo })
+            })
+            if (Object.keys(erroresServidor).length === 0) {
+                setError('root.server', { type: 'server', message: mensajeError(err) })
+            }
+        }
     }
 
     return {
@@ -34,6 +59,7 @@ const useRegistro = () => {
         handleSubmit,
         watch,
         registrarUsuario,
+        mensaje,
         errors,
         isSubmitting
     }
