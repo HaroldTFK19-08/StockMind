@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 
 import LoginFormulario from '../Components/FormLogin'
@@ -7,9 +7,18 @@ import LoginLateral from '../Components/LoginLateral'
 import useLoginAnimation from '../Hooks/AnimacionLogin'
 
 import { loginData } from '../Data/Informacion'
+import useAuth from '../Hooks/useAuth'
+import { rutaPrincipalUsuario } from '../Utils/roles'
+import Cargando from '../../../Shared/Components/Feedback/Cargando'
 
 const Login = () => {
     const { visible } = useLoginAnimation()
+    const { usuario, cargando } = useAuth()
+    const rutaUsuario = rutaPrincipalUsuario(usuario)
+
+    if (cargando) return <Cargando texto="Validando sesión..." />
+    if (rutaUsuario) return <Navigate to={rutaUsuario} replace />
+
     return (
         <main className="flex min-h-screen items-center justify-center bg-[#F7F9F6] px-5 py-8">
             <div

@@ -11,6 +11,7 @@ const LoginFormulario = () => {
         handleSubmit,
         iniciarSesion,
         errors,
+        error,
         isSubmitting
     } = useLogin()
     return (
@@ -32,13 +33,7 @@ const LoginFormulario = () => {
             <form
                 onSubmit={handleSubmit(async (datos) => {
                     const rutaPanel = await iniciarSesion(datos)
-
-                    // Solo navegamos a rutas internas de la app (empiezan por "/") para evitar redirecciones externas.
-                    const rutaSegura = typeof rutaPanel === 'string' && rutaPanel.startsWith('/') && !rutaPanel.startsWith('//')
-                        ? rutaPanel
-                        : '/aprendiz/home'
-
-                    navigate(rutaSegura, { replace: true })
+                    if (rutaPanel) navigate(rutaPanel, { replace: true })
                 })}
                 className="w-full space-y-1"
             >
@@ -62,6 +57,12 @@ const LoginFormulario = () => {
                     error={errors.password}
                     password
                 />
+
+                {error && (
+                    <p role="alert" className="mb-3 rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm text-[#b42318]">
+                        {error}
+                    </p>
+                )}
 
                 {/* Acción secundaria: recuperación de contraseña (pendiente de flujo real) */}
                 <div className="mb-5 pt-1 text-center">
@@ -93,9 +94,9 @@ const LoginFormulario = () => {
                 </button>
             </form>
 
-            {/* Texto de ayuda/demo (informativo) */}
+            {/* La cuenta debe estar activa y tener un rol para ingresar. */}
             <p className="mt-5 rounded-xl border border-[#edf2f7] bg-[#fbfdfb] px-4 py-3 text-center text-xs leading-5 text-gray-500">
-                {loginData.ayudaDemo}
+                {loginData.ayudaAcceso}
             </p>
         </div>
     )

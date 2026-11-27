@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { LogOut, X } from "lucide-react";
 import StockMind from "../../assets/Capa 1.svg";
+import useAuth from "../../Modules/Auth/Hooks/useAuth";
 
 /**
  * Menú lateral de todos los paneles.
@@ -9,6 +10,9 @@ import StockMind from "../../assets/Capa 1.svg";
  * En celular se muestra como panel deslizable (abierto / onCerrar).
  */
 export default function NavegacionLayout({ enlaces = [], abierto = false, onCerrar }) {
+    const navigate = useNavigate();
+    const { cerrarSesion } = useAuth();
+
     useEffect(() => {
         if (!abierto) return;
 
@@ -26,6 +30,12 @@ export default function NavegacionLayout({ enlaces = [], abierto = false, onCerr
             window.removeEventListener("keydown", alPresionarEscape);
         };
     }, [abierto, onCerrar]);
+
+    const salir = async () => {
+        await cerrarSesion();
+        onCerrar();
+        navigate("/login", { replace: true });
+    };
 
     return (
         <>
@@ -92,13 +102,14 @@ export default function NavegacionLayout({ enlaces = [], abierto = false, onCerr
 
                 {/* Cerrar sesión */}
                 <div className="border-t border-gray-100 p-3">
-                    <Link
-                        to="/login"
+                    <button
+                        type="button"
+                        onClick={salir}
                         className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-gray-600 transition-[color,background-color,transform] duration-[180ms] hover:translate-x-0.5 hover:bg-red-50 hover:text-red-600"
                     >
                         <LogOut size={19} strokeWidth={1.9} />
                         <span>Cerrar sesión</span>
-                    </Link>
+                    </button>
                 </div>
             </aside>
         </>

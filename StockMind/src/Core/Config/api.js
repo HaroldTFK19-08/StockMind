@@ -1,4 +1,5 @@
 import axios from "axios";
+import { eliminarToken, obtenerToken } from "../Auth/token";
 
 // Cliente HTTP centralizado para el backend.
 // - baseURL viene de variables de entorno (no hardcodear URLs sensibles).
@@ -13,3 +14,22 @@ export const api = axios.create({
         "Content-Type": "application/json",
     },
 });
+
+api.interceptors.request.use((config) => {
+    const token = obtenerToken();
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+api.interceptors.response.use(
+    (respuesta) => respuesta,
+    (error) => {
+        if (error.response?.status === 401) {
+            eliminarToken();
+            window.dispatchEvent(new Event("stockmind:unauthorized"));
+        }
+        return Promise.reject(error);
+    },
+);

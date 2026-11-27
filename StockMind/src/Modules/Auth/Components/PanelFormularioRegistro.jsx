@@ -127,6 +127,7 @@ const PanelFormularioRegistro = () => {
     registrarUsuario,
     errors,
     isSubmitting,
+    mensaje,
   } = useRegistro();
 
   const password = watch("password");
@@ -169,6 +170,16 @@ const PanelFormularioRegistro = () => {
           noValidate
           className="space-y-1.5"
         >
+          {mensaje && (
+            <p role="status" className="rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-xs leading-5 text-[#166534]">
+              {mensaje}
+            </p>
+          )}
+          {errors.root?.server && (
+            <p role="alert" className="rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-xs leading-5 text-[#b42318]">
+              {errors.root.server.message}
+            </p>
+          )}
           <SeccionFormulario titulo="Perfil">
             <CampoArchivo
               id="foto_perfil"

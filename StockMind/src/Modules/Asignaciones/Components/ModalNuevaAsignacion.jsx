@@ -1,113 +1,182 @@
-import { useState } from 'react'
-
 import Modal from '../../../Shared/Components/Modals/Modal'
 import Campo, { claseInput } from '../../../Shared/Components/Forms/Campo'
 import Boton from '../../../Shared/Components/UI/Boton'
-import { nombreAmbiente } from '../../Ambientes/Data/ambientesData'
-import { jornadas, tiposDocumento } from '../Data/asignacionesData'
+import useFormularioAsignacion from '../Hooks/useFormularioAsignacion'
 
-const formularioVacio = { aprendiz: '', tipoDocumento: 'C.C.', documento: '', jornada: 'Mañana' }
+const estadosAsignacion = [
+    { value: 'activa', label: 'Activa' },
+    { value: 'devuelta', label: 'Devuelta' },
+    { value: 'vencida', label: 'Vencida' },
+]
 
-/**
- * Formulario para asignar uno o varios elementos a un aprendiz.
- * disponibles: elementos en buen estado que nadie tiene asignados.
- */
-const ModalNuevaAsignacion = ({ abierto, disponibles, onCerrar, onGuardar }) => {
-    const [formulario, setFormulario] = useState(formularioVacio)
-    const [seleccionados, setSeleccionados] = useState([])
-    const [error, setError] = useState('')
-
-    const cambiarCampo = (evento) => setFormulario({ ...formulario, [evento.target.name]: evento.target.value })
-
-    // Marca o desmarca un elemento de la lista
-    const alternarElemento = (id) => {
-        if (seleccionados.includes(id)) {
-            setSeleccionados(seleccionados.filter((s) => s !== id))
-        } else {
-            setSeleccionados([...seleccionados, id])
-        }
-    }
-
-    const cerrar = () => {
-        setFormulario(formularioVacio)
-        setSeleccionados([])
-        setError('')
-        onCerrar()
-    }
-
-    const guardar = (evento) => {
-        evento.preventDefault()
-        if (!formulario.aprendiz.trim() || !formulario.documento.trim()) return setError('Escribe el nombre y el documento del aprendiz')
-        if (seleccionados.length === 0) return setError('Selecciona al menos un elemento')
-
-        onGuardar(formulario, seleccionados)
-        cerrar()
-    }
+const ModalNuevaAsignacion = ({
+    abierto,
+    asignacion,
+    aprendices,
+    instructores,
+    elementos,
+    onCerrar,
+    onGuardar,
+}) => {
+    const { cambiarCampo, error, formulario, guardar, guardando } = useFormularioAsignacion({
+        asignacion,
+        onCerrar,
+        onGuardar,
+    })
 
     return (
-        <Modal abierto={abierto} titulo="Nueva asignación" descripcion="Entrega elementos a un aprendiz." onCerrar={cerrar} ancho="max-w-[760px]">
-            {/* Formulario principal del modal:
-                - Estructura en secciones para lectura clara.
-                - Sin contenedores con scroll interno (los elementos se muestran en grilla). */}
-            <form onSubmit={guardar} className="space-y-6">
+        <Modal
+            abierto={abierto}
+            titulo={asignacion ? 'Editar asignación' : 'Nueva asignación'}
+            descripcion="Asigna un elemento a un aprendiz y registra su fecha de devolución esperada."
+            onCerrar={guardando ? () => {} : onCerrar}
+            ancho="max-w-[760px]"
+        >
+            <form onSubmit={guardar} className="space-y-5">
                 <section className="rounded-2xl border border-[#edf2f7] bg-[#fbfdfb] p-4 sm:p-5">
-                    <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.04em] text-[#2F8F00]">Datos del aprendiz</h3>
+                    <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.04em] text-[#2F8F00]">
+                        Personas y elemento
+                    </h3>
                     <div className="grid gap-4 sm:grid-cols-2">
-                        <Campo etiqueta="Nombre del aprendiz" htmlFor="aprendiz" className="sm:col-span-2">
-                            <input id="aprendiz" name="aprendiz" value={formulario.aprendiz} onChange={cambiarCampo} className={claseInput} />
-                        </Campo>
-                        <Campo etiqueta="Tipo de documento" htmlFor="tipoDocumento">
-                            <select id="tipoDocumento" name="tipoDocumento" value={formulario.tipoDocumento} onChange={cambiarCampo} className={claseInput}>
-                                {tiposDocumento.map((t) => <option key={t}>{t}</option>)}
+                        <Campo etiqueta="Aprendiz" htmlFor="apprentice_id">
+                            <select
+                                id="apprentice_id"
+                                name="apprentice_id"
+                                value={formulario.apprentice_id}
+                                onChange={cambiarCampo}
+                                className={claseInput}
+                                required
+                            >
+                                <option value="">Selecciona un aprendiz</option>
+                                {aprendices.map((aprendiz) => (
+                                    <option key={aprendiz.id} value={aprendiz.id}>
+                                        {aprendiz.nombre}{aprendiz.documento ? ` · ${aprendiz.documento}` : ''}
+                                    </option>
+                                ))}
                             </select>
                         </Campo>
-                        <Campo etiqueta="Número de documento" htmlFor="documento">
-                            <input id="documento" name="documento" inputMode="numeric" value={formulario.documento} onChange={cambiarCampo} className={claseInput} />
+                        <Campo etiqueta="Instructor responsable" htmlFor="teacher_id">
+                            <select
+                                id="teacher_id"
+                                name="teacher_id"
+                                value={formulario.teacher_id}
+                                onChange={cambiarCampo}
+                                className={claseInput}
+                                required
+                            >
+                                <option value="">Selecciona un instructor</option>
+                                {instructores.map((instructor) => (
+                                    <option key={instructor.id} value={instructor.id}>
+                                        {instructor.nombre}
+                                    </option>
+                                ))}
+                            </select>
                         </Campo>
-                        <Campo etiqueta="Jornada" htmlFor="jornada" className="sm:col-span-2">
-                            <select id="jornada" name="jornada" value={formulario.jornada} onChange={cambiarCampo} className={claseInput}>
-                                {jornadas.map((j) => <option key={j}>{j}</option>)}
+                        <Campo etiqueta="Elemento disponible" htmlFor="element_id" className="sm:col-span-2">
+                            <select
+                                id="element_id"
+                                name="element_id"
+                                value={formulario.element_id}
+                                onChange={cambiarCampo}
+                                className={claseInput}
+                                required
+                            >
+                                <option value="">Selecciona un elemento</option>
+                                {elementos.map((elemento) => (
+                                    <option key={elemento.id} value={elemento.id}>
+                                        {elemento.codigo_inventario ?? `ID ${elemento.id}`} · {elemento.nombre}
+                                    </option>
+                                ))}
                             </select>
                         </Campo>
                     </div>
                 </section>
 
-                <fieldset className="rounded-2xl border border-[#edf2f7] bg-white p-4 sm:p-5">
-                    <legend className="px-1 text-sm font-bold uppercase tracking-[0.04em] text-[#2F8F00]">
-                        Elementos disponibles ({seleccionados.length} seleccionados)
-                    </legend>
-
-                    {/* Lista de elementos sin scroll: se organiza en columnas para aprovechar el espacio */}
-                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                        {disponibles.length === 0 && (
-                            <p className="rounded-xl border border-dashed border-[#d7e4d8] p-4 text-sm text-[#64748b] sm:col-span-2">
-                                No hay elementos disponibles.
-                            </p>
+                <section className="rounded-2xl border border-[#edf2f7] bg-white p-4 sm:p-5">
+                    <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.04em] text-[#2F8F00]">
+                        Fechas y estado
+                    </h3>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Campo etiqueta="Fecha de asignación" htmlFor="fecha_asignacion">
+                            <input
+                                id="fecha_asignacion"
+                                name="fecha_asignacion"
+                                type="date"
+                                value={formulario.fecha_asignacion}
+                                onChange={cambiarCampo}
+                                className={claseInput}
+                            />
+                        </Campo>
+                        <Campo etiqueta="Devolución esperada" htmlFor="fecha_devolucion_esperada">
+                            <input
+                                id="fecha_devolucion_esperada"
+                                name="fecha_devolucion_esperada"
+                                type="date"
+                                value={formulario.fecha_devolucion_esperada}
+                                onChange={cambiarCampo}
+                                className={claseInput}
+                                required
+                            />
+                        </Campo>
+                        {asignacion && (
+                            <>
+                                <Campo etiqueta="Devolución real" htmlFor="fecha_devolucion_real">
+                                    <input
+                                        id="fecha_devolucion_real"
+                                        name="fecha_devolucion_real"
+                                        type="date"
+                                        value={formulario.fecha_devolucion_real}
+                                        onChange={cambiarCampo}
+                                        className={claseInput}
+                                    />
+                                </Campo>
+                                <Campo etiqueta="Estado" htmlFor="estado">
+                                    <select
+                                        id="estado"
+                                        name="estado"
+                                        value={formulario.estado}
+                                        onChange={cambiarCampo}
+                                        className={claseInput}
+                                    >
+                                        {estadosAsignacion.map((estado) => (
+                                            <option key={estado.value} value={estado.value}>{estado.label}</option>
+                                        ))}
+                                    </select>
+                                </Campo>
+                            </>
                         )}
-                        {disponibles.map((elemento) => (
-                            <label key={elemento.id} className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#edf2f7] p-3 text-sm transition-colors hover:border-[#dce8dd] hover:bg-[#F7F9F6]">
-                                <input
-                                    type="checkbox"
-                                    checked={seleccionados.includes(elemento.id)}
-                                    onChange={() => alternarElemento(elemento.id)}
-                                    className="h-4 w-4 accent-[#39A900]"
-                                />
-                                <span className="min-w-0 flex-1">
-                                    <span className="block font-semibold text-[#081B28]">{elemento.id} · {elemento.nombre}</span>
-                                    <span className="block text-xs text-[#64748b]">{nombreAmbiente(elemento.ambienteId)}</span>
-                                </span>
-                            </label>
-                        ))}
+                        <Campo etiqueta="Observaciones (opcional)" htmlFor="observaciones" className="sm:col-span-2">
+                            <textarea
+                                id="observaciones"
+                                name="observaciones"
+                                rows={3}
+                                value={formulario.observaciones}
+                                onChange={cambiarCampo}
+                                maxLength={255}
+                                className={claseInput}
+                            />
+                        </Campo>
                     </div>
-                </fieldset>
+                </section>
 
-                {/* Mensaje de validación general del formulario */}
-                {error && <p role="alert" className="animate-inline-error rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm text-[#dc2626]">{error}</p>}
+                {error && (
+                    <p role="alert" className="animate-inline-error rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm text-[#dc2626]">
+                        {error}
+                    </p>
+                )}
 
-                {/* Acciones finales del formulario */}
                 <div className="flex flex-col-reverse gap-3 border-t border-[#edf2f7] pt-5 sm:flex-row sm:justify-end">
-                    <Boton variante="texto" className="w-full sm:w-auto" onClick={cerrar}>Cancelar</Boton>
-                    <Boton type="submit" className="w-full sm:w-auto">Asignar elementos</Boton>
+                    <Boton variante="texto" className="w-full sm:w-auto" onClick={onCerrar} disabled={guardando}>
+                        Cancelar
+                    </Boton>
+                    <Boton
+                        type="submit"
+                        className="w-full sm:w-auto"
+                        disabled={guardando || !aprendices.length || !instructores.length || !elementos.length}
+                        aria-busy={guardando}
+                    >
+                        {guardando ? 'Guardando...' : asignacion ? 'Guardar cambios' : 'Asignar elemento'}
+                    </Boton>
                 </div>
             </form>
         </Modal>
