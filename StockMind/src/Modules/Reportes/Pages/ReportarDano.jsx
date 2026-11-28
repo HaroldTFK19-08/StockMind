@@ -1,14 +1,19 @@
 import { useLocation } from 'react-router-dom'
-import { CircleCheck, LoaderCircle, Send } from 'lucide-react'
+import { Camera, CircleCheck, LoaderCircle, Send } from 'lucide-react'
 
 import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import Campo, { claseInput } from '../../../Shared/Components/Forms/Campo'
+import CampoArchivo from '../../../Shared/Components/Forms/CampoArchivo'
 import Boton from '../../../Shared/Components/UI/Boton'
+import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
+import { useCarga } from '../../../Shared/Hooks/useCarga'
+import useAuth from '../../Auth/Hooks/useAuth'
+import { obtenerUsuario } from '../../Administrador/Services/usuariosService'
+import { obtenerMisElementos } from '../../Elementos/Services/elementosService'
 
 import SelectorElemento from '../Components/SelectorElemento'
 import useReportarDano from '../Hooks/useReportarDano'
 import { tiposDano } from '../Data/reportesData'
-import misElementos from '../../Elementos/Data/misElementos'
 
 const LIMITE = 500
 
@@ -18,13 +23,24 @@ const pasos = [
     { titulo: 'Resuelto', texto: 'Te avisamos cuando el elemento esté listo para usar.' },
 ]
 
-const ReportarDano = ({ elementos = misElementos, rutaReportes = '/aprendiz/reportes' }) => {
+const ReportarDano = ({ rutaReportes = '/aprendiz/reportes' }) => {
     // Si venimos desde "Mis elementos", el elemento ya viene seleccionado
     const { state } = useLocation()
-    const { register, handleSubmit, watch, errors, isSubmitting, enviarReporte, reporteEnviado, nuevoReporte } =
-        useReportarDano(state?.elementoId ?? '')
+    const { usuario } = useAuth()
+    const { datos: perfil, cargando: cargandoPerfil, error: errorPerfil } = useCarga(
+        () => usuario?.id ? obtenerUsuario(usuario.id) : Promise.resolve(null),
+        usuario?.id ?? ''
+    )
+    const { datos: elementos = [], cargando: cargandoElementos, error: errorElementos } =
+        useCarga(obtenerMisElementos, 'mis-elementos-reporte')
+    const { register, handleSubmit, watch, errors, isSubmitting, enviarReporte, reporteEnviado, nuevoReporte, errorEnvio } =
+        useReportarDano(state?.elementoId ?? '', perfil?.apprentice?.id)
 
     const descripcion = watch('descripcion') ?? ''
+    const fotoRegistro = register('foto_probatorio', {
+        required: 'Adjunta una foto probatoria del daño',
+    })
+    const foto = watch('foto_probatorio')?.[0]
 
     // Pantalla de éxito
     if (reporteEnviado) {
@@ -48,8 +64,13 @@ const ReportarDano = ({ elementos = misElementos, rutaReportes = '/aprendiz/repo
     return (
         <section className="grid gap-6 lg:grid-cols-[1fr_300px]">
             <Tarjeta>
+                {errorPerfil && <MensajeError>{errorPerfil}</MensajeError>}
+                {errorElementos && <MensajeError>{errorElementos}</MensajeError>}
+                {cargandoPerfil || cargandoElementos ? (
+                    <p className="py-8 text-center text-sm text-[#64748b]">Cargando tus datos y elementos...</p>
+                ) : (
                 <form onSubmit={handleSubmit(enviarReporte)} noValidate className="space-y-7">
-                    <SelectorElemento elementos={elementos} register={register} seleccionado={watch('elementoId')} error={errors.elementoId} />
+                    <SelectorElemento elementos={elementos ?? []} register={register} seleccionado={watch('elementoId')} error={errors.elementoId} />
 
                     <Campo etiqueta="Tipo de daño" htmlFor="tipoDano" error={errors.tipoDano?.message}>
                         <select id="tipoDano" className={claseInput} {...register('tipoDano', { required: 'Elige el tipo de daño' })}>
@@ -73,13 +94,32 @@ const ReportarDano = ({ elementos = misElementos, rutaReportes = '/aprendiz/repo
                         <p className="mt-1 text-right text-xs text-[#94a3b8]">{descripcion.length}/{LIMITE}</p>
                     </Campo>
 
+                    <Campo etiqueta="Foto probatoria" htmlFor="foto_probatorio" error={errors.foto_probatorio?.message}>
+                        <CampoArchivo
+                            id="foto_probatorio"
+                            name={fotoRegistro.name}
+                            accept="image/jpeg,image/png,image/webp"
+                            required
+                            inputRef={fotoRegistro.ref}
+                            onChange={fotoRegistro.onChange}
+                            onBlur={fotoRegistro.onBlur}
+                            archivo={foto}
+                            icono={Camera}
+                            placeholder="Adjunta una foto clara del elemento"
+                            textoAyuda="JPG, PNG o WEBP. Máximo 5 MB."
+                        />
+                    </Campo>
+
+                    {errorEnvio && <MensajeError>{errorEnvio}</MensajeError>}
+
                     <div className="flex flex-col-reverse gap-3 border-t border-[#f1f5f9] pt-6 sm:flex-row sm:justify-end">
                         <Boton to={rutaReportes} variante="texto">Cancelar</Boton>
-                        <Boton type="submit" disabled={isSubmitting} icono={isSubmitting ? LoaderCircle : Send}>
+                        <Boton type="submit" disabled={isSubmitting || !perfil?.apprentice?.id} icono={isSubmitting ? LoaderCircle : Send}>
                             {isSubmitting ? 'Enviando...' : 'Enviar reporte'}
                         </Boton>
                     </div>
                 </form>
+                )}
             </Tarjeta>
 
             {/* Qué pasa después de enviar */}

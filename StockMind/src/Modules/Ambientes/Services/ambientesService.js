@@ -3,7 +3,7 @@ import { obtenerTodos, obtenerUno } from '../../../Core/Services/apiUtils'
 
 // Ambientes -> /v1/ambientes
 // Campos: headquarter_id (sede), nombre, capacidad, tipo, estado ("activo" o "inactivo")
-//         teacher_id (instructor responsable, opcional)
+//         teacher_id (instructor responsable, opcional), cuentadante_id (opcional al crear)
 // Cada ambiente trae además: headquarter, teacher, elements_count y danteaccounts_count
 
 export const obtenerAmbientes = () => obtenerTodos('/ambientes')

@@ -75,6 +75,9 @@ const AuthProvider = ({ children }) => {
     }
 
     const limpiarError = () => setError('')
+    const actualizarUsuarioSesion = (datos) => {
+        setUsuario((actual) => actual ? { ...actual, ...datos } : actual)
+    }
 
     return (
         <AuthContext.Provider
@@ -86,6 +89,7 @@ const AuthProvider = ({ children }) => {
                 registrarCuenta,
                 cerrarSesion: cerrarSesionUsuario,
                 limpiarError,
+                actualizarUsuarioSesion,
             }}
         >
             {children}

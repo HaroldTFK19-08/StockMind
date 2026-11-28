@@ -1,19 +1,29 @@
 import { useState } from 'react'
 
-import { mensajeError } from '../../../Core/Services/apiUtils'
+import { erroresDeCampos, mensajeError } from '../../../Core/Services/apiUtils'
 import { fechaHoy } from '../../../Shared/Utils/fechas'
 
-const formularioVacio = { origenId: '', destinoId: '', danteaccountId: '', motivo: '' }
+const formularioVacio = (ambienteOrigenId) => ({
+    origenId: ambienteOrigenId ? String(ambienteOrigenId) : '',
+    destinoId: '',
+    motivo: '',
+})
 
-const useFormularioNuevoTraslado = ({ ambientes, elementos, danteaccountId, onCerrar, onGuardar }) => {
-    const [formulario, setFormulario] = useState(formularioVacio)
+const useFormularioNuevoTraslado = ({ ambientes, elementos, danteaccountId, ambienteOrigenId, onCerrar, onGuardar }) => {
+    const [formulario, setFormulario] = useState(() => formularioVacio(ambienteOrigenId))
     const [seleccionados, setSeleccionados] = useState([])
     const [error, setError] = useState('')
     const [guardando, setGuardando] = useState(false)
 
-    const elementosOrigen = elementos.filter((elemento) => elemento.environment_id === Number(formulario.origenId))
-    const origen = ambientes.find((ambiente) => ambiente.id === Number(formulario.origenId))
-    const destinos = ambientes.filter((ambiente) => ambiente.id !== Number(formulario.origenId))
+    const elementosOrigen = elementos.filter((elemento) =>
+        Number(elemento.environment_id) === Number(formulario.origenId)
+        && String(elemento.estado).toLowerCase() === 'disponible',
+    )
+    const origen = ambientes.find((ambiente) => Number(ambiente.id) === Number(formulario.origenId))
+    const destinos = ambientes.filter((ambiente) =>
+        Number(ambiente.id) !== Number(formulario.origenId)
+        && String(ambiente.estado).toLowerCase() === 'activo',
+    )
 
     const cambiarCampo = (evento) => {
         const { name, value } = evento.target
@@ -23,16 +33,21 @@ const useFormularioNuevoTraslado = ({ ambientes, elementos, danteaccountId, onCe
         } else {
             setFormulario((actual) => ({ ...actual, [name]: value }))
         }
+        setError('')
     }
 
     const alternarElemento = (id) => {
+        const elementoId = Number(id)
         setSeleccionados((actuales) =>
-            actuales.includes(id) ? actuales.filter((seleccionado) => seleccionado !== id) : [...actuales, id],
+            actuales.includes(elementoId)
+                ? actuales.filter((seleccionado) => seleccionado !== elementoId)
+                : [...actuales, elementoId],
         )
     }
 
     const cerrar = () => {
-        setFormulario(formularioVacio)
+        if (guardando) return
+        setFormulario(formularioVacio(ambienteOrigenId))
         setSeleccionados([])
         setError('')
         onCerrar()
@@ -40,9 +55,25 @@ const useFormularioNuevoTraslado = ({ ambientes, elementos, danteaccountId, onCe
 
     const guardar = async (evento) => {
         evento.preventDefault()
-        const idCuentaDante = danteaccountId || formulario.danteaccountId
-        if (!formulario.origenId || !formulario.destinoId || !idCuentaDante || !formulario.motivo.trim()) {
-            setError('Completa origen, destino, ID de cuenta Cuentadante y motivo')
+        const origenId = Number(formulario.origenId)
+        const destinoId = Number(formulario.destinoId)
+        const idCuentaDante = Number(danteaccountId)
+        const motivo = formulario.motivo.trim()
+
+        if (!Number.isInteger(idCuentaDante) || idCuentaDante < 1) {
+            setError('No tienes una cuenta DANTE activa asociada a tu usuario.')
+            return
+        }
+        if (!Number.isInteger(origenId) || origenId < 1 || !Number.isInteger(destinoId) || destinoId < 1) {
+            setError('Selecciona un ambiente de origen y un destino válido.')
+            return
+        }
+        if (origenId === destinoId || !destinos.some((ambiente) => Number(ambiente.id) === destinoId)) {
+            setError('Selecciona un ambiente de destino activo y diferente al origen.')
+            return
+        }
+        if (!motivo || motivo.length > 255) {
+            setError('El motivo es obligatorio y no debe superar 255 caracteres.')
             return
         }
         if (seleccionados.length === 0) {
@@ -54,16 +85,19 @@ const useFormularioNuevoTraslado = ({ ambientes, elementos, danteaccountId, onCe
         setError('')
         try {
             await onGuardar({
-                ambiente_origen_id: Number(formulario.origenId),
-                ambiente_destino_id: Number(formulario.destinoId),
-                danteaccount_id: Number(idCuentaDante),
-                motivo: formulario.motivo.trim(),
+                ambiente_origen_id: origenId,
+                ambiente_destino_id: destinoId,
+                danteaccount_id: idCuentaDante,
+                motivo,
                 fecha_solicitud: fechaHoy(),
                 element_ids: seleccionados,
             })
-            cerrar()
+            setFormulario(formularioVacio(ambienteOrigenId))
+            setSeleccionados([])
+            onCerrar()
         } catch (err) {
-            setError(mensajeError(err))
+            const erroresServidor = Object.values(erroresDeCampos(err))
+            setError(erroresServidor.length ? erroresServidor.join(' ') : mensajeError(err))
         } finally {
             setGuardando(false)
         }

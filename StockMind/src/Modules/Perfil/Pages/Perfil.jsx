@@ -1,50 +1,85 @@
 import { useState } from 'react'
-import { KeyRound, LogOut, Pencil } from 'lucide-react'
+import { BookOpen, Building2, IdCard, KeyRound, LogOut, Mail, MapPin, Pencil, Phone, UserRound } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import Boton from '../../../Shared/Components/UI/Boton'
-import MensajeExito from '../../../Shared/Components/Feedback/MensajeExito'
+import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
+import { useCarga } from '../../../Shared/Hooks/useCarga'
+import { mensajeError } from '../../../Core/Services/apiUtils'
 
 import DatoPerfil from '../Components/DatoPerfil'
-import Interruptor from '../Components/Interruptor'
 import ModalContrasena from '../Components/ModalContrasena'
 import useAuth from '../../Auth/Hooks/useAuth'
+import { obtenerUsuario } from '../../Administrador/Services/usuariosService'
 
-/**
- * Página de perfil. La usan todos los roles, cada uno le pasa sus datos:
- * <Perfil usuario={perfilAprendiz} rutaEditar="/aprendiz/perfil/editar" />
- */
-const Perfil = ({ usuario, rutaEditar }) => {
+const nombreUsuario = (usuario) => [
+    usuario?.nombre_1,
+    usuario?.nombre_2,
+    usuario?.apellido_1,
+    usuario?.apellido_2,
+].filter(Boolean).join(' ') || usuario?.email || 'Usuario'
+
+const Perfil = ({ rutaEditar }) => {
     const navigate = useNavigate()
-    const { cerrarSesion } = useAuth()
-    const [notificaciones, setNotificaciones] = useState(true)
-    const [correosResumen, setCorreosResumen] = useState(false)
+    const { usuario: sesion, cerrarSesion } = useAuth()
     const [modalAbierto, setModalAbierto] = useState(false)
-    const [mensaje, setMensaje] = useState('')
+    const [errorSesion, setErrorSesion] = useState('')
+    const { datos: usuario, cargando, error } = useCarga(
+        () => sesion?.id ? obtenerUsuario(sesion.id) : Promise.resolve(null),
+        sesion?.id ?? ''
+    )
 
-    const nombreCompleto = `${usuario.nombres} ${usuario.apellidos}`
+    const nombreCompleto = nombreUsuario(usuario)
+    const rol = (usuario?.roles ?? []).map((item) => item.rol).filter(Boolean).join(' · ') || 'Sin rol asignado'
+    const ficha = usuario?.apprentice?.coursegroup
+    const ambientes = (usuario?.danteaccounts ?? [])
+        .map((cuenta) => cuenta.environment?.nombre)
+        .filter(Boolean)
+
+    const datos = [
+        { icono: IdCard, etiqueta: 'Documento', valor: [usuario?.tipo_identidad, usuario?.numero_identidad].filter(Boolean).join(' ') },
+        { icono: Mail, etiqueta: 'Correo', valor: usuario?.email },
+        { icono: Phone, etiqueta: 'Teléfono', valor: usuario?.telefono },
+        { icono: BookOpen, etiqueta: 'Programa / especialidad', valor: ficha?.programa ?? usuario?.teacher?.especialidad },
+        { icono: IdCard, etiqueta: 'Ficha', valor: ficha?.codigo },
+        { icono: Building2, etiqueta: 'Instructor', valor: usuario?.teacher?.tipo_instructor },
+        { icono: MapPin, etiqueta: 'Ambientes DANTE', valor: ambientes.join(', ') },
+    ].filter((dato) => dato.valor)
+
     const salir = async () => {
-        await cerrarSesion()
-        navigate('/login', { replace: true })
+        try {
+            await cerrarSesion()
+            navigate('/login', { replace: true })
+        } catch (error) {
+            setErrorSesion(mensajeError(error))
+        }
     }
+
+    if (cargando) return <p className="py-8 text-center text-sm text-[#64748b]">Cargando tu perfil...</p>
+    if (error) return <MensajeError>{error}</MensajeError>
+    if (!usuario) return <MensajeError>No se encontró la información del usuario.</MensajeError>
 
     return (
         <section>
-            {mensaje && <MensajeExito>{mensaje}</MensajeExito>}
+            {errorSesion && <MensajeError>{errorSesion}</MensajeError>}
 
             <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
-                {/* Columna izquierda: foto y acciones */}
                 <div className="space-y-6">
                     <Tarjeta className="text-center">
-                        <img
-                            src={usuario.foto}
-                            alt={nombreCompleto}
-                            className="mx-auto mb-4 h-28 w-28 rounded-full border-4 border-[#E8F7E3] object-cover"
-                        />
+                        {usuario.foto_perfil ? (
+                            <img
+                                src={usuario.foto_perfil}
+                                alt=""
+                                className="mx-auto mb-4 h-28 w-28 rounded-full border-4 border-[#E8F7E3] object-cover"
+                            />
+                        ) : (
+                            <div className="mx-auto mb-4 flex h-28 w-28 items-center justify-center rounded-full border-4 border-[#E8F7E3] bg-[#f0fdf4] text-[#39A900]">
+                                <UserRound size={42} aria-hidden="true" />
+                            </div>
+                        )}
                         <h2 className="text-xl font-bold text-[#081B28]">{nombreCompleto}</h2>
-                        <p className="mt-1 text-sm text-[#64748b]">{usuario.rol}</p>
-                        <p className="mt-1 break-all text-sm text-[#64748b]">{usuario.correo}</p>
+                        <p className="mt-1 text-sm text-[#64748b]">{rol}</p>
                         <Boton to={rutaEditar} icono={Pencil} className="mt-5 w-full">
                             Editar datos
                         </Boton>
@@ -62,29 +97,23 @@ const Perfil = ({ usuario, rutaEditar }) => {
                     </Tarjeta>
                 </div>
 
-                {/* Columna derecha: datos y preferencias */}
                 <div className="space-y-6">
                     <Tarjeta titulo="Información personal">
-                        <dl className="grid gap-5 sm:grid-cols-2">
-                            {usuario.datos.map((dato) => (
-                                <DatoPerfil key={dato.etiqueta} icono={dato.icono} etiqueta={dato.etiqueta} valor={dato.valor} />
-                            ))}
-                        </dl>
+                        {datos.length > 0 ? (
+                            <dl className="grid gap-5 sm:grid-cols-2">
+                                {datos.map((dato) => (
+                                    <DatoPerfil key={dato.etiqueta} icono={dato.icono} etiqueta={dato.etiqueta} valor={dato.valor} />
+                                ))}
+                            </dl>
+                        ) : (
+                            <p className="text-sm text-[#64748b]">No hay información adicional registrada.</p>
+                        )}
                     </Tarjeta>
 
                     <Tarjeta titulo="Preferencias">
-                        <div className="divide-y divide-[#f1f5f9]">
-                            <Interruptor
-                                etiqueta="Recibir notificaciones en la plataforma"
-                                activo={notificaciones}
-                                onCambiar={() => setNotificaciones(!notificaciones)}
-                            />
-                            <Interruptor
-                                etiqueta="Recibir un resumen semanal por correo"
-                                activo={correosResumen}
-                                onCambiar={() => setCorreosResumen(!correosResumen)}
-                            />
-                        </div>
+                        <p className="text-sm leading-6 text-[#64748b]">
+                            Las preferencias de notificaciones no se pueden guardar todavía porque el backend no ofrece un endpoint para ellas.
+                        </p>
                     </Tarjeta>
                 </div>
             </div>
@@ -92,7 +121,6 @@ const Perfil = ({ usuario, rutaEditar }) => {
             <ModalContrasena
                 abierto={modalAbierto}
                 onCerrar={() => setModalAbierto(false)}
-                onGuardada={() => setMensaje('Contraseña actualizada')}
             />
         </section>
     )

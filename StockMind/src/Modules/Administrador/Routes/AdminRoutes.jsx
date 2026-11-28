@@ -2,8 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 
 import PanelLayout from '../../../Shared/Layouts/PanelLayout'
 import panelAdmin from '../Data/panelAdmin'
-import perfilAdmin from '../Data/perfilAdmin'
-import notificacionesAdmin from '../Data/notificacionesAdmin'
 
 import HomeAdmin from '../Pages/Home'
 import Usuarios from '../Pages/Usuarios'
@@ -34,9 +32,9 @@ const AdminRoutes = () => {
                 <Route path="movimientos" element={<Movimientos />} />
                 <Route path="reportes" element={<GestionReportes mostrarCentro />} />
                 <Route path="usuarios" element={<Usuarios />} />
-                <Route path="notificaciones" element={<Notificaciones datos={notificacionesAdmin} />} />
-                <Route path="perfil" element={<Perfil usuario={perfilAdmin} rutaEditar="/admin/perfil/editar" />} />
-                <Route path="perfil/editar" element={<EditarPerfil usuario={perfilAdmin} rutaPerfil="/admin/perfil" />} />
+                <Route path="notificaciones" element={<Notificaciones />} />
+                <Route path="perfil" element={<Perfil rutaEditar="/admin/perfil/editar" />} />
+                <Route path="perfil/editar" element={<EditarPerfil rutaPerfil="/admin/perfil" />} />
                 <Route path="categorias" element={<Categorias />} />
             </Route>
 

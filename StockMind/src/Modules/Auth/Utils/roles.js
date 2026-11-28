@@ -23,8 +23,20 @@ const normalizarRol = (rol) => String(rol ?? '')
     .toLowerCase()
     .replace(/[^a-z]/g, '')
 
-const rolesUsuario = (usuario) => (usuario?.roles ?? [])
-    .map((rol) => normalizarRol(typeof rol === 'string' ? rol : rol.rol))
+const nombreDelRol = (rol) => {
+    if (typeof rol === 'string') return rol
+    if (!rol || typeof rol !== 'object') return ''
+    return rol.rol ?? rol.name ?? rol.nombre ?? rol.slug ?? ''
+}
+
+const rolesUsuario = (usuario) => {
+    const roles = usuario?.roles ?? usuario?.role ?? usuario?.rol ?? []
+    const lista = Array.isArray(roles) ? roles : Array.isArray(roles?.data) ? roles.data : [roles]
+
+    return lista
+        .map((rol) => normalizarRol(nombreDelRol(rol)))
+        .filter(Boolean)
+}
 
 export const usuarioTieneRol = (usuario, tipo) => {
     const configuracion = rolesPorRuta[tipo]

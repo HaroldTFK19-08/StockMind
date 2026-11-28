@@ -5,8 +5,13 @@ import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
 import Campo, { claseInput } from '../../../Shared/Components/Forms/Campo'
 import Boton from '../../../Shared/Components/UI/Boton'
 import MensajeExito from '../../../Shared/Components/Feedback/MensajeExito'
+import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
+import { useCarga } from '../../../Shared/Hooks/useCarga'
+import { mensajeError } from '../../../Core/Services/apiUtils'
 
-// Campos que el usuario puede editar
+import useAuth from '../../Auth/Hooks/useAuth'
+import { obtenerUsuario, actualizarUsuario } from '../../Administrador/Services/usuariosService'
+
 const campos = [
     { nombre: 'nombres', etiqueta: 'Nombres', tipo: 'text' },
     { nombre: 'apellidos', etiqueta: 'Apellidos', tipo: 'text' },
@@ -14,28 +19,39 @@ const campos = [
     { nombre: 'correo', etiqueta: 'Correo electrónico', tipo: 'email' },
 ]
 
-/**
- * <EditarPerfil usuario={perfilAprendiz} rutaPerfil="/aprendiz/perfil" />
- */
-const EditarPerfil = ({ usuario, rutaPerfil }) => {
-    const [formulario, setFormulario] = useState({
-        nombres: usuario.nombres,
-        apellidos: usuario.apellidos,
-        telefono: usuario.telefono,
-        correo: usuario.correo,
-    })
+const formularioDeUsuario = (usuario) => ({
+    nombres: [usuario?.nombre_1, usuario?.nombre_2].filter(Boolean).join(' '),
+    apellidos: [usuario?.apellido_1, usuario?.apellido_2].filter(Boolean).join(' '),
+    telefono: usuario?.telefono ?? '',
+    correo: usuario?.email ?? '',
+})
+
+const EditarPerfil = ({ rutaPerfil }) => {
+    const { usuario: sesion, actualizarUsuarioSesion } = useAuth()
+    const { datos: usuario, cargando, error } = useCarga(
+        () => sesion?.id ? obtenerUsuario(sesion.id) : Promise.resolve(null),
+        sesion?.id ?? ''
+    )
+    const [formularioEditado, setFormularioEditado] = useState(null)
     const [errores, setErrores] = useState({})
+    const [errorApi, setErrorApi] = useState('')
     const [guardado, setGuardado] = useState(false)
+    const [guardando, setGuardando] = useState(false)
+
+    const formulario = formularioEditado ?? formularioDeUsuario(usuario)
 
     const cambiarCampo = (evento) => {
-        setFormulario({ ...formulario, [evento.target.name]: evento.target.value })
+        setFormularioEditado((actual) => ({
+            ...(actual ?? formularioDeUsuario(usuario)),
+            [evento.target.name]: evento.target.value,
+        }))
         setGuardado(false)
     }
 
-    const guardar = (evento) => {
+    const guardar = async (evento) => {
         evento.preventDefault()
+        setErrorApi('')
 
-        // Validación sencilla: ningún campo vacío y correo con @
         const nuevosErrores = {}
         campos.forEach((campo) => {
             if (!formulario[campo.nombre].trim()) nuevosErrores[campo.nombre] = 'Este campo es obligatorio'
@@ -47,10 +63,32 @@ const EditarPerfil = ({ usuario, rutaPerfil }) => {
         setErrores(nuevosErrores)
         if (Object.keys(nuevosErrores).length > 0) return
 
-        // TODO: enviar al backend
-        console.log('Datos actualizados:', formulario)
-        setGuardado(true)
+        const nombres = formulario.nombres.trim().split(/\s+/)
+        const apellidos = formulario.apellidos.trim().split(/\s+/)
+        const datos = {
+            nombre_1: nombres.shift(),
+            apellido_1: apellidos.shift(),
+            telefono: formulario.telefono.trim(),
+            email: formulario.correo.trim(),
+        }
+        if (nombres.length) datos.nombre_2 = nombres.join(' ')
+        if (apellidos.length) datos.apellido_2 = apellidos.join(' ')
+
+        setGuardando(true)
+        try {
+            await actualizarUsuario(usuario.id, datos)
+            actualizarUsuarioSesion(datos)
+            setGuardado(true)
+        } catch (errorPeticion) {
+            setErrorApi(mensajeError(errorPeticion))
+        } finally {
+            setGuardando(false)
+        }
     }
+
+    if (cargando) return <p className="py-8 text-center text-sm text-[#64748b]">Cargando tus datos...</p>
+    if (error) return <MensajeError>{error}</MensajeError>
+    if (!usuario) return <MensajeError>No se encontró la información del usuario.</MensajeError>
 
     return (
         <section className="mx-auto max-w-[720px]">
@@ -59,6 +97,7 @@ const EditarPerfil = ({ usuario, rutaPerfil }) => {
             </Boton>
 
             {guardado && <MensajeExito>Tus datos se guardaron correctamente</MensajeExito>}
+            {errorApi && <MensajeError>{errorApi}</MensajeError>}
 
             <Tarjeta titulo="Información personal">
                 <p className="-mt-3 mb-6 text-sm text-[#64748b]">
@@ -83,7 +122,9 @@ const EditarPerfil = ({ usuario, rutaPerfil }) => {
 
                     <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#f1f5f9] pt-6 sm:flex-row sm:justify-end">
                         <Boton to={rutaPerfil} variante="texto">Cancelar</Boton>
-                        <Boton type="submit" icono={Save}>Guardar cambios</Boton>
+                        <Boton type="submit" disabled={guardando} icono={Save}>
+                            {guardando ? 'Guardando...' : 'Guardar cambios'}
+                        </Boton>
                     </div>
                 </form>
             </Tarjeta>

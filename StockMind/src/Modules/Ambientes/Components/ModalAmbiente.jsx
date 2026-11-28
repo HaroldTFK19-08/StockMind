@@ -1,34 +1,24 @@
 import Modal from '../../../Shared/Components/Modals/Modal'
 import Campo, { claseInput } from '../../../Shared/Components/Forms/Campo'
 import PieFormulario from '../../../Shared/Components/Forms/PieFormulario'
-import { useFormulario } from '../../../Shared/Hooks/useFormulario'
 import { capitalizar } from '../../../Shared/Utils/texto'
 
 import { estadosActivo, tiposAmbiente } from '../Data/opcionesAmbiente'
-import { actualizarAmbiente, crearAmbiente } from '../Services/ambientesService'
+import { useModalAmbiente } from '../Hooks/useModalAmbiente'
 
 /**
  * Formulario para crear o editar un ambiente.
  * - ambiente = null   -> crea uno nuevo en la sede "sedeId" (POST /ambientes)
  * - ambiente = {...}  -> edita ese ambiente (PUT /ambientes/:id)
- *
- * El instructor responsable (teacher_id) es opcional y todavía no se envía:
- * la lista de instructores está en /usuarios, que necesita inicio de sesión.
  */
 const ModalAmbiente = ({ ambiente, sedeId, onGuardado, onCerrar }) => {
-    const editando = Boolean(ambiente)
-
-    const formulario = useFormulario(
-        {
-            headquarter_id: ambiente?.headquarter_id ?? sedeId,
-            nombre: ambiente?.nombre ?? '',
-            tipo: ambiente?.tipo ?? '',
-            capacidad: ambiente?.capacidad ?? '',
-            estado: ambiente?.estado ?? 'activo',
-        },
-        (valores) => (editando ? actualizarAmbiente(ambiente.id, valores) : crearAmbiente(valores)),
-        onGuardado
-    )
+    const {
+        editando,
+        formulario,
+        cuentadantes,
+        cargandoCuentadantes,
+        errorCuentadantes,
+    } = useModalAmbiente({ ambiente, sedeId, onGuardado })
     const { valores, cambiar, errores } = formulario
 
     return (
@@ -62,6 +52,51 @@ const ModalAmbiente = ({ ambiente, sedeId, onGuardado, onCerrar }) => {
                                 {estadosActivo.map((estado) => <option key={estado} value={estado}>{capitalizar(estado)}</option>)}
                             </select>
                         </Campo>
+
+                        {!editando && (
+                            <Campo
+                                etiqueta="Cuentadante (opcional)"
+                                htmlFor="cuentadante_id"
+                                error={errores.cuentadante_id}
+                                className="sm:col-span-2"
+                            >
+                                <select
+                                    id="cuentadante_id"
+                                    name="cuentadante_id"
+                                    value={valores.cuentadante_id}
+                                    onChange={cambiar}
+                                    className={claseInput}
+                                    disabled={cargandoCuentadantes || Boolean(errorCuentadantes)}
+                                    aria-invalid={Boolean(errores.cuentadante_id)}
+                                    aria-describedby="cuentadante-ayuda"
+                                >
+                                    <option value="">Sin asignar</option>
+                                    {cuentadantes.map((usuario) => (
+                                        <option key={usuario.id} value={usuario.id}>
+                                            {usuario.nombre}
+                                        </option>
+                                    ))}
+                                </select>
+                                <p id="cuentadante-ayuda" className="mt-1.5 text-xs text-[#64748b]">
+                                    Solo aparecen usuarios activos con rol Cuentadante y sin una asignación vigente.
+                                </p>
+                                {cargandoCuentadantes && (
+                                    <p role="status" className="mt-1.5 text-sm text-[#64748b]">
+                                        Cargando Cuentadantes...
+                                    </p>
+                                )}
+                                {errorCuentadantes && (
+                                    <p role="alert" className="mt-1.5 text-sm text-[#dc2626]">
+                                        No fue posible cargar los Cuentadantes: {errorCuentadantes}
+                                    </p>
+                                )}
+                                {!cargandoCuentadantes && !errorCuentadantes && cuentadantes.length === 0 && (
+                                    <p className="mt-1.5 text-sm text-[#64748b]">
+                                        No hay Cuentadantes disponibles para asignar.
+                                    </p>
+                                )}
+                            </Campo>
+                        )}
                     </div>
                 </section>
 

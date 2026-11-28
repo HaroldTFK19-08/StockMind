@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
-import { mensajeError } from '../../../Core/Services/apiUtils'
+import { mensajeError, obtenerUno } from '../../../Core/Services/apiUtils'
 import { obtenerAmbientes } from '../../Ambientes/Services/ambientesService'
 import { obtenerElementos } from '../../Elementos/Services/elementosService'
+import useAuth from '../../Auth/Hooks/useAuth'
 import { useCarga } from '../../../Shared/Hooks/useCarga'
-import { fechaHoy } from '../../../Shared/Utils/fechas'
 import { incluyeTexto } from '../../../Shared/Utils/texto'
 
 import {
@@ -47,33 +47,42 @@ const adaptarTraslado = (traslado, ambientes, inventario) => {
     }
 }
 
-const cargarDatos = async (idsAmbientesPermitidos) => {
-    const [traslados, ambientes, elementos] = await Promise.all([
+const cargarDatos = async (usuarioId) => {
+    const [trasladosApi, ambientes, elementos, perfil] = await Promise.all([
         obtenerTraslados(),
         obtenerAmbientes(),
         obtenerElementos(),
+        obtenerUno(`/usuarios/${usuarioId}`),
     ])
-    const ambientesVisibles = idsAmbientesPermitidos.length
-        ? ambientes.filter((ambiente) => idsAmbientesPermitidos.includes(ambiente.id))
-        : ambientes
+    const cuentas = Array.isArray(perfil?.danteaccounts) ? perfil.danteaccounts : []
+    const idsCuentas = new Set(cuentas.map((cuenta) => Number(cuenta.id)))
+    const cuentasActivas = cuentas.filter((cuenta) => !cuenta.fecha_fin)
+    const cuentaActiva = cuentasActivas.length === 1 ? cuentasActivas[0] : null
+    const idCuentaActiva = Number(cuentaActiva?.id)
+    const idAmbienteActivo = Number(cuentaActiva?.environment_id ?? cuentaActiva?.environment?.id)
 
     return {
-        traslados: traslados.map((traslado) => adaptarTraslado(traslado, ambientes, elementos)),
-        ambientes: ambientesVisibles,
+        traslados: trasladosApi
+            .filter((traslado) => idsCuentas.has(Number(traslado.danteaccount_id ?? traslado.danteaccount?.id)))
+            .map((traslado) => adaptarTraslado(traslado, ambientes, elementos)),
+        ambientes,
         elementos,
+        danteaccountId: Number.isInteger(idCuentaActiva) && idCuentaActiva > 0 ? idCuentaActiva : null,
+        ambienteOrigenId: Number.isInteger(idAmbienteActivo) && idAmbienteActivo > 0 ? idAmbienteActivo : null,
     }
 }
 
-const useTraslados = (ambientesIniciales = []) => {
-    const idsAmbientesPermitidos = ambientesIniciales.map((ambiente) => ambiente.id)
-    const claveCarga = idsAmbientesPermitidos.join(',')
-    const { datos, cargando, error, recargar } = useCarga(() => cargarDatos(idsAmbientesPermitidos), claveCarga)
+const useTraslados = () => {
+    const { usuario } = useAuth()
+    const usuarioId = usuario?.id
+    const { datos, cargando, error, recargar } = useCarga(() => cargarDatos(usuarioId), usuarioId ?? '')
     const [busqueda, setBusqueda] = useState('')
     const [detalle, setDetalle] = useState(null)
     const [trasladoAEliminar, setTrasladoAEliminar] = useState(null)
     const [modalNuevo, setModalNuevo] = useState(false)
     const [mensaje, setMensaje] = useState('')
     const [errorAccion, setErrorAccion] = useState('')
+    const [actualizandoEstado, setActualizandoEstado] = useState(false)
 
     const ambientes = datos?.ambientes ?? []
     const elementos = datos?.elementos ?? []
@@ -92,29 +101,27 @@ const useTraslados = (ambientesIniciales = []) => {
         recargar()
     }
 
-    const marcarRecibido = async (traslado) => {
+    const cambiarEstado = async (traslado, estado) => {
+        setActualizandoEstado(true)
         try {
-            await actualizarTraslado(traslado.apiId, {
-                ambiente_origen_id: traslado.ambiente_origen_id ?? traslado.origin_environment?.id ?? traslado.ambiente_origen?.id,
-                ambiente_destino_id: traslado.ambiente_destino_id ?? traslado.destination_environment?.id ?? traslado.ambiente_destino?.id,
-                danteaccount_id: traslado.danteaccount_id ?? traslado.danteaccount?.id,
-                motivo: traslado.motivo,
-                fecha_solicitud: traslado.fecha_solicitud,
-                fecha_traslado: fechaHoy(),
-                estado: 'completado',
-                element_ids: traslado.element_ids
-                    ?? traslado.motion?.elements?.map((elemento) => elemento.id)
-                    ?? traslado.elements?.map((elemento) => elemento.id)
-                    ?? traslado.elementos.map((elemento) => elemento.id),
-            })
+            await actualizarTraslado(traslado.apiId, { estado })
             setDetalle(null)
-            setMensaje(`El traslado ${traslado.id} quedó completado`)
+            setMensaje(
+                estado === 'aprobado'
+                    ? `El traslado ${traslado.id} quedó aprobado`
+                    : `El traslado ${traslado.id} quedó completado`,
+            )
             setErrorAccion('')
             recargar()
         } catch (err) {
             setErrorAccion(mensajeError(err))
+        } finally {
+            setActualizandoEstado(false)
         }
     }
+
+    const aprobarTraslado = (traslado) => cambiarEstado(traslado, 'aprobado')
+    const marcarRecibido = (traslado) => cambiarEstado(traslado, 'completado')
 
     const abrirDetalle = async (id) => {
         try {
@@ -138,10 +145,14 @@ const useTraslados = (ambientesIniciales = []) => {
 
     return {
         ambientes,
+        ambienteOrigenId: datos?.ambienteOrigenId ?? null,
+        aprobarTraslado,
+        actualizandoEstado,
         busqueda,
         cargando,
         detalle,
         datos,
+        danteaccountId: datos?.danteaccountId ?? null,
         elementos,
         eliminarSeleccionado,
         error: error || errorAccion,

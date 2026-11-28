@@ -36,7 +36,14 @@ export const obtenerUno = async (ruta) => {
 const aFormData = (datos) => {
     const formulario = new FormData()
     Object.entries(datos).forEach(([campo, valor]) => {
-        if (valor !== null && valor !== undefined) formulario.append(campo, valor)
+        if (valor === null || valor === undefined) return
+
+        if (Array.isArray(valor)) {
+            valor.forEach((elemento) => formulario.append(`${campo}[]`, elemento))
+            return
+        }
+
+        formulario.append(campo, valor)
     })
     return formulario
 }
