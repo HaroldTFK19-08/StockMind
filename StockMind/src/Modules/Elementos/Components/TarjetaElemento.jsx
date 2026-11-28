@@ -1,4 +1,4 @@
-import { AlertTriangle, CalendarDays, MapPin } from 'lucide-react'
+import { AlertTriangle, CalendarDays, MapPin, Package } from 'lucide-react'
 
 import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
 import Boton from '../../../Shared/Components/UI/Boton'
@@ -8,7 +8,7 @@ import { tiposElemento } from '../Data/misElementos'
 // Tarjeta de un elemento asignado al aprendiz
 const TarjetaElemento = ({ elemento, rutaReportar }) => {
     const tipo = tiposElemento[elemento.tipo]
-    const Icono = tipo.icono
+    const Icono = tipo?.icono ?? Package
 
     return (
         <article className="flex flex-col rounded-[20px] border border-[#f1f5f9] bg-white p-5 shadow-[0_4px_15px_rgba(0,0,0,0.03)]">
@@ -20,7 +20,7 @@ const TarjetaElemento = ({ elemento, rutaReportar }) => {
             </div>
 
             <h3 className="font-bold text-[#081B28]">{elemento.nombre}</h3>
-            <p className="text-sm text-[#64748b]">{tipo.nombre}</p>
+            <p className="text-sm text-[#64748b]">{elemento.categoria ?? tipo?.nombre ?? 'Elemento'}</p>
 
             <dl className="mt-4 grid grid-cols-2 gap-3 rounded-[14px] bg-[#F7F9F6] p-3 text-sm">
                 <div>

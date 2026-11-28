@@ -1,98 +1,86 @@
 import { useState } from 'react'
-import { CalendarDays, CircleCheck, Send, UserRound } from 'lucide-react'
+import { CalendarDays, CircleCheck, UserRound } from 'lucide-react'
 
 import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
-import Campo, { claseInput } from '../../../Shared/Components/Forms/Campo'
 import Boton from '../../../Shared/Components/UI/Boton'
 import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
 import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
-import MensajeExito from '../../../Shared/Components/Feedback/MensajeExito'
-import { fechaHoy, formatearFecha } from '../../../Shared/Utils/fechas'
+import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
+import { useCarga } from '../../../Shared/Hooks/useCarga'
+import { mensajeError } from '../../../Core/Services/apiUtils'
+import { formatearFecha } from '../../../Shared/Utils/fechas'
+import useAuth from '../../Auth/Hooks/useAuth'
+import { obtenerUsuario } from '../../Administrador/Services/usuariosService'
 
-import reportesData from '../Data/reportesData'
-import ambientesData, { nombreAmbiente } from '../../Ambientes/Data/ambientesData'
-
-const novedadVacia = { ambienteId: '', asunto: '', descripcion: '' }
+import { actualizarEstadoReporte, obtenerReportes } from '../Services/reportesService'
 
 /**
- * Reportes del Cuentadante:
- * - Enviar una novedad al administrador.
- * - Ver los reportes que llegan de sus ambientes y marcarlos como solucionados.
+ * El endpoint de reportes permite gestionar estados. El backend aún no ofrece
+ * un endpoint para crear las novedades independientes del Cuentadante.
  */
-const ReportesCuentadante = ({ ambientes = ambientesData, reportes: reportesIniciales = reportesData }) => {
-    const [reportes, setReportes] = useState(reportesIniciales.filter((r) => r.estado !== 'Resuelto'))
-    const [novedad, setNovedad] = useState(novedadVacia)
-    const [enviadas, setEnviadas] = useState([])
-    const [error, setError] = useState('')
+const ReportesCuentadante = () => {
+    const { usuario } = useAuth()
+    const { datos: perfil, cargando: cargandoPerfil, error: errorPerfil } = useCarga(
+        () => usuario?.id ? obtenerUsuario(usuario.id) : Promise.resolve(null),
+        usuario?.id ?? ''
+    )
+    const { datos: todosReportes = [], cargando: cargandoReportes, error: errorReportes, recargar } =
+        useCarga(obtenerReportes, 'reportes-cuentadante')
+    const [errorEstado, setErrorEstado] = useState('')
+    const [actualizandoId, setActualizandoId] = useState(null)
 
-    const cambiarCampo = (evento) => {
-        setNovedad({ ...novedad, [evento.target.name]: evento.target.value })
-    }
+    const ambientes = (perfil?.danteaccounts ?? [])
+        .map((cuenta) => cuenta.environment)
+        .filter(Boolean)
+    const idsAmbientes = new Set(ambientes.map((ambiente) => Number(ambiente.id)))
+    const reportes = (todosReportes ?? [])
+        .filter((reporte) => idsAmbientes.has(Number(reporte.ambienteId)) && reporte.estado !== 'Resuelto')
+        .map((reporte) => ({
+            ...reporte,
+            ambiente: ambientes.find((ambiente) => Number(ambiente.id) === Number(reporte.ambienteId))?.nombre
+                ?? reporte.ambiente,
+        }))
 
-    const enviarNovedad = (evento) => {
-        evento.preventDefault()
-        if (!novedad.ambienteId || !novedad.asunto.trim() || !novedad.descripcion.trim()) {
-            return setError('Completa todos los campos')
+    const marcarSolucionado = async (id) => {
+        setErrorEstado('')
+        setActualizandoId(id)
+        try {
+            await actualizarEstadoReporte(id, 'Resuelto')
+            recargar()
+        } catch (error) {
+            setErrorEstado(mensajeError(error))
+        } finally {
+            setActualizandoId(null)
         }
-        setEnviadas([{ ...novedad, id: Date.now(), fecha: fechaHoy() }, ...enviadas])
-        setNovedad(novedadVacia)
-        setError('')
-    }
-
-    const marcarSolucionado = (id) => {
-        setReportes(reportes.map((r) => (r.id === id ? { ...r, estado: 'Resuelto' } : r)))
     }
 
     return (
         <section className="grid gap-6 lg:grid-cols-[380px_1fr]">
-            {/* Formulario de novedad */}
             <div className="space-y-6">
                 <Tarjeta titulo="Enviar novedad al administrador">
-                    {enviadas.length > 0 && <MensajeExito>Novedad enviada</MensajeExito>}
-                    <form onSubmit={enviarNovedad} className="space-y-4">
-                        <Campo etiqueta="Ambiente" htmlFor="ambienteId">
-                            <select id="ambienteId" name="ambienteId" value={novedad.ambienteId} onChange={cambiarCampo} className={claseInput}>
-                                <option value="">Selecciona un ambiente</option>
-                                {ambientes.map((a) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
-                            </select>
-                        </Campo>
-                        <Campo etiqueta="Asunto" htmlFor="asunto">
-                            <input id="asunto" name="asunto" value={novedad.asunto} onChange={cambiarCampo} placeholder="Ej: Se necesitan 3 sillas nuevas" className={claseInput} />
-                        </Campo>
-                        <Campo etiqueta="Descripción" htmlFor="descripcion" error={error}>
-                            <textarea id="descripcion" name="descripcion" rows={4} value={novedad.descripcion} onChange={cambiarCampo} className={claseInput} />
-                        </Campo>
-                        <Boton type="submit" icono={Send} className="w-full">Enviar novedad</Boton>
-                    </form>
+                    <p className="text-sm leading-6 text-[#64748b]">
+                        Esta acción no está disponible todavía: el backend no tiene un endpoint para registrar novedades.
+                        No se guardará ni se mostrará un envío simulado.
+                    </p>
                 </Tarjeta>
-
-                {enviadas.length > 0 && (
-                    <Tarjeta titulo="Novedades enviadas hoy">
-                        <ul className="space-y-3">
-                            {enviadas.map((n) => (
-                                <li key={n.id} className="rounded-[12px] bg-[#F7F9F6] p-3 text-sm">
-                                    <p className="font-semibold text-[#081B28]">{n.asunto}</p>
-                                    <p className="text-[#64748b]">{nombreAmbiente(n.ambienteId)}</p>
-                                </li>
-                            ))}
-                        </ul>
-                    </Tarjeta>
-                )}
             </div>
 
-            {/* Reportes recibidos */}
             <div>
+                {(errorPerfil || errorReportes || errorEstado) && (
+                    <MensajeError>{errorPerfil || errorReportes || errorEstado}</MensajeError>
+                )}
                 <h2 className="mb-4 text-lg font-bold text-[#081B28]">Reportes recibidos</h2>
-                {reportes.length === 0 ? (
-                    <EstadoVacio titulo="No hay reportes abiertos" descripcion="Cuando un aprendiz reporte un daño en tus ambientes, aparecerá aquí." />
+                {cargandoPerfil || cargandoReportes ? (
+                    <p className="py-8 text-center text-sm text-[#64748b]">Cargando reportes...</p>
+                ) : reportes.length === 0 ? (
+                    <EstadoVacio titulo="No hay reportes abiertos" descripcion="Cuando se reporte un daño en uno de tus ambientes, aparecerá aquí." />
                 ) : (
                     <div className="space-y-4">
                         {reportes.map((reporte) => (
                             <Tarjeta key={reporte.id}>
                                 <div className="flex flex-wrap items-center gap-2">
                                     <EstadoBadge estado={reporte.estado} />
-                                    {reporte.prioridad === 'Alta' && reporte.estado !== 'Resuelto' && <EstadoBadge estado="Urgente" />}
-                                    <span className="text-sm text-[#64748b]">{nombreAmbiente(reporte.ambienteId)}</span>
+                                    <span className="text-sm text-[#64748b]">{reporte.ambiente}</span>
                                 </div>
                                 <h3 className="mt-3 font-bold text-[#081B28]">{reporte.elemento}: {reporte.tipoDano.toLowerCase()}</h3>
                                 <p className="mt-1 text-sm leading-6 text-[#475569]">{reporte.descripcion}</p>
@@ -101,11 +89,14 @@ const ReportesCuentadante = ({ ambientes = ambientesData, reportes: reportesInic
                                         <span className="flex items-center gap-1.5"><UserRound size={15} /> {reporte.aprendiz}</span>
                                         <span className="flex items-center gap-1.5"><CalendarDays size={15} /> {formatearFecha(reporte.fecha)}</span>
                                     </div>
-                                    {reporte.estado !== 'Resuelto' && (
-                                        <Boton variante="secundario" icono={CircleCheck} onClick={() => marcarSolucionado(reporte.id)}>
-                                            Marcar como solucionado
-                                        </Boton>
-                                    )}
+                                    <Boton
+                                        variante="secundario"
+                                        icono={CircleCheck}
+                                        disabled={actualizandoId === reporte.id}
+                                        onClick={() => marcarSolucionado(reporte.id)}
+                                    >
+                                        {actualizandoId === reporte.id ? 'Actualizando...' : 'Marcar como solucionado'}
+                                    </Boton>
                                 </div>
                             </Tarjeta>
                         ))}

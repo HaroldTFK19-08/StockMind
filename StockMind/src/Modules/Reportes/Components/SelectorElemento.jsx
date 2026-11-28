@@ -1,3 +1,4 @@
+import { Package } from 'lucide-react'
 import { tiposElemento } from '../../Elementos/Data/misElementos'
 
 /**
@@ -11,9 +12,9 @@ const SelectorElemento = ({ elementos, register, seleccionado, error }) => (
         <div className="grid gap-3 sm:grid-cols-2">
             {elementos.map((elemento) => {
                 const tipo = tiposElemento[elemento.tipo]
-                const Icono = tipo.icono
+                const Icono = tipo?.icono ?? Package
                 const bloqueado = elemento.estado !== 'Buen estado'
-                const activo = seleccionado === elemento.id
+                const activo = String(seleccionado) === String(elemento.id)
 
                 let clases = 'cursor-pointer border-[#edf2f7] bg-white hover:border-[#cbd5e1]'
                 if (activo) clases = 'cursor-pointer border-[#39A900] bg-[#f0fdf4]'
@@ -29,7 +30,7 @@ const SelectorElemento = ({ elementos, register, seleccionado, error }) => (
                             {...register('elementoId', { required: 'Selecciona el elemento dañado' })}
                         />
                         <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-[12px] bg-[#F4F7FA] text-[#39A900]">
-                            {tipo.imagen ? <img src={tipo.imagen} alt="" className="h-full w-full object-cover" /> : <Icono size={24} />}
+                            {tipo?.imagen ? <img src={tipo.imagen} alt="" className="h-full w-full object-cover" /> : <Icono size={24} />}
                         </div>
                         <div className="min-w-0">
                             <p className="truncate text-sm font-semibold text-[#081B28]">{elemento.nombre}</p>

@@ -5,37 +5,61 @@ import SearchBar from '../../../Shared/Forms/SearchBar'
 import FiltroChips from '../../../Shared/Components/UI/FiltroChips'
 import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
 import Boton from '../../../Shared/Components/UI/Boton'
+import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
+import { useCarga } from '../../../Shared/Hooks/useCarga'
+import { mensajeError } from '../../../Core/Services/apiUtils'
 import { incluyeTexto } from '../../../Shared/Utils/texto'
 
 import TarjetaNotificacion from '../Components/TarjetaNotificacion'
+import {
+    marcarNotificacionLeida as marcarNotificacionLeidaApi,
+    marcarTodasNotificacionesLeidas,
+    obtenerNotificaciones,
+} from '../Services/notificacionesService'
 
 /**
  * Centro de notificaciones. Cada rol le pasa su lista:
  * <Notificaciones datos={notificacionesAprendiz} />
  */
-const Notificaciones = ({ datos = [] }) => {
-    const [notificaciones, setNotificaciones] = useState(datos)
+const Notificaciones = () => {
+    const { datos: notificaciones = [], cargando, error, recargar } =
+        useCarga(obtenerNotificaciones, 'notificaciones')
+    const notificacionesCargadas = notificaciones ?? []
     const [busqueda, setBusqueda] = useState('')
     const [filtro, setFiltro] = useState('Todas')
+    const [errorAccion, setErrorAccion] = useState('')
 
-    const sinLeer = notificaciones.filter((n) => !n.leida).length
+    const sinLeer = notificacionesCargadas.filter((n) => !n.leida).length
 
-    const visibles = notificaciones.filter((n) => {
+    const visibles = notificacionesCargadas.filter((n) => {
         const coincideFiltro = filtro === 'Todas' || !n.leida
         const coincideTexto = incluyeTexto(n.titulo + n.mensaje, busqueda)
         return coincideFiltro && coincideTexto
     })
 
-    const marcarLeida = (id) => {
-        setNotificaciones(notificaciones.map((n) => (n.id === id ? { ...n, leida: true } : n)))
+    const marcarLeida = async (id) => {
+        setErrorAccion('')
+        try {
+            await marcarNotificacionLeidaApi(id)
+            recargar()
+        } catch (errorPeticion) {
+            setErrorAccion(mensajeError(errorPeticion))
+        }
     }
 
-    const marcarTodas = () => {
-        setNotificaciones(notificaciones.map((n) => ({ ...n, leida: true })))
+    const marcarTodas = async () => {
+        setErrorAccion('')
+        try {
+            await marcarTodasNotificacionesLeidas()
+            recargar()
+        } catch (errorPeticion) {
+            setErrorAccion(mensajeError(errorPeticion))
+        }
     }
 
     return (
         <section className="mx-auto max-w-[860px]">
+            {(error || errorAccion) && <MensajeError>{error || errorAccion}</MensajeError>}
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-[#64748b]">
                     {sinLeer > 0 ? `Tienes ${sinLeer} notificaciones sin leer.` : 'Estás al día.'}
@@ -57,10 +81,12 @@ const Notificaciones = ({ datos = [] }) => {
                 opciones={['Todas', 'Sin leer']}
                 valor={filtro}
                 onCambiar={setFiltro}
-                conteos={{ Todas: notificaciones.length, 'Sin leer': sinLeer }}
+                conteos={{ Todas: notificacionesCargadas.length, 'Sin leer': sinLeer }}
             />
 
-            {visibles.length > 0 ? (
+            {cargando ? (
+                <p className="py-8 text-center text-sm text-[#64748b]">Cargando notificaciones...</p>
+            ) : visibles.length > 0 ? (
                 <div className="space-y-4">
                     {visibles.map((notificacion) => (
                         <TarjetaNotificacion key={notificacion.id} notificacion={notificacion} onMarcarLeida={marcarLeida} />

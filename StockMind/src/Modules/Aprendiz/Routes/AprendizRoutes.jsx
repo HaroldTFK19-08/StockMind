@@ -2,9 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 
 import PanelLayout from '../../../Shared/Layouts/PanelLayout'
 import panelAprendiz from '../Data/panelAprendiz'
-import perfilAprendiz from '../Data/perfilAprendiz'
-import notificacionesAprendiz from '../Data/notificacionesAprendiz'
-import { reportesDelAprendiz } from '../Data/datosAprendiz'
 
 // Páginas del módulo Aprendiz
 import HomeAprendiz from '../Pages/Home'
@@ -24,11 +21,11 @@ const AprendizRoutes = () => {
                 <Route index element={<Navigate to="/aprendiz/home" replace />} />
                 <Route path="home" element={<HomeAprendiz />} />
                 <Route path="elementos" element={<MisElementos />} />
-                <Route path="reportes" element={<MisReportes reportes={reportesDelAprendiz} rutaReportar="/aprendiz/reportes/reportarDano" />} />
+                <Route path="reportes" element={<MisReportes rutaReportar="/aprendiz/reportes/reportarDano" />} />
                 <Route path="reportes/reportarDano" element={<ReportarDano />} />
-                <Route path="notificaciones" element={<Notificaciones datos={notificacionesAprendiz} />} />
-                <Route path="perfil" element={<Perfil usuario={perfilAprendiz} rutaEditar="/aprendiz/perfil/editar" />} />
-                <Route path="perfil/editar" element={<EditarPerfil usuario={perfilAprendiz} rutaPerfil="/aprendiz/perfil" />} />
+                <Route path="notificaciones" element={<Notificaciones />} />
+                <Route path="perfil" element={<Perfil rutaEditar="/aprendiz/perfil/editar" />} />
+                <Route path="perfil/editar" element={<EditarPerfil rutaPerfil="/aprendiz/perfil" />} />
             </Route>
 
             {/* Cualquier otra ruta de /aprendiz vuelve al inicio */}

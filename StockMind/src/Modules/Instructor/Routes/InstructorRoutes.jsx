@@ -2,9 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 
 import PanelLayout from '../../../Shared/Layouts/PanelLayout'
 import panelInstructor from '../Data/panelInstructor'
-import perfilInstructor from '../Data/perfilInstructor'
-import notificacionesInstructor from '../Data/notificacionesInstructor'
-import { reportesInstructor } from '../Data/datosInstructor'
 
 import HomeInstructor from '../Pages/Home'
 import Ambientes from '../../Ambientes/Pages/Ambientes'
@@ -23,10 +20,10 @@ const InstructorRoutes = () => {
                 <Route path="home" element={<HomeInstructor />} />
                 <Route path="ambientes" element={<Ambientes rutaBase="/instructor/ambientes" />} />
                 <Route path="ambientes/:id" element={<DetalleAmbiente puedeReportar />} />
-                <Route path="reportes" element={<GestionReportes reportes={reportesInstructor} puedeCambiarEstado />} />
-                <Route path="notificaciones" element={<Notificaciones datos={notificacionesInstructor} />} />
-                <Route path="perfil" element={<Perfil usuario={perfilInstructor} rutaEditar="/instructor/perfil/editar" />} />
-                <Route path="perfil/editar" element={<EditarPerfil usuario={perfilInstructor} rutaPerfil="/instructor/perfil" />} />
+                <Route path="reportes" element={<GestionReportes puedeCambiarEstado />} />
+                <Route path="notificaciones" element={<Notificaciones />} />
+                <Route path="perfil" element={<Perfil rutaEditar="/instructor/perfil/editar" />} />
+                <Route path="perfil/editar" element={<EditarPerfil rutaPerfil="/instructor/perfil" />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/instructor/home" replace />} />

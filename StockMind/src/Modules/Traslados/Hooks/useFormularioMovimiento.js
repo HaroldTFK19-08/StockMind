@@ -8,7 +8,7 @@ const crearFormulario = (movimiento) => ({
     tipo: movimiento?.tipo ?? tiposMovimiento[0],
     motivo: movimiento?.motivo ?? '',
     fecha_movimiento: movimiento?.fecha ?? fechaHoy(),
-    transfer_id: movimiento?.transferId ?? '',
+    transfer_id: movimiento?.tipo === 'traslado' ? movimiento.transferId ?? '' : '',
     element_ids: movimiento?.elementIds ?? [],
 })
 
@@ -19,7 +19,12 @@ const useFormularioMovimiento = ({ movimiento, onCerrar, onGuardar }) => {
 
     const cambiarCampo = (evento) => {
         const { name, value } = evento.target
-        setFormulario((actual) => ({ ...actual, [name]: value }))
+        setFormulario((actual) => {
+            if (name === 'tipo' && value !== 'traslado') {
+                return { ...actual, tipo: value, transfer_id: '' }
+            }
+            return { ...actual, [name]: value }
+        })
     }
 
     const alternarElemento = (id) => {
@@ -46,6 +51,14 @@ const useFormularioMovimiento = ({ movimiento, onCerrar, onGuardar }) => {
         }
         if (formulario.element_ids.length === 0) {
             setError('Selecciona al menos un elemento')
+            return
+        }
+        if (formulario.tipo === 'traslado' && transferId === null) {
+            setError('Un movimiento de tipo traslado debe estar asociado a un traslado')
+            return
+        }
+        if (formulario.tipo !== 'traslado' && transferId !== null) {
+            setError('Solo los movimientos de tipo traslado pueden asociarse a un traslado')
             return
         }
         if (transferId !== null && (!Number.isInteger(transferId) || transferId < 1)) {

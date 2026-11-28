@@ -64,19 +64,22 @@ const ModalNuevoMovimiento = ({ abierto, movimiento, elementos, onCerrar, onGuar
                                 className={claseInput}
                             />
                         </Campo>
-                        <Campo etiqueta="ID de traslado (opcional)" htmlFor="transfer_id" className="sm:col-span-2">
-                            <input
-                                id="transfer_id"
-                                name="transfer_id"
-                                type="number"
-                                min="1"
-                                step="1"
-                                value={formulario.transfer_id}
-                                onChange={cambiarCampo}
-                                placeholder="Solo si el movimiento pertenece a un traslado"
-                                className={claseInput}
-                            />
-                        </Campo>
+                        {formulario.tipo === 'traslado' && (
+                            <Campo etiqueta="ID de traslado" htmlFor="transfer_id" className="sm:col-span-2">
+                                <input
+                                    id="transfer_id"
+                                    name="transfer_id"
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    value={formulario.transfer_id}
+                                    onChange={cambiarCampo}
+                                    placeholder="ID del traslado asociado"
+                                    className={claseInput}
+                                    required
+                                />
+                            </Campo>
+                        )}
                     </div>
                 </section>
 

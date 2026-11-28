@@ -2,7 +2,6 @@ import Modal from '../../../Shared/Components/Modals/Modal'
 import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
 import Boton from '../../../Shared/Components/UI/Boton'
 import { formatearFecha } from '../../../Shared/Utils/fechas'
-import { nombreAmbiente } from '../../Ambientes/Data/ambientesData'
 import { estadosReporte } from '../Data/reportesData'
 
 /**
@@ -13,22 +12,20 @@ const ModalDetalleReporte = ({ reporte, onCerrar, puedeCambiarEstado, onCambiarE
 
     const datos = [
         ['Elemento', `${reporte.elemento} (${reporte.placa})`],
-        ['Ambiente', nombreAmbiente(reporte.ambienteId)],
+        ['Ambiente', reporte.ambiente ?? 'Sin ambiente'],
         ['Reportado por', reporte.aprendiz],
         ['Fecha', formatearFecha(reporte.fecha)],
         ['Tipo de daño', reporte.tipoDano],
     ]
 
     return (
-        <Modal abierto titulo={`Reporte ${reporte.id}`} onCerrar={onCerrar} ancho="max-w-[720px]">
+        <Modal abierto titulo={`Reporte ${reporte.numero ?? reporte.id}`} onCerrar={onCerrar} ancho="max-w-[720px]">
             {/* Detalle del reporte:
                 - Presenta información clave en tarjetas/secciones legibles.
                 - Mantiene acciones de cambio de estado cuando el usuario tiene permiso. */}
             <div className="space-y-5">
                 <div className="flex flex-wrap gap-2">
-                    {/* Badges de estado y prioridad para lectura rápida */}
                     <EstadoBadge estado={reporte.estado} />
-                    <EstadoBadge estado={reporte.prioridad} />
                 </div>
 
                 <section className="rounded-2xl border border-[#edf2f7] bg-[#fbfdfb] p-4 sm:p-5">
@@ -47,6 +44,17 @@ const ModalDetalleReporte = ({ reporte, onCerrar, puedeCambiarEstado, onCambiarE
                     <h3 className="mb-3 text-sm font-bold uppercase tracking-[0.04em] text-[#2F8F00]">Descripción</h3>
                     <p className="rounded-xl bg-[#F7F9F6] p-4 text-sm leading-6 text-[#475569]">{reporte.descripcion}</p>
                 </section>
+
+                {reporte.foto_probatorio && (
+                    <section className="rounded-2xl border border-[#edf2f7] bg-white p-4 sm:p-5">
+                        <h3 className="mb-3 text-sm font-bold uppercase tracking-[0.04em] text-[#2F8F00]">Evidencia</h3>
+                        <img
+                            src={reporte.foto_probatorio}
+                            alt={`Evidencia del reporte ${reporte.numero ?? reporte.id}`}
+                            className="max-h-80 rounded-xl object-contain"
+                        />
+                    </section>
+                )}
 
                 {puedeCambiarEstado && (
                     <div className="rounded-2xl border border-[#edf2f7] p-4 sm:p-5">

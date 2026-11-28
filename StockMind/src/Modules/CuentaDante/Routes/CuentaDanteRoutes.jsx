@@ -2,9 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 
 import PanelLayout from '../../../Shared/Layouts/PanelLayout'
 import panelCuentaDante from '../Data/panelCuentaDante'
-import perfilCuentaDante from '../Data/perfilCuentaDante'
-import notificacionesCuentaDante from '../Data/notificacionesCuentaDante'
-import { ambientesCuentaDante, reportesCuentaDante } from '../Data/datosCuentaDante'
 
 import HomeCuentaDante from '../Pages/Home'
 import Ambientes from '../../Ambientes/Pages/Ambientes'
@@ -28,11 +25,11 @@ const CuentaDanteRoutes = () => {
                 <Route path="ambientes/:id" element={<DetalleAmbiente />} />
                 <Route path="elementos" element={<Inventario />} />
                 <Route path="asignaciones" element={<Asignaciones />} />
-                <Route path="traslados" element={<Traslados ambientes={ambientesCuentaDante} />} />
-                <Route path="reportes" element={<ReportesCuentadante ambientes={ambientesCuentaDante} reportes={reportesCuentaDante} />} />
-                <Route path="notificaciones" element={<Notificaciones datos={notificacionesCuentaDante} />} />
-                <Route path="perfil" element={<Perfil usuario={perfilCuentaDante} rutaEditar="/cuentadante/perfil/editar" />} />
-                <Route path="perfil/editar" element={<EditarPerfil usuario={perfilCuentaDante} rutaPerfil="/cuentadante/perfil" />} />
+                <Route path="traslados" element={<Traslados />} />
+                <Route path="reportes" element={<ReportesCuentadante />} />
+                <Route path="notificaciones" element={<Notificaciones />} />
+                <Route path="perfil" element={<Perfil rutaEditar="/cuentadante/perfil/editar" />} />
+                <Route path="perfil/editar" element={<EditarPerfil rutaPerfil="/cuentadante/perfil" />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/cuentadante/home" replace />} />

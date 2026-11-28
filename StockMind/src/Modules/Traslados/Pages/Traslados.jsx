@@ -17,13 +17,17 @@ import { formatearFecha } from '../../../Shared/Utils/fechas'
 import ModalNuevoTraslado from '../Components/ModalNuevoTraslado'
 import useTraslados from '../Hooks/useTraslados'
 
-const Traslados = ({ ambientes: ambientesIniciales = [], danteaccountId }) => {
+const Traslados = () => {
     const {
         ambientes,
+        ambienteOrigenId,
+        aprobarTraslado,
+        actualizandoEstado,
         busqueda,
         cargando,
         datos,
         detalle,
+        danteaccountId,
         elementos,
         eliminarSeleccionado,
         error,
@@ -33,6 +37,7 @@ const Traslados = ({ ambientes: ambientesIniciales = [], danteaccountId }) => {
         marcarRecibido,
         modalNuevo,
         abrirDetalle,
+        recargar,
         setBusqueda,
         setDetalle,
         setModalNuevo,
@@ -42,10 +47,17 @@ const Traslados = ({ ambientes: ambientesIniciales = [], danteaccountId }) => {
         trasladoAEliminar,
         traslados,
         trasladosPendientes,
-    } = useTraslados(ambientesIniciales)
+    } = useTraslados()
 
     if (cargando) return <Cargando texto="Cargando traslados..." />
-    if (!datos) return <MensajeError>{error}</MensajeError>
+    if (!datos) {
+        return (
+            <section>
+                <MensajeError>{error || 'No se pudieron cargar los traslados.'}</MensajeError>
+                <Boton onClick={recargar}>Reintentar</Boton>
+            </section>
+        )
+    }
 
     return (
         <section>
@@ -60,8 +72,24 @@ const Traslados = ({ ambientes: ambientesIniciales = [], danteaccountId }) => {
 
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-lg font-bold text-[#081B28]">Historial de traslados</h2>
-                <Boton icono={Plus} onClick={() => setModalNuevo(true)}>Nuevo traslado</Boton>
+                <Boton
+                    icono={Plus}
+                    onClick={() => setModalNuevo(true)}
+                    disabled={!danteaccountId || !ambienteOrigenId}
+                >
+                    Nuevo traslado
+                </Boton>
             </div>
+            {!danteaccountId && (
+                <p role="status" className="mb-4 rounded-xl border border-[#fef3c7] bg-[#fffbeb] px-4 py-3 text-sm text-[#92400e]">
+                    Tu usuario debe tener una sola cuenta DANTE activa. Solicita al administrador que revise la asignación para crear traslados.
+                </p>
+            )}
+            {danteaccountId && !ambienteOrigenId && (
+                <p role="status" className="mb-4 rounded-xl border border-[#fef3c7] bg-[#fffbeb] px-4 py-3 text-sm text-[#92400e]">
+                    La cuenta DANTE activa no tiene un ambiente de origen válido. Solicita al administrador que revise la asignación.
+                </p>
+            )}
 
             <SearchBar
                 placeholder="Buscar por código, motivo, origen o destino..."
@@ -122,9 +150,24 @@ const Traslados = ({ ambientes: ambientesIniciales = [], danteaccountId }) => {
                                 </li>
                             ))}
                         </ul>
+                        {detalle.estado === 'pendiente' && (
+                            <Boton
+                                className="mt-5 w-full"
+                                onClick={() => aprobarTraslado(detalle)}
+                                disabled={actualizandoEstado}
+                                aria-busy={actualizandoEstado}
+                            >
+                                {actualizandoEstado ? 'Aprobando...' : 'Aprobar traslado'}
+                            </Boton>
+                        )}
                         {detalle.estado === 'aprobado' && (
-                            <Boton className="mt-5 w-full" onClick={() => marcarRecibido(detalle)}>
-                                Confirmar llegada
+                            <Boton
+                                className="mt-5 w-full"
+                                onClick={() => marcarRecibido(detalle)}
+                                disabled={actualizandoEstado}
+                                aria-busy={actualizandoEstado}
+                            >
+                                {actualizandoEstado ? 'Confirmando...' : 'Confirmar llegada'}
                             </Boton>
                         )}
                         {['pendiente', 'rechazado'].includes(detalle.estado) && (
@@ -132,6 +175,7 @@ const Traslados = ({ ambientes: ambientesIniciales = [], danteaccountId }) => {
                                 variante="peligro"
                                 icono={Trash2}
                                 className="mt-3 w-full"
+                                disabled={actualizandoEstado}
                                 onClick={() => {
                                     setDetalle(null)
                                     setTrasladoAEliminar(detalle)
@@ -155,10 +199,12 @@ const Traslados = ({ ambientes: ambientesIniciales = [], danteaccountId }) => {
             )}
 
             <ModalNuevoTraslado
+                key={`${danteaccountId ?? ''}-${ambienteOrigenId ?? ''}`}
                 abierto={modalNuevo}
                 ambientes={ambientes}
                 elementos={elementos}
                 danteaccountId={danteaccountId}
+                ambienteOrigenId={ambienteOrigenId}
                 onCerrar={() => setModalNuevo(false)}
                 onGuardar={guardarTraslado}
             />

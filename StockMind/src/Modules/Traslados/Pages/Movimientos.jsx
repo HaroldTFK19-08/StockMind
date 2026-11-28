@@ -131,27 +131,33 @@ const Movimientos = () => {
                                 </div>
                             </dl>
 
-                            <div className="mt-4 flex justify-end gap-2">
-                                <Boton
-                                    variante="secundario"
-                                    icono={Pencil}
-                                    className="px-3 py-1.5"
-                                    onClick={() => abrirEdicion(movimiento.apiId)}
-                                    disabled={cargandoEdicion}
-                                    aria-label={`Editar movimiento ${movimiento.apiId}`}
-                                >
-                                    Editar
-                                </Boton>
-                                <Boton
-                                    variante="peligro"
-                                    icono={Trash2}
-                                    className="px-3 py-1.5"
-                                    onClick={() => setMovimientoAEliminar(movimiento)}
-                                    aria-label={`Eliminar movimiento ${movimiento.apiId}`}
-                                >
-                                    Eliminar
-                                </Boton>
-                            </div>
+                            {movimiento.transferId ? (
+                                <p className="mt-4 text-right text-xs text-[#64748b]">
+                                    Este movimiento se gestiona desde el módulo de traslados.
+                                </p>
+                            ) : (
+                                <div className="mt-4 flex justify-end gap-2">
+                                    <Boton
+                                        variante="secundario"
+                                        icono={Pencil}
+                                        className="px-3 py-1.5"
+                                        onClick={() => abrirEdicion(movimiento.apiId)}
+                                        disabled={cargandoEdicion}
+                                        aria-label={`Editar movimiento ${movimiento.apiId}`}
+                                    >
+                                        Editar
+                                    </Boton>
+                                    <Boton
+                                        variante="peligro"
+                                        icono={Trash2}
+                                        className="px-3 py-1.5"
+                                        onClick={() => setMovimientoAEliminar(movimiento)}
+                                        aria-label={`Eliminar movimiento ${movimiento.apiId}`}
+                                    >
+                                        Eliminar
+                                    </Boton>
+                                </div>
+                            )}
                         </Tarjeta>
                     ))}
                 </div>

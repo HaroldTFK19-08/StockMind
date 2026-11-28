@@ -3,18 +3,22 @@ import { useState } from 'react'
 import SearchBar from '../../../Shared/Forms/SearchBar'
 import FiltroChips from '../../../Shared/Components/UI/FiltroChips'
 import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
+import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
 import { contarPor, incluyeTexto } from '../../../Shared/Utils/texto'
+import { useCarga } from '../../../Shared/Hooks/useCarga'
+import { obtenerMisElementos } from '../Services/elementosService'
 
 import TarjetaElemento from '../Components/TarjetaElemento'
-import misElementos from '../Data/misElementos'
 import { estadosElemento } from '../Data/inventarioData'
 
 const opciones = ['Todos', ...estadosElemento]
 
 // Elementos que tiene a cargo el aprendiz
-const MisElementos = ({ elementos = misElementos, rutaReportar = '/aprendiz/reportes/reportarDano' }) => {
+const MisElementos = ({ rutaReportar = '/aprendiz/reportes/reportarDano' }) => {
     const [busqueda, setBusqueda] = useState('')
     const [estado, setEstado] = useState('Todos')
+    const { datos, cargando, error } = useCarga(obtenerMisElementos, 'mis-elementos')
+    const elementos = datos ?? []
 
     const filtrados = elementos.filter((elemento) => {
         const coincideEstado = estado === 'Todos' || elemento.estado === estado
@@ -28,6 +32,7 @@ const MisElementos = ({ elementos = misElementos, rutaReportar = '/aprendiz/repo
 
     return (
         <section>
+            {error && <MensajeError>{error}</MensajeError>}
             <p className="mb-6 text-sm text-[#64748b]">
                 Estos son los elementos que tienes a cargo. Si alguno falla, repórtalo desde su tarjeta.
             </p>
@@ -35,7 +40,9 @@ const MisElementos = ({ elementos = misElementos, rutaReportar = '/aprendiz/repo
             <SearchBar placeholder="Buscar por nombre, placa o serial..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
             <FiltroChips opciones={opciones} valor={estado} onCambiar={setEstado} conteos={conteos} />
 
-            {filtrados.length > 0 ? (
+            {cargando ? (
+                <p className="py-8 text-center text-sm text-[#64748b]">Cargando tus elementos...</p>
+            ) : filtrados.length > 0 ? (
                 <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     {filtrados.map((elemento) => (
                         <TarjetaElemento key={elemento.id} elemento={elemento} rutaReportar={rutaReportar} />

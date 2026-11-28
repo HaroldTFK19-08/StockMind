@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { AlertOctagon, AlertTriangle, ArrowLeft, CircleCheck, Package, Wrench } from 'lucide-react'
+import { AlertOctagon, ArrowLeft, CircleCheck, Package, Wrench } from 'lucide-react'
 
 import StatCard from '../../../Shared/Components/Cards/StatCard'
 import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
@@ -9,7 +9,6 @@ import EstadoBadge from '../../../Shared/Components/UI/EstadoBadge'
 import Boton from '../../../Shared/Components/UI/Boton'
 import Cargando from '../../../Shared/Components/Feedback/Cargando'
 import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
-import MensajeExito from '../../../Shared/Components/Feedback/MensajeExito'
 import { claseInput } from '../../../Shared/Components/Forms/Campo'
 import { useCarga } from '../../../Shared/Hooks/useCarga'
 import { capitalizar, contarPor, incluyeTexto } from '../../../Shared/Utils/texto'
@@ -18,7 +17,6 @@ import { obtenerAmbiente } from '../Services/ambientesService'
 import { obtenerElementosDeAmbiente } from '../../Elementos/Services/elementosService'
 import { estadosElemento } from '../../Elementos/Data/opcionesElemento'
 import FotoElemento from '../../Elementos/Components/FotoElemento'
-import ModalReporteFalla from '../../Reportes/Components/ModalReporteFalla'
 
 /**
  * Inventario de un ambiente. El id viene de la URL: /instructor/ambientes/:id
@@ -36,8 +34,6 @@ const DetalleAmbiente = ({ puedeReportar = false }) => {
 
     const [busqueda, setBusqueda] = useState('')
     const [estado, setEstado] = useState('')
-    const [elementoAReportar, setElementoAReportar] = useState(null)
-    const [mensaje, setMensaje] = useState('')
 
     if (cargando) return <Cargando texto="Cargando ambiente..." />
 
@@ -55,12 +51,6 @@ const DetalleAmbiente = ({ puedeReportar = false }) => {
         (e) => (estado === '' || e.estado === estado) && incluyeTexto(e.nombre + e.codigo_inventario + (e.serial ?? ''), busqueda)
     )
 
-    const enviarReporte = (reporte) => {
-        console.log('Reporte de falla:', reporte) // TODO: enviar al backend (módulo de reportes)
-        setElementoAReportar(null)
-        setMensaje(`Reporte enviado para ${reporte.elemento} (${reporte.placa})`)
-    }
-
     return (
         <section>
             <Boton variante="texto" icono={ArrowLeft} className="mb-4 px-0" onClick={() => navigate(-1)}>
@@ -74,7 +64,11 @@ const DetalleAmbiente = ({ puedeReportar = false }) => {
                 </p>
             </div>
 
-            {mensaje && <MensajeExito>{mensaje}</MensajeExito>}
+            {puedeReportar && (
+                <p role="status" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+                    El reporte desde esta vista no está disponible: el backend exige asociar un aprendiz y una foto probatoria.
+                </p>
+            )}
 
             <div className="mb-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
                 <StatCard etiqueta="Total de elementos" valor={elementos.length} icono={Package} />
@@ -119,16 +113,6 @@ const DetalleAmbiente = ({ puedeReportar = false }) => {
                                     <dd className="mt-1"><EstadoBadge estado={capitalizar(elemento.estado)} /></dd>
                                 </div>
                             </dl>
-                            {puedeReportar && (
-                                <Boton
-                                    variante="secundario"
-                                    icono={AlertTriangle}
-                                    className="mt-4 w-full"
-                                    onClick={() => setElementoAReportar({ ...elemento, placa: elemento.codigo_inventario })}
-                                >
-                                    Reportar
-                                </Boton>
-                            )}
                         </Tarjeta>
                     ))}
                 </div>
@@ -138,13 +122,6 @@ const DetalleAmbiente = ({ puedeReportar = false }) => {
                 <EstadoVacio titulo="No hay elementos con ese filtro" descripcion="Cambia el estado o la búsqueda." />
             )}
 
-            {puedeReportar && (
-                <ModalReporteFalla
-                    elemento={elementoAReportar}
-                    onCerrar={() => setElementoAReportar(null)}
-                    onEnviar={enviarReporte}
-                />
-            )}
         </section>
     )
 }

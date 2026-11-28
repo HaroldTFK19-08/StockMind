@@ -19,7 +19,7 @@ const ListaReportes = ({ reportes = [], compacta = false }) => (
             {reportes.map((reporte) => (
                 <li key={reporte.id} className="grid gap-2 px-5 py-4 md:grid-cols-[100px_1.6fr_1.2fr_120px_110px] md:items-center md:gap-4 md:px-6">
                     <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-[#081B28]">{reporte.id}</span>
+                        <span className="text-sm font-bold text-[#081B28]">{reporte.numero ?? reporte.id}</span>
                         <span className="md:hidden"><EstadoBadge estado={reporte.estado} /></span>
                     </div>
                     <div>
