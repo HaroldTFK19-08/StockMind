@@ -1,3 +1,4 @@
+import { ENDPOINTS, construirRuta } from '../../../Core/Config/endpoints'
 import { api } from '../../../Core/Config/api'
 import { actualizarConArchivos, crearConArchivos, obtenerTodos, obtenerUno } from '../../../Core/Services/apiUtils'
 
@@ -52,8 +53,18 @@ export const obtenerElementosDeAmbiente = async (ambienteId) => {
 
 export const obtenerElemento = (id) => obtenerUno(`/elementos/${id}`)
 
+// Inventario agrupado por sede / almacén / categoría (misma lógica que el PDF).
+export const obtenerInventarioAgrupado = (params = {}) =>
+    obtenerTodos(ENDPOINTS.elementos.inventario.ruta, params)
+
+// Historial de movimientos de un elemento por código de inventario.
+export const obtenerHistorialElemento = async (codigo) => {
+    const respuesta = await api.get(construirRuta(ENDPOINTS.elementos.historial.ruta, { codigo }))
+    return respuesta.data
+}
+
 export const verPdfElementos = async () => {
-    const respuesta = await api.get('/elementos/pdf/ver', {
+    const respuesta = await api.get(ENDPOINTS.elementos.pdfVer.ruta, {
         responseType: 'blob',
         headers: { Accept: 'application/pdf' },
     })
@@ -61,7 +72,7 @@ export const verPdfElementos = async () => {
 }
 
 export const descargarPdfElementos = async () => {
-    const respuesta = await api.get('/elementos/pdf/descargar', {
+    const respuesta = await api.get(ENDPOINTS.elementos.pdfDescargar.ruta, {
         responseType: 'blob',
         headers: { Accept: 'application/pdf' },
     })

@@ -8,6 +8,7 @@ import {
     iniciarSesion as iniciarSesionApi,
     obtenerUsuarioActual,
     registrarUsuario,
+    verificarCodigoAcceso,
 } from '../Services/AuthService'
 
 const AuthProvider = ({ children }) => {
@@ -62,6 +63,11 @@ const AuthProvider = ({ children }) => {
 
     const registrarCuenta = (datos) => registrarUsuario(datos)
 
+    // Valida el código de activación recibido por correo tras la aprobación del
+    // registro. No crea sesión: después se llama a iniciarSesion (o se envía el
+    // código directamente en /auth/login, que lo consume).
+    const verificarCodigo = (datos) => verificarCodigoAcceso(datos)
+
     const cerrarSesionUsuario = async () => {
         try {
             if (obtenerToken()) await cerrarSesionApi()
@@ -87,6 +93,7 @@ const AuthProvider = ({ children }) => {
                 error,
                 iniciarSesion: iniciarSesionUsuario,
                 registrarCuenta,
+                verificarCodigo,
                 cerrarSesion: cerrarSesionUsuario,
                 limpiarError,
                 actualizarUsuarioSesion,

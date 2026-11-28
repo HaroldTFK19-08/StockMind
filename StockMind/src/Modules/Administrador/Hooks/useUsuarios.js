@@ -86,10 +86,15 @@ const cargarDatos = async () => {
             && rol.id > 0
             && ['Aprendiz', 'Instructor', 'Cuentadante'].includes(rol.nombre)
         ))
+    // El administrador no se muestra en la gestión de usuarios: se excluye de
+    // la lista, de los conteos y de los chips de filtro.
     const rolesDisponibles = [...new Set(rolesApi.map((rol) => nombreRol(rol.rol)).filter(Boolean))]
+        .filter((nombre) => nombre !== 'Administrador')
 
     return {
-        usuarios: usuariosApi.map(adaptarUsuario),
+        usuarios: usuariosApi
+            .map(adaptarUsuario)
+            .filter((usuario) => !usuario.roles.includes('Administrador')),
         rolesDisponibles,
         rolesAsignables,
     }

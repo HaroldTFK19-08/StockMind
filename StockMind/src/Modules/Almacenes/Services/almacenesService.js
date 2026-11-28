@@ -1,31 +1,21 @@
-import { api } from '../../../Core/Config/api'
-import { obtenerTodos, obtenerUno } from '../../../Core/Services/apiUtils'
+import { ENDPOINTS } from '../../../Core/Config/endpoints'
+import crearServicioCrud from '../../../Core/Services/crearServicioCrud'
 
-// Almacenes -> /v1/almacenes
-// Campos: headquarter_id (sede), nombre, capacidad_elementos, estado ("activo" o "inactivo")
-// Cada almacén trae además: headquarter y elements_count
+// Almacenes -> /almacenes (el prefijo /v1 ya está en VITE_API_PROYECT_STOCKMIND).
+// Campos: headquarter_id (sede), nombre, capacidad_elementos, estado ("activo" o "inactivo").
+// Cada almacén trae además: headquarter y elements_count.
+const servicio = crearServicioCrud(ENDPOINTS.almacenes, { parametro: 'almacen' })
 
-export const obtenerAlmacenes = () => obtenerTodos('/almacenes')
+export const obtenerAlmacenes = () => servicio.listar()
 
-// El backend todavía no filtra por sede, así que se filtra aquí
+export const obtenerAlmacen = (id) => servicio.ver(id)
+
+// El backend todavía no filtra por sede, así que se filtra aquí.
 export const obtenerAlmacenesDeSede = async (sedeId) => {
     const almacenes = await obtenerAlmacenes()
     return almacenes.filter((almacen) => almacen.headquarter_id === Number(sedeId))
 }
 
-export const obtenerAlmacen = (id) => obtenerUno(`/almacenes/${id}`)
-
-export const crearAlmacen = async (almacen) => {
-    const respuesta = await api.post('/almacenes', almacen)
-    return respuesta.data
-}
-
-export const actualizarAlmacen = async (id, almacen) => {
-    const respuesta = await api.put(`/almacenes/${id}`, almacen)
-    return respuesta.data
-}
-
-export const eliminarAlmacen = async (id) => {
-    const respuesta = await api.delete(`/almacenes/${id}`)
-    return respuesta.data
-}
+export const crearAlmacen = (datos) => servicio.crear(datos)
+export const actualizarAlmacen = (id, datos) => servicio.actualizar(id, datos)
+export const eliminarAlmacen = (id) => servicio.eliminar(id)

@@ -9,7 +9,8 @@ const LoginInput = ({
     placeholder,
     register,
     error,
-    password = false
+    password = false,
+    ...props
 }) => {
     const {
         visible,
@@ -37,6 +38,7 @@ const LoginInput = ({
                 <input
                     type={tipoInput}
                     placeholder={placeholder}
+                    {...props}
                     {...register(name)}
                     className={`w-full rounded-xl border bg-[#F3F4F6] px-[45px] py-3.5 pr-12 text-sm text-[#081B28] outline-none transition-all duration-300 placeholder:text-gray-500 hover:bg-[#eef2ee] focus:bg-white focus:ring-4 ${
                         error

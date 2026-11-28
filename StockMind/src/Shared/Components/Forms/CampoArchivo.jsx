@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { ImagePlus, UploadCloud } from 'lucide-react'
 
 /**
@@ -35,19 +35,16 @@ const CampoArchivo = ({
 }) => {
     const nombreArchivo = archivo?.name ?? ''
     const esImagen = Boolean(archivo?.type?.startsWith('image/'))
-    const [previewUrl, setPreviewUrl] = useState('')
+    // La URL de vista previa se deriva del archivo, sin actualizar estado dentro
+    // de un efecto. El efecto solo libera la URL cuando cambia o se desmonta.
+    const previewUrl = useMemo(
+        () => (archivo && esImagen ? URL.createObjectURL(archivo) : ''),
+        [archivo, esImagen],
+    )
 
-    // Genera/revoca URL temporal para vista previa de imágenes seleccionadas.
-    useEffect(() => {
-        if (!archivo || !esImagen) {
-            setPreviewUrl('')
-            return undefined
-        }
-
-        const url = URL.createObjectURL(archivo)
-        setPreviewUrl(url)
-        return () => URL.revokeObjectURL(url)
-    }, [archivo, esImagen])
+    useEffect(() => () => {
+        if (previewUrl) URL.revokeObjectURL(previewUrl)
+    }, [previewUrl])
 
     // Clases visuales según modo compacto (usado en formularios densos/registro).
     const clasesContenedor = compacto

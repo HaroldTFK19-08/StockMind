@@ -1,31 +1,20 @@
-import { api } from '../../../Core/Config/api'
-import { obtenerTodos, obtenerUno } from '../../../Core/Services/apiUtils'
+import { ENDPOINTS } from '../../../Core/Config/endpoints'
+import crearServicioCrud from '../../../Core/Services/crearServicioCrud'
 
-// Sedes -> /v1/sedes
-// Campos: trainingcenter_id (centro), nombre, direccion, zona ("urbana" o "rural")
-// Cada sede trae además: trainingcenter, warehouses_count y environments_count
+// Sedes -> /sedes (el prefijo /v1 ya está en VITE_API_PROYECT_STOCKMIND).
+// Campos: trainingcenter_id (centro), nombre, direccion, zona ("urbana" o "rural").
+// Cada sede trae además: trainingcenter, warehouses_count y environments_count.
+const servicio = crearServicioCrud(ENDPOINTS.sedes, { parametro: 'sede' })
 
-export const obtenerSedes = () => obtenerTodos('/sedes')
+export const obtenerSedes = (params) => servicio.listar(params)
 
-// El backend todavía no filtra por centro, así que se filtra aquí
+// El backend todavía no filtra por centro, así que se filtra aquí.
 export const obtenerSedesDeCentro = async (centroId) => {
     const sedes = await obtenerSedes()
     return sedes.filter((sede) => sede.trainingcenter_id === Number(centroId))
 }
 
-export const obtenerSede = (id) => obtenerUno(`/sedes/${id}`)
-
-export const crearSede = async (sede) => {
-    const respuesta = await api.post('/sedes', sede)
-    return respuesta.data
-}
-
-export const actualizarSede = async (id, sede) => {
-    const respuesta = await api.put(`/sedes/${id}`, sede)
-    return respuesta.data
-}
-
-export const eliminarSede = async (id) => {
-    const respuesta = await api.delete(`/sedes/${id}`)
-    return respuesta.data
-}
+export const obtenerSede = (id) => servicio.ver(id)
+export const crearSede = (datos) => servicio.crear(datos)
+export const actualizarSede = (id, datos) => servicio.actualizar(id, datos)
+export const eliminarSede = (id) => servicio.eliminar(id)

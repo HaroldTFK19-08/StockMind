@@ -1,19 +1,13 @@
-import { api } from "../../../Core/Config/api"
-import { actualizarConArchivos, crearConArchivos, obtenerTodos, obtenerUno } from '../../../Core/Services/apiUtils'
+import { ENDPOINTS } from '../../../Core/Config/endpoints'
+import crearServicioCrud from '../../../Core/Services/crearServicioCrud'
 
-// Centros de formación -> /v1/centros
-// Campos: nombre, regional, ciudad, foto_centro (imagen; obligatoria al crear)
+// Centros de formación -> /centros (el prefijo /v1 ya está en VITE_API_PROYECT_STOCKMIND).
+// Campos: nombre, regional, ciudad, foto_centro (imagen; obligatoria al crear).
+// La respuesta del listado NO está paginada en el backend.
+const servicio = crearServicioCrud(ENDPOINTS.centros, { parametro: 'centro', archivos: true })
 
-export const obtenerCentros = () => obtenerTodos('/centros')
-
-export const obtenerCentro = (id) => obtenerUno(`/centros/${id}`)
-
-// Se envían como FormData porque llevan la foto del centro
-export const crearCentro = (centro) => crearConArchivos('/centros', centro)
-
-export const actualizarCentro = (id, centro) => actualizarConArchivos(`/centros/${id}`, centro)
-
-export const eliminarCentro = async (id) => {
-    const respuesta = await api.delete(`/centros/${id}`)
-    return respuesta.data
-}
+export const obtenerCentros = (params) => servicio.listar(params)
+export const obtenerCentro = (id) => servicio.ver(id)
+export const crearCentro = (datos) => servicio.crear(datos)
+export const actualizarCentro = (id, datos) => servicio.actualizar(id, datos)
+export const eliminarCentro = (id) => servicio.eliminar(id)

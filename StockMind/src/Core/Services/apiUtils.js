@@ -12,17 +12,24 @@ import {api} from "../Config/api"
  */
 
 // Trae TODOS los registros de una ruta. Si viene paginada, pide las páginas que falten.
-export const obtenerTodos = async (ruta) => {
-    const primera = (await api.get(ruta)).data
+// Los filtros se conservan en todas las páginas (útil para /consultas/*).
+export const obtenerTodos = async (ruta, params = {}) => {
+    const primera = (await api.get(ruta, { params })).data
     // Respuesta sin paginar: ya es la lista completa
     if (Array.isArray(primera)) return primera
     const lista = [...(primera.data ?? [])]
-    const ultimaPagina = primera.last_page ?? 1
+    const ultimaPagina = primera.last_page ?? primera.meta?.last_page ?? 1
     for (let pagina = 2; pagina <= ultimaPagina; pagina++) {
-        const respuesta = await api.get(ruta, { params: { page: pagina } })
-        lista.push(...respuesta.data.data)
+        const respuesta = await api.get(ruta, { params: { ...params, page: pagina } })
+        lista.push(...(respuesta.data.data ?? []))
     }
     return lista
+}
+
+// Devuelve la paginación completa cuando el frontend necesita current_page/total.
+export const obtenerPagina = async (ruta, params = {}) => {
+    const respuesta = await api.get(ruta, { params })
+    return respuesta.data
 }
 
 // Trae un solo registro: GET /ruta/id -> { data: {...} }
@@ -61,6 +68,39 @@ export const actualizarConArchivos = async (ruta, datos) => {
     const respuesta = await api.post(ruta, aFormData({ ...datos, _method: 'PUT' }), conArchivos)
     return respuesta.data
 }
+// Descarga/visualización de PDFs. El backend devuelve Blob, no JSON.
+export const obtenerArchivo = async (ruta, params = {}, nombre = 'documento.pdf') => {
+    const respuesta = await api.get(ruta, { params, responseType: 'blob' })
+    const cabecera = respuesta.headers['content-disposition'] ?? ''
+    const coincidencia = cabecera.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i)
+    return {
+        blob: respuesta.data,
+        nombre: coincidencia ? decodeURIComponent(coincidencia[1]) : nombre,
+    }
+}
+
+// Abre un PDF del backend en una pestaña nueva.
+export const abrirArchivo = async (ruta, params = {}, nombre = 'documento.pdf') => {
+    const { blob } = await obtenerArchivo(ruta, params, nombre)
+    const url = URL.createObjectURL(blob)
+    const ventana = window.open(url, '_blank')
+    if (!ventana) URL.revokeObjectURL(url)
+    else ventana.addEventListener('load', () => URL.revokeObjectURL(url), { once: true })
+}
+
+// Guarda un PDF del backend en el equipo del usuario.
+export const descargarArchivo = async (ruta, params = {}, nombre = 'documento.pdf') => {
+    const { blob, nombre: nombreArchivo } = await obtenerArchivo(ruta, params, nombre)
+    const url = URL.createObjectURL(blob)
+    const enlace = document.createElement('a')
+    enlace.href = url
+    enlace.download = nombreArchivo
+    document.body.appendChild(enlace)
+    enlace.click()
+    enlace.remove()
+    URL.revokeObjectURL(url)
+}
+
 // Mensaje seguro para mostrar al usuario cuando una petición falla.
 // No se exponen detalles internos del cliente/red para evitar filtrar información.
 export const mensajeError = (error) => {

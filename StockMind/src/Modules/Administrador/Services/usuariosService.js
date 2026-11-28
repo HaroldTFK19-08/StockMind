@@ -1,11 +1,13 @@
-import { api } from '../../../Core/Config/api'
-import { obtenerTodos, obtenerUno } from '../../../Core/Services/apiUtils'
-
-export const obtenerUsuarios = () => obtenerTodos('/usuarios')
-export const obtenerUsuario = (id) => obtenerUno(`/usuarios/${id}`)
-export const obtenerRoles = () => obtenerTodos('/roles')
-
-export const actualizarUsuario = async (id, datos) => {
-    const respuesta = await api.put(`/usuarios/${id}`, datos)
-    return respuesta.data
-}
+// Compatibilidad: los hooks y páginas existentes importan este archivo.
+// La implementación vive en los servicios por módulo, que a su vez leen el
+// catálogo de ENDPOINTS, para que no haya rutas duplicadas.
+export {
+    obtenerUsuarios,
+    obtenerUsuario,
+    actualizarUsuario,
+    crearUsuario,
+    eliminarUsuario,
+    actualizarMiPerfil,
+    desactivarUsuario,
+} from '../../Usuarios/Services/usuariosService'
+export { obtenerRoles } from '../../Roles/Services/rolesService'

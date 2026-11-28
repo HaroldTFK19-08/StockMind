@@ -1,18 +1,11 @@
-import { api } from '../../../Core/Config/api'
-import { obtenerTodos } from '../../../Core/Services/apiUtils'
+import { ENDPOINTS } from '../../../Core/Config/endpoints'
+import crearServicioCrud from '../../../Core/Services/crearServicioCrud'
 
-// Laravel devuelve las categorías paginadas ({ data: [...] }); obtenerTodos devuelve la lista completa
-export const ObterCategorias = () => obtenerTodos('/categorias')
+// Categorías -> /categorias (prefijo /v1 incluido en VITE_API_PROYECT_STOCKMIND).
+// Laravel devuelve las categorías paginadas; obtenerTodos recorre todas las páginas.
+const servicio = crearServicioCrud(ENDPOINTS.categorias, { parametro: 'categoria' })
 
-export const CrearCategoria = async (categoria) => {
-    const response = await api.post('/categorias', categoria)
-    return response.data
-}
-export const ActualizarCategoria = async (id, categoria) => {
-    const response = await api.put(`/categorias/${id}`, categoria)
-    return response.data
-}
-export const EliminarCategoria = async (id) => {
-    const response = await api.delete(`/categorias/${id}`)
-    return response.data
-}
+export const ObterCategorias = (params) => servicio.listar(params)
+export const CrearCategoria = (datos) => servicio.crear(datos)
+export const ActualizarCategoria = (id, datos) => servicio.actualizar(id, datos)
+export const EliminarCategoria = (id) => servicio.eliminar(id)

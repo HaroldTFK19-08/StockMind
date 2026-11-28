@@ -9,6 +9,7 @@ import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
 import { useCarga } from '../../../Shared/Hooks/useCarga'
 import { formatearFecha } from '../../../Shared/Utils/fechas'
 import useAuth from '../../Auth/Hooks/useAuth'
+import { usuarioTieneRol } from '../../Auth/Utils/roles'
 import { obtenerUsuarios } from '../Services/usuariosService'
 import { obtenerCentros } from '../../Centros/Services/centrosService'
 import { obtenerAmbientes } from '../../Ambientes/Services/ambientesService'
@@ -33,7 +34,8 @@ export default function HomeAdmin() {
     const centros = centrosDatos ?? []
     const ambientes = ambientesDatos ?? []
     const elementos = elementosDatos ?? []
-    const usuarios = usuariosDatos ?? []
+    // El contador del panel excluye al administrador, igual que la gestión de usuarios.
+    const usuarios = (usuariosDatos ?? []).filter((usuario) => !usuarioTieneRol(usuario, 'admin'))
     const reportes = reportesDatos ?? []
     const problemas = elementos.filter(conProblemas)
     const pendientes = reportes.filter((reporte) => reporte.estado !== 'Resuelto').slice(0, 5)

@@ -1,4 +1,4 @@
-import { Mail, Lock, LoaderCircle } from 'lucide-react'
+import { Mail, Lock, LoaderCircle, Hash } from 'lucide-react'
 import LoginInput from './LoginInput'
 import useLogin from '../Hooks/LoginCampos'
 import { loginData } from '../Data/Informacion'
@@ -56,6 +56,20 @@ const LoginFormulario = () => {
                     register={register}
                     error={errors.password}
                     password
+                />
+
+                {/* Código de activación de 6 dígitos enviado por correo cuando se aprueba
+                    el registro y se asignan los roles. Solo es obligatorio si la cuenta
+                    tiene uno activo; /auth/login lo consume automáticamente. */}
+                <LoginInput
+                    icon={Hash}
+                    type="text"
+                    name="codigo"
+                    inputMode="numeric"
+                    maxLength={6}
+                    placeholder="Código de activación (opcional)"
+                    register={register}
+                    error={errors.codigo}
                 />
 
                 {error && (

@@ -1,3 +1,4 @@
+import { ENDPOINTS } from '../../../Core/Config/endpoints'
 import { api } from '../../../Core/Config/api'
 import { obtenerTodos, obtenerUno } from '../../../Core/Services/apiUtils'
 
@@ -21,11 +22,11 @@ export const eliminarAsignacion = async (id) => {
 }
 
 export const verPdfAsignaciones = async () => {
-    const respuesta = await api.get('/asignaciones/pdf/ver', { responseType: 'blob' })
+    const respuesta = await api.get(ENDPOINTS.asignaciones.pdfVer.ruta, { responseType: 'blob' })
     return respuesta.data
 }
 
 export const descargarPdfAsignaciones = async () => {
-    const respuesta = await api.get('/asignaciones/pdf/descargar', { responseType: 'blob' })
+    const respuesta = await api.get(ENDPOINTS.asignaciones.pdfDescargar.ruta, { responseType: 'blob' })
     return respuesta.data
 }

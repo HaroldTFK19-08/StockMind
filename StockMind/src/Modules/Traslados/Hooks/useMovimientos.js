@@ -1,15 +1,11 @@
 import { useState } from 'react'
 
-import { mensajeError } from '../../../Core/Services/apiUtils'
 import { obtenerElementos } from '../../Elementos/Services/elementosService'
 import { useCarga } from '../../../Shared/Hooks/useCarga'
 import { incluyeTexto } from '../../../Shared/Utils/texto'
 
 import {
-    actualizarMovimiento,
     crearMovimiento,
-    eliminarMovimiento,
-    obtenerMovimiento,
     obtenerMovimientos,
 } from '../service/MovimientoService'
 
@@ -56,11 +52,8 @@ const useMovimientos = () => {
     const [filtro, setFiltro] = useState('Todos')
     const [busqueda, setBusqueda] = useState('')
     const [modalAbierto, setModalAbierto] = useState(false)
-    const [movimientoEnEdicion, setMovimientoEnEdicion] = useState(null)
-    const [movimientoAEliminar, setMovimientoAEliminar] = useState(null)
     const [mensaje, setMensaje] = useState('')
     const [errorAccion, setErrorAccion] = useState('')
-    const [cargandoEdicion, setCargandoEdicion] = useState(false)
 
     const movimientos = datos?.movimientos ?? []
     const elementos = datos?.elementos ?? []
@@ -74,57 +67,24 @@ const useMovimientos = () => {
         )
 
     const abrirNuevo = () => {
-        setMovimientoEnEdicion(null)
         setErrorAccion('')
         setModalAbierto(true)
     }
 
-    const abrirEdicion = async (id) => {
-        setCargandoEdicion(true)
-        setErrorAccion('')
-        try {
-            const movimiento = await obtenerMovimiento(id)
-            setMovimientoEnEdicion(adaptarMovimiento(movimiento, elementos))
-            setModalAbierto(true)
-        } catch (err) {
-            setErrorAccion(mensajeError(err))
-        } finally {
-            setCargandoEdicion(false)
-        }
-    }
-
+    // El backend solo expone POST para movimientos: el historial no se edita ni se borra.
     const guardarMovimiento = async (movimiento) => {
-        if (movimientoEnEdicion) {
-            await actualizarMovimiento(movimientoEnEdicion.apiId, movimiento)
-            setMensaje('Movimiento actualizado correctamente')
-        } else {
-            await crearMovimiento(movimiento)
-            setMensaje('Movimiento registrado correctamente')
-        }
-
+        await crearMovimiento(movimiento)
+        setMensaje('Movimiento registrado correctamente')
         setErrorAccion('')
         setModalAbierto(false)
-        setMovimientoEnEdicion(null)
-        recargar()
-    }
-
-    const eliminarSeleccionado = () => eliminarMovimiento(movimientoAEliminar.apiId)
-
-    const terminarEliminacion = (respuesta) => {
-        setMensaje(respuesta?.message ?? 'Movimiento eliminado correctamente')
-        setMovimientoAEliminar(null)
-        setErrorAccion('')
         recargar()
     }
 
     return {
-        abrirEdicion,
         abrirNuevo,
         busqueda,
         cargando,
-        cargandoEdicion,
         datos,
-        eliminarSeleccionado,
         elementos,
         error: error || errorAccion,
         filtro,
@@ -132,15 +92,11 @@ const useMovimientos = () => {
         guardarMovimiento,
         mensaje,
         modalAbierto,
-        movimientoAEliminar,
-        movimientoEnEdicion,
         movimientos,
         recargar,
         setBusqueda,
         setFiltro,
         setModalAbierto,
-        setMovimientoAEliminar,
-        terminarEliminacion,
     }
 }
 

@@ -1,4 +1,4 @@
-import { ArrowDownToLine, ArrowUpFromLine, Boxes, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ArrowDownToLine, ArrowUpFromLine, Boxes, Plus } from 'lucide-react'
 
 import StatCard from '../../../Shared/Components/Cards/StatCard'
 import Tarjeta from '../../../Shared/Components/Cards/Tarjeta'
@@ -9,7 +9,6 @@ import MensajeExito from '../../../Shared/Components/Feedback/MensajeExito'
 import EstadoVacio from '../../../Shared/Components/Feedback/EstadoVacio'
 import MensajeError from '../../../Shared/Components/Feedback/MensajeError'
 import Cargando from '../../../Shared/Components/Feedback/Cargando'
-import ModalEliminar from '../../../Shared/Components/Modals/ModalEliminar'
 import SearchBar from '../../../Shared/Forms/SearchBar'
 import { formatearFecha } from '../../../Shared/Utils/fechas'
 
@@ -19,13 +18,10 @@ import useMovimientos from '../Hooks/useMovimientos'
 
 const Movimientos = () => {
     const {
-        abrirEdicion,
         abrirNuevo,
         busqueda,
         cargando,
-        cargandoEdicion,
         datos,
-        eliminarSeleccionado,
         elementos,
         error,
         filtro,
@@ -33,15 +29,11 @@ const Movimientos = () => {
         guardarMovimiento,
         mensaje,
         modalAbierto,
-        movimientoAEliminar,
-        movimientoEnEdicion,
         movimientos,
         recargar,
         setBusqueda,
         setFiltro,
         setModalAbierto,
-        setMovimientoAEliminar,
-        terminarEliminacion,
     } = useMovimientos()
 
     if (cargando) return <Cargando texto="Cargando movimientos..." />
@@ -77,15 +69,12 @@ const Movimientos = () => {
 
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-lg font-bold text-[#081B28]">Historial de movimientos</h2>
-                <Boton icono={Plus} onClick={abrirNuevo} disabled={cargandoEdicion}>Registrar movimiento</Boton>
+                <Boton icono={Plus} onClick={abrirNuevo}>Registrar movimiento</Boton>
             </div>
 
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm text-[#64748b]">
-                    {elementosRegistrados} elementos asociados a {movimientos.length} movimientos
-                </p>
-                {cargandoEdicion && <p role="status" className="text-sm text-[#64748b]">Cargando movimiento...</p>}
-            </div>
+            <p className="mb-4 text-sm text-[#64748b]">
+                {elementosRegistrados} elementos asociados a {movimientos.length} movimientos
+            </p>
 
             <SearchBar
                 placeholder="Buscar por tipo, motivo, traslado o elemento..."
@@ -131,33 +120,11 @@ const Movimientos = () => {
                                 </div>
                             </dl>
 
-                            {movimiento.transferId ? (
-                                <p className="mt-4 text-right text-xs text-[#64748b]">
-                                    Este movimiento se gestiona desde el módulo de traslados.
-                                </p>
-                            ) : (
-                                <div className="mt-4 flex justify-end gap-2">
-                                    <Boton
-                                        variante="secundario"
-                                        icono={Pencil}
-                                        className="px-3 py-1.5"
-                                        onClick={() => abrirEdicion(movimiento.apiId)}
-                                        disabled={cargandoEdicion}
-                                        aria-label={`Editar movimiento ${movimiento.apiId}`}
-                                    >
-                                        Editar
-                                    </Boton>
-                                    <Boton
-                                        variante="peligro"
-                                        icono={Trash2}
-                                        className="px-3 py-1.5"
-                                        onClick={() => setMovimientoAEliminar(movimiento)}
-                                        aria-label={`Eliminar movimiento ${movimiento.apiId}`}
-                                    >
-                                        Eliminar
-                                    </Boton>
-                                </div>
-                            )}
+                            <p className="mt-4 text-right text-xs text-[#64748b]">
+                                {movimiento.transferId
+                                    ? 'Este movimiento se gestiona desde el módulo de traslados.'
+                                    : 'El backend registra los movimientos como historial: no permite editarlos ni eliminarlos.'}
+                            </p>
                         </Tarjeta>
                     ))}
                 </div>
@@ -167,22 +134,10 @@ const Movimientos = () => {
 
             {modalAbierto && (
                 <ModalNuevoMovimiento
-                    key={movimientoEnEdicion?.apiId ?? 'nuevo-movimiento'}
                     abierto={modalAbierto}
-                    movimiento={movimientoEnEdicion}
                     elementos={elementos}
                     onCerrar={() => setModalAbierto(false)}
                     onGuardar={guardarMovimiento}
-                />
-            )}
-
-            {movimientoAEliminar && (
-                <ModalEliminar
-                    titulo="Eliminar movimiento"
-                    nombre={`#${movimientoAEliminar.apiId}`}
-                    eliminar={eliminarSeleccionado}
-                    onEliminado={terminarEliminacion}
-                    onCerrar={() => setMovimientoAEliminar(null)}
                 />
             )}
         </section>

@@ -17,6 +17,7 @@ const useLogin = () => {
         defaultValues: {
             email: '',
             password: '',
+            codigo: '',
         },
     })
     const { iniciarSesion: autenticar, cerrarSesion, error: errorSesion, limpiarError } = useAuth()
@@ -28,7 +29,9 @@ const useLogin = () => {
         setErrorGeneral('')
 
         try {
-            const usuario = await autenticar(credenciales)
+            const { codigo, ...credencialesBase } = credenciales
+            const datos = codigo ? { ...credencialesBase, codigo: String(codigo).trim() } : credencialesBase
+            const usuario = await autenticar(datos)
             const ruta = rutaPrincipalUsuario(usuario)
             if (!ruta) {
                 await cerrarSesion()
